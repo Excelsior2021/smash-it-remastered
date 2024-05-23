@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               Int               @id @unique @default(autoincrement())
+  username         String            @unique
+  email            String            @unique
+  firstName        String            @map("first_name")
+  lastName         String            @map("last_name")
+  password         String
+  createdAt        DateTime          @default(now()) @map("created_at")
+  groupRequests    GroupRequests[]
+  approvedMatches  Match[]
+  asOpponent       MatchSubmission[] @relation("opponent")
+  matchSubmissions MatchSubmission[] @relation("user")
+  stats            Stat[]
+
+  @@map("user")
+}
+
+model Group {
+  id              Int               @id @unique @default(autoincrement())
+  name            String            @unique
+  createdAt       DateTime          @default(now()) @map("created_at")
+  requests        GroupRequests[]
+  matches         Match[]
+  matchSubmission MatchSubmission[]
+  stats           Stat[]
+
+  @@map("group")
+}
+
+model GroupRequests {
+  userId  Int   @map("user_id")
+  groupId Int   @map("group_id")
+  group   Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, groupId])
+  @@map("group_requests")
+}
+
+model Stat {
+  userId           Int     @map("user_id")
+  groupId          Int     @map("group_id")
+  wins             Float   @default(0) @db.Real
+  loses            Float   @default(0) @db.Real
+  ptsFor           Int     @default(0) @map("pts_for")
+  ptsAgainst       Int     @default(0) @map("pts_against")
+  isAdmin          Boolean @default(false) @map("is_admin")
+  matches          Int     @default(dbgenerated("\nCASE\n    WHEN ((wins + loses) = (0)::double precision) THEN (0)::real\n    ELSE (wins + loses)\nEND"))
+  winRatio         Float   @default(dbgenerated("\nCASE\n    WHEN ((wins + loses) = (0)::double precision) THEN (0)::real\n    ELSE (wins / (wins + loses))\nEND")) @map("win_ratio") @db.Real
+  matchesAsPlayer1 Match[] @relation("player1")
+  matchesAsPlayer2 Match[] @relation("player2")
+  group            Group   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user             User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, groupId])
+  @@map("stat")
+}
+
+model Match {
+  id           Int      @id @unique @default(autoincrement())
+  player1Id    Int?     @map("player1_id")
+  player2Id    Int?     @map("player2_id")
+  player1Score Int      @map("player1_score")
+  player2Score Int      @map("player2_score")
+  groupId      Int      @map("group_id")
+  matchDate    DateTime @map("match_date")
+  approvedAt   DateTime @default(now()) @map("approved_at")
+  submittedAt  DateTime @map("submitted_at")
+  approvedBy   Int?     @map("approved_by")
+  approver     User?    @relation(fields: [approvedBy], references: [id])
+  group        Group    @relation(fields: [groupId], references: [id])
+  player1      Stat?    @relation("player1", fields: [player1Id, groupId], references: [userId, groupId])
+  player2      Stat?    @relation("player2", fields: [player2Id, groupId], references: [userId, groupId])
+
+  @@map("match")
+}
+
+model MatchSubmission {
+  id            Int      @id @unique @default(autoincrement())
+  userId        Int?     @map("user_id")
+  opponentId    Int?     @map("opponent_id")
+  userScore     Int      @map("user_score")
+  opponentScore Int      @map("opponent_score")
+  matchDate     DateTime @map("match_date")
+  submittedAt   DateTime @default(now()) @map("submitted_at")
+  groupId       Int
+  group         Group    @relation(fields: [groupId], references: [id])
+  opponent      User?    @relation("opponent", fields: [opponentId], references: [id])
+  user          User?    @relation("user", fields: [userId], references: [id])
+
+  @@map("match_submission")
+}

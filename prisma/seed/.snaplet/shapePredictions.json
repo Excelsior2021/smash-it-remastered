@@ -1,0 +1,62 @@
+[
+  {
+    "schemaName": "public",
+    "tableName": "group",
+    "predictions": [
+      {
+        "input": "public group name",
+        "column": "name",
+        "shape": "COMPANY_NAME",
+        "confidence": 0.9052385091781616,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "public",
+    "tableName": "user",
+    "predictions": [
+      {
+        "input": "public user email",
+        "column": "email",
+        "shape": "EMAIL",
+        "confidence": 0.99404376745224,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public user first_name",
+        "column": "first_name",
+        "shape": "PERSON_FIRST_NAME",
+        "confidence": 0.9833793044090271,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public user last_name",
+        "column": "last_name",
+        "shape": "PERSON_LAST_NAME",
+        "confidence": 0.9846183657646179,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public user password",
+        "column": "password",
+        "shape": "PASSWORD",
+        "confidence": 0.9340711236000061,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public user username",
+        "column": "username",
+        "shape": "USERNAME",
+        "confidence": 0.9716823697090149,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  }
+]
