@@ -6,21 +6,38 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "migrate": "npx prisma migrate dev",
+    "db-reset": "npx prisma migrate reset",
+    "postmigrate": "npx @snaplet/seed --config prisma/seed/seed.config.ts sync"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed/seed.ts"
   },
   "dependencies": {
+    "@prisma/client": "5.14.0",
+    "bcryptjs": "^2.4.3",
+    "next": "14.2.3",
+    "next-auth": "^4.24.7",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.3"
+    "react-hook-form": "^7.51.3",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@snaplet/copycat": "^5.0.0",
+    "@snaplet/seed": "^0.97.11",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
+    "daisyui": "^4.10.3",
     "eslint": "^8",
-    "eslint-config-next": "14.2.3"
+    "eslint-config-next": "14.2.3",
+    "postcss": "^8",
+    "postgres": "^3.4.4",
+    "prisma": "^5.14.0",
+    "tailwindcss": "^3.4.1",
+    "tsx": "^4.9.3",
+    "typescript": "^5"
   }
 }

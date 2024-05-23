@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* :root {
+  color-scheme: dark;
+} */
+
+/* width */
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+.nav {
+  bottom: 0;
+  transition: bottom 0.1s linear;
+}
+
+.nav--hide {
+  bottom: -80px;
+  transition: bottom 0.1s linear;
+}
+
+@media (min-width: 768px) {
+  .nav--hide {
+    transition: none;
+  }
+}
+
+.remove:hover {
+  stroke: orange;
+}
+
+.add-member:hover {
+  stroke: green;
+}

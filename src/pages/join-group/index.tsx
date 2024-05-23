@@ -1,0 +1,96 @@
+import GroupResults from "@/src/components/group-results/group-results"
+import Toast from "@/src/components/toast/toast"
+import { queryGroups } from "@/src/lib/api"
+import { protectedRoute } from "@/src/lib/auth"
+import routes from "@/src/lib/client-routes"
+import headerStore from "@/src/store/header"
+import userStore from "@/src/store/user"
+import { useEffect, useState } from "react"
+import { useForm } from "react-hook-form"
+import prisma from "@/src/lib/prisma"
+
+import type { Dispatch, SetStateAction } from "react"
+import type { groupRequest, userGroup } from "@/types"
+
+type props = {
+  groupRequests: groupRequest[]
+}
+
+const JoinGroup = ({ groupRequests }: props) => {
+  const { register, handleSubmit, setError } = useForm()
+  const [groups, setGroups] = useState(null)
+  const userGroups = userStore(state => state.groups)
+  const setBackRoute = headerStore(state => state.setBackRoute)
+  const clearBackRoute = headerStore(state => state.clearBackRoute)
+
+  const handleQueryGroups = async (
+    query: string,
+    setGroups: Dispatch<SetStateAction<userGroup[]>>,
+    queryGroups
+  ) => {
+    setGroups(await queryGroups(query.toLowerCase()))
+  }
+
+  useEffect(() => {
+    setBackRoute(routes.joinCreateGroup)
+    return () => clearBackRoute()
+  }, [setBackRoute, clearBackRoute])
+
+  return (
+    <div>
+      <Toast text="You can no longer join more groups as you're already a member of 3 groups." />
+      <div className="mb-6">
+        <h1 className="text-3xl text-center capitalize">join groups</h1>
+        <p className="text-center">
+          please note you can only be a member of a maximum of 3 groups
+        </p>
+      </div>
+      <div className="flex flex-col items-center">
+        <search className="mb-6 w-full max-w-96">
+          <form
+            className="flex flex-col gap-8"
+            onChange={handleSubmit(async ({ query }) =>
+              handleQueryGroups(query, setGroups, queryGroups)
+            )}>
+            <label className="hidden" htmlFor="query">
+              search for groups
+            </label>
+            <input
+              {...register("query")}
+              placeholder="search groups"
+              className="input text-black"
+              type="search"
+            />
+          </form>
+        </search>
+        <div className="w-full max-w-[500px]">
+          <GroupResults
+            groups={groups}
+            userGroups={userGroups}
+            groupRequests={groupRequests}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default JoinGroup
+
+export const getServerSideProps = async context => {
+  const props = await protectedRoute(context)
+  const { authenticated, session } = props
+  if (!authenticated) return props
+
+  const groupRequests = await prisma.groupRequests.findMany({
+    where: {
+      userId: session.user.id,
+    },
+  })
+
+  return {
+    props: {
+      groupRequests,
+    },
+  }
+}
