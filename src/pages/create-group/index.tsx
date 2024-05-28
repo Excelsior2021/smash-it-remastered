@@ -1,6 +1,6 @@
 import Input from "@/src/components/input/input"
 import { createGroup } from "@/src/lib/api"
-import routes from "@/src/lib/client-routes"
+import clientRoute from "@/src/lib/client-route"
 import { useRouter } from "next/router"
 import { useForm } from "react-hook-form"
 import { useEffect } from "react"
@@ -8,7 +8,7 @@ import headerStore from "@/src/store/header"
 import { protectedRoute } from "@/src/lib/auth"
 import userStore from "@/src/store/user"
 
-import type { routes as Routes } from "@/types"
+import type { clientRoute as Routes } from "@/types"
 import type { NextRouter } from "next/router"
 import type { FieldValues, UseFormSetError } from "react-hook-form"
 
@@ -51,12 +51,12 @@ const CreateGroup = () => {
       } else {
         const { group } = await res.json()
         setActiveGroup({ id: group.id, name: group.name })
-        router.push(`${routes.group}/${group.id}`)
+        router.push(`${clientRoute.group}/${group.id}`)
       }
   }
 
   useEffect(() => {
-    setBackRoute(routes.joinCreateGroup)
+    setBackRoute(clientRoute.joinCreateGroup)
     return () => clearBackRoute()
   }, [setBackRoute, clearBackRoute])
 

@@ -39,11 +39,11 @@ const GroupQueryItem = ({
         setRequest(requestState.joined)
         return
       }
-      for (const request of groupRequests) {
-        if (request.groupId === groupId) setRequest(requestState.requested)
-      }
     })
-  })
+    for (const request of groupRequests) {
+      if (request.groupId === groupId) setRequest(requestState.requested)
+    }
+  }, [groupId, groupRequests, userGroups])
 
   const handleGroupRequest = async (
     userId: number,

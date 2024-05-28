@@ -1,10 +1,10 @@
-import routes from "./client-routes"
+import clientRoute from "./client-route"
 
 const navItems = [
   {
     activeRoute: "home",
     name: "home",
-    route: () => routes.root,
+    route: () => clientRoute.root,
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -25,7 +25,7 @@ const navItems = [
     activeRoute: "profile",
     name: "my profile",
     route: ({ username, groupId }: { username: string; groupId: number }) =>
-      `${routes.profile}/${groupId}/${username}`,
+      `${clientRoute.profile}/${groupId}/${username}`,
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -45,7 +45,7 @@ const navItems = [
   {
     activeRoute: "group",
     name: "group",
-    route: ({ groupId } = {}) => `${routes.group}/${groupId}`,
+    route: ({ groupId } = {}) => `${clientRoute.group}/${groupId}`,
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -65,7 +65,7 @@ const navItems = [
   {
     activeRoute: "account",
     name: "account",
-    route: () => routes.account,
+    route: () => clientRoute.account,
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"

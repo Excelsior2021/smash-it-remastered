@@ -1,7 +1,8 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "../../../auth/[...nextauth]"
-import { isAdmin } from "@/src/lib/server-validation"
+import { isAdmin, validateScores } from "@/src/lib/server-validation"
 import prisma from "@/src/lib/prisma"
+import method from "@/src/lib/http-method"
 
 import type { NextApiRequest, NextApiResponse } from "next"
 
@@ -13,10 +14,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const groupId = parseInt(req.query.groupId as string)
 
   switch (req.method) {
-    case "POST": {
+    case method.post: {
       const { userId, opponentId, matchDate } = req.body
       const userScore = parseInt(req.body.userScore)
       const opponentScore = parseInt(req.body.opponentScore)
+
+      if (!validateScores(userScore, opponentScore))
+        return res.status(422).json("invalid scores")
+
       try {
         const submission = await prisma.matchSubmission.create({
           data: {
@@ -34,7 +39,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         console.log(error)
       }
     }
-    case "DELETE": {
+    case method.delete: {
       //admin authorization required
       try {
         const admin = await isAdmin(prisma, session.user.id, groupId)

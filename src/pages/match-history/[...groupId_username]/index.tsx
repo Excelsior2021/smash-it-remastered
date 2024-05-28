@@ -1,6 +1,6 @@
 import MatchHistoryItem from "@/src/components/match-history-item/match-history-item"
 import { protectedRoute } from "@/src/lib/auth"
-import routes from "@/src/lib/client-routes"
+import clientRoute from "@/src/lib/client-route"
 import prisma from "@/src/lib/prisma"
 import { userInGroup } from "@/src/lib/server-validation"
 import { updateGroupDataForPage } from "@/src/lib/utils"
@@ -28,8 +28,6 @@ const MatchHistory = ({
   let matchesObj
   if (matches) matchesObj = JSON.parse(matches)
 
-  console.log(matchesObj)
-
   const activeGroup = userStore(state => state.activeGroup)
   const setBackRoute = headerStore(state => state.setBackRoute)
   const clearBackRoute = headerStore(state => state.clearBackRoute)
@@ -49,9 +47,9 @@ const MatchHistory = ({
         activeGroup,
         router,
         groupId as string,
-        `${routes.matchHistory}/${activeGroup.id}/${username}`
+        `${clientRoute.matchHistory}/${activeGroup.id}/${username}`
       )
-      setBackRoute(`${routes.profile}/${activeGroup.id}/${username}`)
+      setBackRoute(`${clientRoute.profile}/${activeGroup.id}/${username}`)
     }
 
     return () => clearBackRoute()
@@ -152,22 +150,14 @@ export const getServerSideProps = async context => {
     include: {
       player1: {
         select: {
-          user: {
-            select: {
-              id: true,
-              username: true,
-            },
-          },
+          id: true,
+          username: true,
         },
       },
       player2: {
         select: {
-          user: {
-            select: {
-              id: true,
-              username: true,
-            },
-          },
+          id: true,
+          username: true,
         },
       },
     },

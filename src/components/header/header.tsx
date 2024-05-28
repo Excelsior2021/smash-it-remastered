@@ -1,5 +1,5 @@
 import userStore from "@/src/store/user"
-import routes from "@/src/lib/client-routes"
+import clientRoute from "@/src/lib/client-route"
 import Image from "next/image"
 import Link from "next/link"
 import BackButton from "../svg/back-button"
@@ -23,7 +23,7 @@ const Header = () => {
         </div>
       )}
       <div className="relative w-48 h-12">
-        <Link href={routes.root}>
+        <Link href={clientRoute.root}>
           <Image src="/logo.png" alt="logo" fill />
         </Link>
       </div>

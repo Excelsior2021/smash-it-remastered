@@ -20,6 +20,8 @@ model User {
   asOpponent       MatchSubmission[] @relation("opponent")
   matchSubmissions MatchSubmission[] @relation("user")
   stats            Stat[]
+  matchesAsPlayer1 Match[]           @relation("player1")
+  matchesAsPlayer2 Match[]           @relation("player2")
 
   @@map("user")
 }
@@ -56,8 +58,6 @@ model Stat {
   isAdmin          Boolean @default(false) @map("is_admin")
   matches          Int     @default(dbgenerated("\nCASE\n    WHEN ((wins + loses) = (0)::double precision) THEN (0)::real\n    ELSE (wins + loses)\nEND"))
   winRatio         Float   @default(dbgenerated("\nCASE\n    WHEN ((wins + loses) = (0)::double precision) THEN (0)::real\n    ELSE (wins / (wins + loses))\nEND")) @map("win_ratio") @db.Real
-  matchesAsPlayer1 Match[] @relation("player1")
-  matchesAsPlayer2 Match[] @relation("player2")
   group            Group   @relation(fields: [groupId], references: [id], onDelete: Cascade)
   user             User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -78,8 +78,8 @@ model Match {
   approvedBy   Int?     @map("approved_by")
   approver     User?    @relation(fields: [approvedBy], references: [id])
   group        Group    @relation(fields: [groupId], references: [id])
-  player1      Stat?    @relation("player1", fields: [player1Id, groupId], references: [userId, groupId])
-  player2      Stat?    @relation("player2", fields: [player2Id, groupId], references: [userId, groupId])
+  player1      User?    @relation("player1", fields: [player1Id], references: [id], onDelete: SetNull)
+  player2      User?    @relation("player2", fields: [player2Id], references: [id], onDelete: SetNull)
 
   @@map("match")
 }

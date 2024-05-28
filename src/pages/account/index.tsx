@@ -1,6 +1,6 @@
 import LinkButton from "@/src/components/link-button/link-button"
 import { protectedRoute } from "@/src/lib/auth"
-import routes from "@/src/lib/client-routes"
+import clientRoute from "@/src/lib/client-route"
 import navStore from "@/src/store/nav"
 import { signOut } from "next-auth/react"
 import { useEffect } from "react"
@@ -24,7 +24,7 @@ const AccountPage = () => {
           <LinkButton href="#" text="change password" />
         </li>
         <li className="w-full">
-          <LinkButton href={routes.deleteAccount} text="delete account" />
+          <LinkButton href={clientRoute.deleteAccount} text="delete account" />
         </li>
       </ul>
 

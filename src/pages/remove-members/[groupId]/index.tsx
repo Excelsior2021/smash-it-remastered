@@ -2,7 +2,7 @@ import MemberList from "@/src/components/member-list/member-list"
 import { adminRoute, notAdmin, protectedRoute } from "@/src/lib/auth"
 import memberListItemType from "@/src/lib/member-list-item-types"
 import prisma from "@/src/lib/prisma"
-import routes from "@/src/lib/client-routes"
+import clientRoute from "@/src/lib/client-route"
 import { updateGroupDataForPage } from "@/src/lib/utils"
 import headerStore from "@/src/store/header"
 import userStore from "@/src/store/user"
@@ -27,9 +27,9 @@ const RemoveMembers = ({ users, groupId }: props) => {
         activeGroup,
         router,
         router.query.groupId as string,
-        `${routes.removeMembers}/${activeGroup.id}`
+        `${clientRoute.removeMembers}/${activeGroup.id}`
       )
-      setBackRoute(`${routes.manageGroup}/${activeGroup.id}`)
+      setBackRoute(`${clientRoute.manageGroup}/${activeGroup.id}`)
     }
     return () => clearBackRoute()
   }, [activeGroup, router, setBackRoute, clearBackRoute])
@@ -68,6 +68,11 @@ export const getServerSideProps = async context => {
     const stats = await prisma.stat.findMany({
       where: {
         groupId,
+        AND: {
+          NOT: {
+            userId: session.user.id,
+          },
+        },
       },
       select: {
         user: {

@@ -1,21 +1,24 @@
-import type { member, routes } from "@/types"
+import apiRoute from "./api-route"
+import method from "./http-method"
+
+import type { clientRoute } from "@/types"
 
 export const login = async (
   signIn,
   { userId, password }: { userId: number; password: string },
-  routes: routes
+  clientRoute: clientRoute
 ) =>
   await signIn("credentials", {
     userId,
     password,
     redirect: false,
-    callbackUrl: routes.root,
+    callbackUrl: clientRoute.root,
   })
 
 export const createAccount = async createAccountStore => {
   try {
-    const res = await fetch("/api/create-account", {
-      method: "POST",
+    const res = await fetch(apiRoute.user, {
+      method: method.post,
       headers: {
         "Content-Type": "application/json",
       },
@@ -30,8 +33,8 @@ export const createAccount = async createAccountStore => {
 
 export const createGroup = async ({ groupName }: { groupName: string }) => {
   try {
-    const res = await fetch("/api/group", {
-      method: "POST",
+    const res = await fetch(apiRoute.group, {
+      method: method.post,
       headers: {
         "Content-Type": "application/json",
       },
@@ -47,8 +50,8 @@ export const createGroup = async ({ groupName }: { groupName: string }) => {
 export const queryGroups = async (query: string) => {
   if (query.trim() === "") return
   try {
-    const res = await fetch("/api/group/query", {
-      method: "POST",
+    const res = await fetch(`${apiRoute.group}/query`, {
+      method: method.post,
       headers: {
         "Content-Type": "application/json",
       },
@@ -62,8 +65,8 @@ export const queryGroups = async (query: string) => {
 
 export const groupRequest = async (userId: number, groupId: number) => {
   try {
-    const res = await fetch(`/api/group/${groupId}/request`, {
-      method: "POST",
+    const res = await fetch(`${apiRoute.group}/${groupId}/request`, {
+      method: method.post,
       headers: {
         "Content-Type": "application/json",
       },
@@ -84,8 +87,8 @@ export const removeUserFromGroup = async (
   groupId: number
 ) => {
   try {
-    const res = await fetch(`/api/group/${groupId}/member`, {
-      method: "DELETE",
+    const res = await fetch(`${apiRoute.group}/${groupId}/member`, {
+      method: method.delete,
       headers: {
         "Content-Type": "application/json",
       },
@@ -94,21 +97,23 @@ export const removeUserFromGroup = async (
       }),
     })
 
-    if (res.ok) return res.ok
+    return res
   } catch (error) {
     console.log(error)
+    return error
   }
 }
 
 export const approveUserToGroup = async (memberId: number, groupId: number) => {
   try {
-    const res = await fetch(`/api/group/${groupId}/approve`, {
-      method: "POST",
+    const res = await fetch(`${apiRoute.group}/${groupId}/approve`, {
+      method: method.post,
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ userId: memberId }),
     })
+    return res
   } catch (error) {
     console.log(error)
   }
@@ -116,13 +121,14 @@ export const approveUserToGroup = async (memberId: number, groupId: number) => {
 
 export const declineUserToGroup = async (memberId: number, groupId: number) => {
   try {
-    const res = await fetch(`/api/group/${groupId}/decline`, {
-      method: "POST",
+    const res = await fetch(`${apiRoute.group}/${groupId}/decline`, {
+      method: method.post,
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ userId: memberId }),
     })
+    return res
   } catch (error) {
     console.log(error)
   }
@@ -139,8 +145,8 @@ export const recordMatch = async (
   matchId: number | null = null
 ) => {
   try {
-    const res = await fetch(`/api/group/${groupId}/match`, {
-      method: "POST",
+    const res = await fetch(`${apiRoute.group}/${groupId}/match`, {
+      method: method.post,
       headers: {
         "Content-Type": "application/json",
       },
@@ -169,8 +175,8 @@ export const submitMatch = async (
   opponentId: number
 ) => {
   try {
-    const res = await fetch(`/api/group/${groupId}/match-submission`, {
-      method: "POST",
+    const res = await fetch(`${apiRoute.group}/${groupId}/match-submission`, {
+      method: method.post,
       headers: {
         "Content-Type": "application/json",
       },
@@ -193,8 +199,8 @@ export const removeMatchSubmission = async (
   groupId: number
 ) => {
   try {
-    const res = await fetch(`/api/group/${groupId}/match-submission`, {
-      method: "DELETE",
+    const res = await fetch(`${apiRoute.group}/${groupId}/match-submission`, {
+      method: method.delete,
       headers: {
         "Content-Type": "application/json",
       },
@@ -207,8 +213,8 @@ export const removeMatchSubmission = async (
 
 export const deleteAccount = async () => {
   try {
-    const res = await fetch("/api/user", {
-      method: "DELETE",
+    const res = await fetch(apiRoute.user, {
+      method: method.delete,
       headers: {
         "Content-Type": "application/json",
       },

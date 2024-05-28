@@ -1,7 +1,7 @@
 import LinkButton from "@/src/components/link-button/link-button"
 import { adminRoute, notAdmin, protectedRoute } from "@/src/lib/auth"
 import prisma from "@/src/lib/prisma"
-import routes from "@/src/lib/client-routes"
+import clientRoute from "@/src/lib/client-route"
 import { updateGroupDataForPage } from "@/src/lib/utils"
 import headerStore from "@/src/store/header"
 import navStore from "@/src/store/nav"
@@ -24,9 +24,9 @@ const ManageGroup = () => {
         activeGroup,
         router,
         groupId as string,
-        `${routes.manageGroup}/${activeGroup.id}`
+        `${clientRoute.manageGroup}/${activeGroup.id}`
       )
-      setBackRoute(`${routes.group}/${activeGroup.id}`)
+      setBackRoute(`${clientRoute.group}/${activeGroup.id}`)
     }
 
     return () => {
@@ -49,21 +49,21 @@ const ManageGroup = () => {
         <ul className="flex flex-col gap-10 items-center max-w-96 m-auto">
           <li className="w-full">
             <LinkButton
-              href={`${routes.groupRequests}/${groupId}`}
+              href={`${clientRoute.groupRequests}/${groupId}`}
               text="requests"
             />
           </li>
 
           <li className="w-full">
             <LinkButton
-              href={`${routes.approveMatches}/${groupId}`}
+              href={`${clientRoute.approveMatches}/${groupId}`}
               text="approve matches"
             />
           </li>
 
           <li className="w-full">
             <LinkButton
-              href={`${routes.removeMembers}/${groupId}`}
+              href={`${clientRoute.removeMembers}/${groupId}`}
               text="remove members"
             />
           </li>

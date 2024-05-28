@@ -1,8 +1,7 @@
 import GroupResults from "@/src/components/group-results/group-results"
-import Toast from "@/src/components/toast/toast"
 import { queryGroups } from "@/src/lib/api"
 import { protectedRoute } from "@/src/lib/auth"
-import routes from "@/src/lib/client-routes"
+import clientRoute from "@/src/lib/client-route"
 import headerStore from "@/src/store/header"
 import userStore from "@/src/store/user"
 import { useEffect, useState } from "react"
@@ -32,13 +31,12 @@ const JoinGroup = ({ groupRequests }: props) => {
   }
 
   useEffect(() => {
-    setBackRoute(routes.joinCreateGroup)
+    setBackRoute(clientRoute.joinCreateGroup)
     return () => clearBackRoute()
   }, [setBackRoute, clearBackRoute])
 
   return (
     <div>
-      <Toast text="You can no longer join more groups as you're already a member of 3 groups." />
       <div className="mb-6">
         <h1 className="text-3xl text-center capitalize">join groups</h1>
         <p className="text-center">

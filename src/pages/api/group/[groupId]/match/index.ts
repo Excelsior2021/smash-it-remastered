@@ -2,6 +2,7 @@ import { isAdmin, validateScores } from "@/src/lib/server-validation"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../../../auth/[...nextauth]"
 import prisma from "@/src/lib/prisma"
+import method from "@/src/lib/http-method"
 
 import type { NextApiRequest, NextApiResponse } from "next"
 
@@ -17,7 +18,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!admin) return res.status(401).json("unauthorized")
 
   switch (req.method) {
-    case "POST": {
+    case method.post: {
       try {
         const {
           player1Id,
@@ -51,7 +52,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           prisma.stat.update({
             where: { userId_groupId: { userId: player1Id, groupId } },
             data: {
-              matches: { increment: 1 },
               wins: { increment: player1Score > player2Score ? 1 : 0 },
               loses: { increment: player1Score < player2Score ? 1 : 0 },
               ptsFor: { increment: player1Score },
@@ -61,7 +61,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           prisma.stat.update({
             where: { userId_groupId: { userId: player2Id, groupId } },
             data: {
-              matches: { increment: 1 },
               wins: { increment: player2Score > player1Score ? 1 : 0 },
               loses: { increment: player2Score < player1Score ? 1 : 0 },
               ptsFor: { increment: player2Score },

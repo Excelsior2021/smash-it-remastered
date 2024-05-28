@@ -10,10 +10,11 @@ import { useForm } from "react-hook-form"
 import Modal from "@/src/components/modal/modal"
 import { recordMatch, submitMatch } from "@/src/lib/api"
 import headerStore from "@/src/store/header"
-import routes from "@/src/lib/client-routes"
+import clientRoute from "@/src/lib/client-route"
 import prisma from "@/src/lib/prisma"
+import { validateScores } from "@/src/lib/server-validation"
 
-import type { member } from "@/types"
+import type { member, player } from "@/types"
 
 type props = {
   opponents: member[]
@@ -21,10 +22,31 @@ type props = {
   isAdmin: boolean
 }
 
+enum scoresSubmissionStatus {
+  pending,
+  success,
+  failed,
+}
+
 const RecordMatch = ({ opponents, groupId, isAdmin }: props) => {
   const session = useSession()
-  const { register, handleSubmit } = useForm()
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    clearErrors,
+    setError,
+    formState: { errors },
+  } = useForm()
   const [chosenOpponent, setChosenOpponent] = useState<member | null>(null)
+  const [matchData, setMatchData] = useState({
+    players: [] as player[],
+    matchDate: "",
+  })
+  const [scoresSubmitting, setScoresSubmitting] = useState(false)
+  const [scoresSubmitted, setScoresSubmitted] = useState(
+    scoresSubmissionStatus.pending
+  )
   const router = useRouter()
   const activeGroup = userStore(state => state.activeGroup)
   const setBackRoute = headerStore(state => state.setBackRoute)
@@ -37,9 +59,9 @@ const RecordMatch = ({ opponents, groupId, isAdmin }: props) => {
           activeGroup,
           router,
           router.query.groupId as string,
-          `${routes.recordMatch}/${activeGroup.id}`
+          `${clientRoute.recordMatch}/${activeGroup.id}`
         )
-        setBackRoute(routes.root)
+        setBackRoute(clientRoute.root)
       }
       setChosenOpponent(null)
     }
@@ -61,30 +83,40 @@ const RecordMatch = ({ opponents, groupId, isAdmin }: props) => {
     userId: number,
     opponentId: number
   ) => {
-    document.getElementById("modal").close()
+    setScoresSubmitting(true)
     const userScore = parseInt(formData.userScore)
     const opponentScore = parseInt(formData.opponentScore)
     const matchDate = formData.matchDate
+    let res: Response | undefined
 
-    if (isAdmin) {
-      const res = await recordMatch(
-        userScore,
-        opponentScore,
-        matchDate,
-        groupId,
-        userId,
-        opponentId,
-        userId
-      )
-    } else {
-      const res = await submitMatch(
-        userScore,
-        opponentScore,
-        matchDate,
-        groupId,
-        userId,
-        opponentId
-      )
+    try {
+      if (isAdmin) {
+        res = await recordMatch(
+          userScore,
+          opponentScore,
+          matchDate,
+          groupId,
+          userId,
+          opponentId,
+          userId
+        )
+      } else {
+        res = await submitMatch(
+          userScore,
+          opponentScore,
+          matchDate,
+          groupId,
+          userId,
+          opponentId
+        )
+      }
+
+      if (res && res.ok) setScoresSubmitted(scoresSubmissionStatus.success)
+      else setScoresSubmitted(scoresSubmissionStatus.failed)
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setScoresSubmitting(false)
     }
   }
 
@@ -92,8 +124,20 @@ const RecordMatch = ({ opponents, groupId, isAdmin }: props) => {
     <div>
       <Modal
         heading="submit scores"
-        action="submit"
-        text="ready to submit the scores?"
+        text={
+          scoresSubmitted === scoresSubmissionStatus.success
+            ? "match submitted!"
+            : scoresSubmitted === scoresSubmissionStatus.failed
+            ? "an error occured. please try again."
+            : null
+        }
+        action={
+          scoresSubmitted === scoresSubmissionStatus.pending ? "submit" : null
+        }
+        matchData={
+          scoresSubmitted === scoresSubmissionStatus.pending ? matchData : null
+        }
+        loading={scoresSubmitting}
         onClick={handleSubmit(
           async formData =>
             await handleSubmitScores(
@@ -103,7 +147,9 @@ const RecordMatch = ({ opponents, groupId, isAdmin }: props) => {
               chosenOpponent.id
             )
         )}
+        onClickClose={() => router.push(clientRoute.root)}
       />
+
       <h1 className="text-3xl text-center mb-6">Record Match</h1>
 
       {opponents.length > 0 ? (
@@ -121,9 +167,31 @@ const RecordMatch = ({ opponents, groupId, isAdmin }: props) => {
             {chosenOpponent && session && (
               <form
                 className="flex flex-col items-center gap-4 w-full lg:gap-10"
-                onSubmit={handleSubmit(() =>
+                onSubmit={handleSubmit(() => {
+                  const userScore = parseInt(getValues().userScore)
+                  const opponentScore = parseInt(getValues().opponentScore)
+                  if (!validateScores(userScore, opponentScore)) {
+                    setError("invalidScores", {
+                      message:
+                        "Scores are invalid. One player should have a score of 11 and both players can't have a score of 11.",
+                    })
+                    return
+                  }
+                  setMatchData({
+                    players: [
+                      {
+                        username: session.data?.user.username,
+                        score: userScore,
+                      },
+                      {
+                        username: chosenOpponent.username,
+                        score: opponentScore,
+                      },
+                    ],
+                    matchDate: getValues().matchDate,
+                  })
                   document.getElementById("modal").showModal()
-                )}>
+                })}>
                 <div className="flex flex-col gap-2 items-center">
                   <label className="capitalize text-xl" htmlFor="date">
                     match date
@@ -136,25 +204,42 @@ const RecordMatch = ({ opponents, groupId, isAdmin }: props) => {
                     min="2024-01-01"
                     max={new Date().toISOString().split("T")[0]}
                   />
+                  {errors.matchDate && (
+                    <p className="text-error">date required</p>
+                  )}
                 </div>
 
-                <div className="flex flex-col gap-10 mb-12 lg:flex-row lg:justify-between">
-                  <MemberMatch
-                    member={session.data!.user}
-                    register={register}
-                    inputLabel="your score"
-                    inputName="userScore"
-                  />
+                <div className="flex flex-col gap-10 mb-4 w-full lg:flex-row lg:justify-between">
+                  <div className="w-full">
+                    <MemberMatch
+                      member={session.data!.user}
+                      register={register}
+                      inputLabel="your score"
+                      inputName="userScore"
+                      clearErrors={clearErrors}
+                    />
+                    {errors.userScore && (
+                      <p className="text-error text-center mb-4">
+                        please enter your score
+                      </p>
+                    )}
+                  </div>
 
                   <span className="border"></span>
 
-                  <div className="flex flex-col">
+                  <div className="flex flex-col w-full">
                     <MemberMatch
                       member={chosenOpponent}
                       register={register}
                       inputLabel="opponent score"
                       inputName="opponentScore"
+                      clearErrors={clearErrors}
                     />
+                    {errors.opponentScore && (
+                      <p className="text-error text-center mb-4">
+                        please enter your opponent&apos;s score
+                      </p>
+                    )}
 
                     <button
                       className="btn max-w-[300px] self-center"
@@ -163,6 +248,12 @@ const RecordMatch = ({ opponents, groupId, isAdmin }: props) => {
                     </button>
                   </div>
                 </div>
+
+                {errors.invalidScores && (
+                  <p className="text-error text-center">
+                    {errors.invalidScores.message}
+                  </p>
+                )}
 
                 <button className="btn btn-secondary w-full max-w-[300px]">
                   submit scores
@@ -199,32 +290,29 @@ export const getServerSideProps = async context => {
       },
     })
 
-    const groupWithoutUser = await prisma.group.findUnique({
+    const groupWithoutUser = await prisma.stat.findMany({
       where: {
-        id: groupId,
+        groupId,
+        AND: {
+          NOT: {
+            userId: session.user.id,
+          },
+        },
       },
       include: {
-        _count: true,
-        stats: {
-          where: {
-            userId: { not: session.user.id },
-          },
+        user: {
           select: {
-            user: {
-              select: {
-                id: true,
-                username: true,
-                firstName: true,
-                lastName: true,
-              },
-            },
+            id: true,
+            username: true,
+            firstName: true,
+            lastName: true,
           },
         },
       },
     })
 
     if (groupWithoutUser) {
-      const opponents = groupWithoutUser.stats.map(member => member.user)
+      const opponents = groupWithoutUser.map(member => member.user)
       return {
         props: { opponents, groupId, isAdmin: stat?.isAdmin },
       }

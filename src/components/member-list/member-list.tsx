@@ -21,7 +21,7 @@ const MemberList = ({
 }: props) => (
   <div className="w-full">
     <h2 className="text-2xl mb-4 capitalize">{heading}</h2>
-    <ul className="join join-vertical bg-secondary w-full max-w-full max-h-[350px] overflow-auto">
+    <ul className="join join-vertical bg-secondary w-full max-h-[350px] overflow-auto">
       {members.map(member => (
         <MemberListItem
           key={member.id}

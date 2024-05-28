@@ -1,4 +1,4 @@
-import type routes from "@/src/lib/client-routes"
+import type clientRoute from "@/src/lib/client-route"
 
 export type userGroup = {
   id: number
@@ -38,7 +38,17 @@ export type match = {
   userScore: number
 }
 
-export type routes = typeof routes
+export type player = {
+  username: string
+  score: number
+}
+
+export type matchData = {
+  players: player[]
+  matchDate: string
+}
+
+export type clientRoute = typeof clientRoute
 
 export type groupRequest = {
   userId: number

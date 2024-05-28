@@ -6,7 +6,7 @@ import { useEffect } from "react"
 import { updateGroupDataForPage } from "@/src/lib/utils"
 import { useRouter } from "next/router"
 import headerStore from "@/src/store/header"
-import routes from "@/src/lib/client-routes"
+import clientRoute from "@/src/lib/client-route"
 import prisma from "@/src/lib/prisma"
 
 import type { member } from "@/types"
@@ -29,9 +29,9 @@ const GroupRequests = ({ users, groupId, serverMessage }: props) => {
         activeGroup,
         router,
         router.query.groupId as string,
-        `${routes.groupRequests}/${activeGroup.id}`
+        `${clientRoute.groupRequests}/${activeGroup.id}`
       )
-      setBackRoute(`${routes.manageGroup}/${activeGroup.id}`)
+      setBackRoute(`${clientRoute.manageGroup}/${activeGroup.id}`)
     }
     return () => clearBackRoute()
   }, [router, activeGroup, setBackRoute, clearBackRoute])
@@ -44,13 +44,15 @@ const GroupRequests = ({ users, groupId, serverMessage }: props) => {
 
       {serverMessage && <p className="text-center m-6">{serverMessage}</p>}
       {users && (
-        <MemberList
-          members={users}
-          groupId={groupId}
-          itemOnClick={() => {}}
-          type={memberListItemType.groupRequest}
-          className="hover:bg-transparent"
-        />
+        <div className="w-full max-w-[500px]">
+          <MemberList
+            members={users}
+            groupId={groupId}
+            itemOnClick={() => {}}
+            type={memberListItemType.groupRequest}
+            className="hover:bg-transparent"
+          />
+        </div>
       )}
     </div>
   )

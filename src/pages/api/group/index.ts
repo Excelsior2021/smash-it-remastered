@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "../auth/[...nextauth]"
 import prisma from "@/src/lib/prisma"
 import { isMaxUserGroups } from "@/src/lib/server-validation"
+import method from "@/src/lib/http-method"
 
 import type { NextApiRequest, NextApiResponse } from "next"
 
@@ -11,7 +12,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!session) return res.status(401).json("not authenticaticated")
 
   switch (req.method) {
-    case "POST": {
+    case method.post: {
       try {
         const maxUserGroups = await isMaxUserGroups(session.user.id, prisma)
         if (maxUserGroups)

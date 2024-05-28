@@ -2,7 +2,7 @@ import FormSection from "@/src/components/form-section/form-section"
 import { createAccount } from "@/src/lib/api"
 import { authRedirect } from "@/src/lib/auth"
 import { accountFormFields, personalFormFields } from "@/src/lib/form-fields"
-import routes from "@/src/lib/client-routes"
+import clientRoute from "@/src/lib/client-route"
 import createAccountFormStore from "@/src/store/create-account"
 import Link from "next/link"
 import { useRouter } from "next/router"
@@ -79,7 +79,7 @@ const CreateAccount = () => {
         </form>
         <p className="text-center">
           Already have an account? Login{" "}
-          <Link className="link" href={routes.login}>
+          <Link className="link" href={clientRoute.login}>
             here
           </Link>
         </p>

@@ -12,7 +12,13 @@ type props = {
   inputName: string
 }
 
-const MemberMatch = ({ member, register, inputLabel, inputName }: props) => {
+const MemberMatch = ({
+  member,
+  register,
+  inputLabel,
+  inputName,
+  clearErrors,
+}: props) => {
   return (
     <div className="flex flex-col items-center p-4">
       <div className="relative w-32 h-32">
@@ -38,6 +44,10 @@ const MemberMatch = ({ member, register, inputLabel, inputName }: props) => {
         max={11}
         required={true}
         register={register}
+        onChange={() => {
+          clearErrors(inputName)
+          clearErrors("invalidScores")
+        }}
       />
     </div>
   )

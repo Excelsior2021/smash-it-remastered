@@ -1,4 +1,4 @@
-enum routes {
+enum clientRoute {
   root = "/",
   login = "/login",
   createAccount = "/create-account",
@@ -17,4 +17,4 @@ enum routes {
   deleteAccount = "/delete-account",
 }
 
-export default routes
+export default clientRoute

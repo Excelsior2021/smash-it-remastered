@@ -1,7 +1,7 @@
 import ApproveMatchList from "@/src/components/approve-match-list/approve-match-list"
 import { adminRoute, notAdmin, protectedRoute } from "@/src/lib/auth"
 import prisma from "@/src/lib/prisma"
-import routes from "@/src/lib/client-routes"
+import clientRoute from "@/src/lib/client-route"
 import { updateGroupDataForPage } from "@/src/lib/utils"
 import headerStore from "@/src/store/header"
 import userStore from "@/src/store/user"
@@ -19,9 +19,9 @@ const ApproveMatches = ({ matchSubmissions, serverMessage }) => {
         activeGroup,
         router,
         router.query.groupId as string,
-        `${routes.approveMatches}/${activeGroup.id}`
+        `${clientRoute.approveMatches}/${activeGroup.id}`
       )
-      setBackRoute(`${routes.manageGroup}/${activeGroup.id}`)
+      setBackRoute(`${clientRoute.manageGroup}/${activeGroup.id}`)
     }
 
     return () => clearBackRoute()

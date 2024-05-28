@@ -502,53 +502,49 @@
           "hasDefaultValue": false
         },
         {
-          "name": "stat_match_player1_id_group_idTostat",
-          "type": "stat",
-          "isRequired": false,
-          "kind": "object",
-          "relationName": "match_player1_id_group_idTostat",
-          "relationFromFields": [
-            "player1_id",
-            "group_id"
-          ],
-          "relationToFields": [
-            "user_id",
-            "group_id"
-          ],
-          "isList": false,
-          "isId": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false
-        },
-        {
-          "name": "stat_match_player2_id_group_idTostat",
-          "type": "stat",
-          "isRequired": false,
-          "kind": "object",
-          "relationName": "match_player2_id_group_idTostat",
-          "relationFromFields": [
-            "player2_id",
-            "group_id"
-          ],
-          "relationToFields": [
-            "user_id",
-            "group_id"
-          ],
-          "isList": false,
-          "isId": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false
-        },
-        {
-          "name": "user",
+          "name": "user_match_approved_byTouser",
           "type": "user",
           "isRequired": false,
           "kind": "object",
-          "relationName": "matchTouser",
+          "relationName": "match_approved_byTouser",
           "relationFromFields": [
             "approved_by"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "user_match_player1_idTouser",
+          "type": "user",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "match_player1_idTouser",
+          "relationFromFields": [
+            "player1_id"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "user_match_player2_idTouser",
+          "type": "user",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "match_player2_idTouser",
+          "relationFromFields": [
+            "player2_id"
           ],
           "relationToFields": [
             "id"
@@ -922,34 +918,6 @@
           "isGenerated": false,
           "sequence": false,
           "hasDefaultValue": false
-        },
-        {
-          "name": "match_match_player1_id_group_idTostat",
-          "type": "match",
-          "isRequired": false,
-          "kind": "object",
-          "relationName": "match_player1_id_group_idTostat",
-          "relationFromFields": [],
-          "relationToFields": [],
-          "isList": true,
-          "isId": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false
-        },
-        {
-          "name": "match_match_player2_id_group_idTostat",
-          "type": "match",
-          "isRequired": false,
-          "kind": "object",
-          "relationName": "match_player2_id_group_idTostat",
-          "relationFromFields": [],
-          "relationToFields": [],
-          "isList": true,
-          "isId": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false
         }
       ],
       "uniqueConstraints": [
@@ -1085,11 +1053,39 @@
           "hasDefaultValue": false
         },
         {
-          "name": "match",
+          "name": "match_match_approved_byTouser",
           "type": "match",
           "isRequired": false,
           "kind": "object",
-          "relationName": "matchTouser",
+          "relationName": "match_approved_byTouser",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "match_match_player1_idTouser",
+          "type": "match",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "match_player1_idTouser",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "match_match_player2_idTouser",
+          "type": "match",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "match_player2_idTouser",
           "relationFromFields": [],
           "relationToFields": [],
           "isList": true,

@@ -1,9 +1,10 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "../../../auth/[...nextauth]"
 import { isAdmin, isMaxGroupMembers } from "@/src/lib/server-validation"
+import prisma from "@/src/lib/prisma"
+import method from "@/src/lib/http-method"
 
 import type { NextApiRequest, NextApiResponse } from "next"
-import prisma from "@/src/lib/prisma"
 
 //admin authorization required
 
@@ -13,7 +14,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!session) return res.status(401).json("not authenticated")
 
   switch (req.method) {
-    case "POST": {
+    case method.post: {
       const groupId = parseInt(req.query.groupId as string)
       const admin = await isAdmin(prisma, session.user.id, groupId)
       if (admin) {

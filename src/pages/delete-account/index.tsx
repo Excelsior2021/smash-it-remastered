@@ -34,8 +34,8 @@ const DeleteAccount = () => {
         delete account
       </h1>
       <p className="text-xl text-center my-6">
-        Deleteing your account will delete or personal data associated with this
-        account
+        Deleteing your account will delete all personal data associated with
+        this account
       </p>
 
       <p className="text-xl text-center my-6">

@@ -1,8 +1,10 @@
-import type { NextApiRequest, NextApiResponse } from "next"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../../../auth/[...nextauth]"
 import { isAdmin } from "@/src/lib/server-validation"
 import prisma from "@/src/lib/prisma"
+import method from "@/src/lib/http-method"
+
+import type { NextApiRequest, NextApiResponse } from "next"
 
 //admin authorization required
 
@@ -17,7 +19,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!admin) return res.status(401).json("unauthorized")
 
   switch (req.method) {
-    case "POST": {
+    case method.post: {
       const { userId } = req.body
       try {
         const user = await prisma.groupRequests.delete({

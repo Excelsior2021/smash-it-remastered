@@ -1,7 +1,7 @@
 import Avatar from "@/src/components/avatar/avatar"
 import NoGroup from "@/src/components/no-group/no-group"
 import { protectedRoute } from "@/src/lib/auth"
-import routes from "@/src/lib/client-routes"
+import clientRoute from "@/src/lib/client-route"
 import { generateDisplayName, updateGroupDataForPage } from "@/src/lib/utils"
 import navStore from "@/src/store/nav"
 import userStore from "@/src/store/user"
@@ -46,7 +46,7 @@ const Profile = ({ profile, serverMessage, noGroup }: props) => {
           activeGroup,
           router,
           groupId,
-          `${routes.profile}/${activeGroup.id}/${profile.username}`
+          `${clientRoute.profile}/${activeGroup.id}/${profile.username}`
         )
     }
     return () => setActiveNavItem(null)
@@ -100,7 +100,7 @@ const Profile = ({ profile, serverMessage, noGroup }: props) => {
         </div>
         <div className="w-full max-w-96 m-auto">
           <LinkButton
-            href={`${routes.matchHistory}/${groupId}/${username}`}
+            href={`${clientRoute.matchHistory}/${groupId}/${username}`}
             text="match history"
           />
         </div>

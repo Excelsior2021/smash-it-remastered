@@ -4,7 +4,7 @@ import NoGroup from "@/src/components/no-group/no-group"
 import StatsTable from "@/src/components/stats-table/stats-table"
 import { protectedRoute } from "@/src/lib/auth"
 import prisma from "@/src/lib/prisma"
-import routes from "@/src/lib/client-routes"
+import clientRoute from "@/src/lib/client-route"
 import { updateGroupDataForPage } from "@/src/lib/utils"
 import navStore from "@/src/store/nav"
 import userStore from "@/src/store/user"
@@ -29,7 +29,6 @@ const GroupPage = ({
   noGroup,
   isAdmin,
 }: props) => {
-  const group = JSON.parse(groupJSON)
   const activeGroup = userStore(state => state.activeGroup)
   const setActiveNavItem = navStore(state => state.setActiveNavItem)
   const router = useRouter()
@@ -41,12 +40,15 @@ const GroupPage = ({
         activeGroup,
         router,
         router.query.groupId as string,
-        `${routes.group}/${activeGroup.id}`
+        `${clientRoute.group}/${activeGroup.id}`
       )
     return () => setActiveNavItem(null)
-  }, [router, activeGroup, setActiveNavItem, group])
+  }, [router, activeGroup, setActiveNavItem])
 
   if (noGroup) return <NoGroup />
+
+  let group
+  if (groupJSON) group = JSON.parse(groupJSON)
 
   return (
     <div>
@@ -56,7 +58,7 @@ const GroupPage = ({
           {isAdmin && activeGroup && (
             <div className="max-w-96 mb-6">
               <LinkButton
-                href={`${routes.manageGroup}/${activeGroup.id}`}
+                href={`${clientRoute.manageGroup}/${activeGroup.id}`}
                 text="manage group"
               />
             </div>

@@ -45,3 +45,17 @@
 .add-member:hover {
   stroke: green;
 }
+
+.notification {
+  transform: translateX(260px);
+  transition: all 0.15s linear;
+}
+
+.notification--enter {
+  transform: translateX(0);
+}
+
+.notification--exit {
+  transform: translateY(-200px);
+  opacity: 0;
+}

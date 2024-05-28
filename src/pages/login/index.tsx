@@ -2,13 +2,13 @@ import Input from "@/src/components/input/input"
 import { login } from "@/src/lib/api"
 import { authRedirect } from "@/src/lib/auth"
 import { loginFormFields } from "@/src/lib/form-fields"
-import routes from "@/src/lib/client-routes"
+import clientRoute from "@/src/lib/client-route"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { useForm } from "react-hook-form"
 import { signIn } from "next-auth/react"
 
-import { routes as routesType } from "@/types"
+import { clientRoute as clientRouteType } from "@/types"
 
 const Login = () => {
   const {
@@ -20,14 +20,18 @@ const Login = () => {
   } = useForm()
   const router = useRouter()
 
-  const handleLogin = async (signIn, formData, routes: routesType) => {
-    const res = await login(signIn, formData, routes)
+  const handleLogin = async (
+    signIn,
+    formData,
+    clientRoute: clientRouteType
+  ) => {
+    const res = await login(signIn, formData, clientRoute)
     if (!res.ok)
       setError("server", {
         message:
           "invalid credentials. please check your username/email and password",
       })
-    else router.replace(routes.root)
+    else router.replace(clientRoute.root)
   }
 
   return (
@@ -37,7 +41,7 @@ const Login = () => {
         <form
           className="flex flex-col gap-8 mb-6"
           onSubmit={handleSubmit(
-            async formData => await handleLogin(signIn, formData, routes)
+            async formData => await handleLogin(signIn, formData, clientRoute)
           )}>
           {loginFormFields.map(field => (
             <div className="flex flex-col gap-1" key={field.name}>
@@ -63,7 +67,7 @@ const Login = () => {
         </form>
         <p className="text-center">
           Create an account{" "}
-          <Link className="link" href={routes.createAccount}>
+          <Link className="link" href={clientRoute.createAccount}>
             here
           </Link>
         </p>

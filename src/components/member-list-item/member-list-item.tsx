@@ -2,7 +2,7 @@ import { useRouter } from "next/router"
 import Avatar from "../avatar/avatar"
 import RemoveUserImage from "../svg/remove-user-image"
 import AddUserImage from "../svg/add-user-image"
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 import memberListItemType from "@/src/lib/member-list-item-types"
 import { generateDisplayName } from "@/src/lib/utils"
 import {
@@ -10,10 +10,10 @@ import {
   declineUserToGroup,
   removeUserFromGroup,
 } from "@/src/lib/api"
-import routes from "@/src/lib/client-routes"
+import clientRoute from "@/src/lib/client-route"
+import Modal from "../modal/modal"
 
 import type { member } from "@/types"
-import type { NextRouter } from "next/router"
 
 type props = {
   member: member
@@ -30,39 +30,37 @@ const MemberListItem = ({
   type,
   className,
 }: props) => {
+  const [loading, setLoading] = useState(false)
+  const [actionSuccess, setActionSuccess] = useState(false)
   const router = useRouter()
 
-  const handleRemoveUser = useCallback(
-    async (memberId: number, groupId: number, router: NextRouter) => {
-      await removeUserFromGroup(memberId, groupId)
-      router.replace(router.asPath)
-    },
-    []
-  )
+  const handleAction = useCallback(
+    async (action, memberId: number, groupId: number) => {
+      try {
+        setLoading(true)
+        const res = await action(memberId, groupId)
 
-  const handleApproveUser = useCallback(
-    async (memberId: number, groupId: number, router: NextRouter) => {
-      await approveUserToGroup(memberId, groupId)
-      router.replace(router.asPath)
-    },
-    []
-  )
-
-  const handleDeclineUser = useCallback(
-    async (memberId: number, groupId: number, router: NextRouter) => {
-      await declineUserToGroup(memberId, groupId)
-      router.replace(router.asPath)
+        if (res.ok) setActionSuccess(true)
+      } catch (error) {
+      } finally {
+        setLoading(false)
+      }
     },
     []
   )
 
   return (
     <li
-      className={`join-item flex items-center gap-4 p-5 hover:bg-accent cursor-pointer ${className}`}
+      className={`join-item flex items-center gap-4 p-5 hover:bg-accent cursor-pointer ${className} ${
+        actionSuccess && "hidden"
+      }`}
       onClick={
         onClick
           ? () => onClick({ member, groupId })
-          : () => router.push(`${routes.profile}/${groupId}/${member.username}`)
+          : () =>
+              router.push(
+                `${clientRoute.profile}/${groupId}/${member.username}`
+              )
       }>
       <div className="avatar">
         <div className="w-12">
@@ -79,28 +77,49 @@ const MemberListItem = ({
         </span>
       </div>
 
-      <div className="relative flex gap-4 ml-auto">
-        {type === memberListItemType.removeMember && (
-          <RemoveUserImage
-            onClick={(e: Event) => {
-              e.stopPropagation()
-              handleRemoveUser(member.id, groupId, router)
-            }}
-          />
+      <div className="relative ml-auto">
+        {loading && (
+          <div className="flex justify-center w-10">
+            <span className="loading loading-spinner loading-md"></span>
+          </div>
         )}
-        {type === memberListItemType.groupRequest && (
-          <>
-            <AddUserImage
-              onClick={async () =>
-                await handleApproveUser(member.id, groupId, router)
-              }
-            />
-            <RemoveUserImage
-              onClick={async () =>
-                await handleDeclineUser(member.id, groupId, router)
-              }
-            />
-          </>
+        {!loading && (
+          <div className="flex gap-4">
+            {type === memberListItemType.removeMember && (
+              <>
+                <Modal
+                  heading="remove member"
+                  action="confirm"
+                  text={`Are you sure you want to remove ${member.username} from the group? All their data for this group will be lost.`}
+                  onClick={async () =>
+                    await handleAction(removeUserFromGroup, member.id, groupId)
+                  }
+                />
+                <RemoveUserImage
+                  onClick={(e: Event) => {
+                    e.stopPropagation()
+                    document.getElementById("modal").showModal()
+                  }}
+                />
+              </>
+            )}
+            {type === memberListItemType.groupRequest && (
+              <>
+                <AddUserImage
+                  onClick={async (e: Event) => {
+                    e.stopPropagation()
+                    await handleAction(approveUserToGroup, member.id, groupId)
+                  }}
+                />
+                <RemoveUserImage
+                  onClick={async (e: Event) => {
+                    e.stopPropagation()
+                    await handleAction(declineUserToGroup, member.id, groupId)
+                  }}
+                />
+              </>
+            )}
+          </div>
         )}
       </div>
     </li>

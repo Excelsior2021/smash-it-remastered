@@ -1,4 +1,4 @@
-import routes from "@/src/lib/client-routes"
+import clientRoute from "@/src/lib/client-route"
 import { useRouter } from "next/router"
 
 const MatchHistoryItem = ({ match, profileUser }) => {
@@ -8,13 +8,13 @@ const MatchHistoryItem = ({ match, profileUser }) => {
   const players = [
     {
       id: match.player1Id,
-      username: match.player1 ? match.player1.user.username : "deleted user",
+      username: match.player1 ? match.player1.username : "deleted user",
       score: match.player1Score,
       onClick: match.player1Id !== (profileUser.id || null),
     },
     {
       id: match.player2Id,
-      username: match.player2 ? match.player2.user.username : "deleted user",
+      username: match.player2 ? match.player2.username : "deleted user",
       score: match.player2Score,
       onClick: match.player1Id !== (profileUser.id || null),
     },
@@ -38,7 +38,7 @@ const MatchHistoryItem = ({ match, profileUser }) => {
                 player.onClick
                   ? () =>
                       router.push(
-                        `${routes.profile}/${match.groupId}/${player.username}`
+                        `${clientRoute.profile}/${match.groupId}/${player.username}`
                       )
                   : undefined
               }>

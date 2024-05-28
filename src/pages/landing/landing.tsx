@@ -1,14 +1,14 @@
-import routes from "@/src/lib/client-routes"
+import clientRoute from "@/src/lib/client-route"
 import LinkButton from "../../components/link-button/link-button"
 
 const links = [
   {
     name: "login",
-    route: routes.login,
+    route: clientRoute.login,
   },
   {
     name: "create account",
-    route: routes.createAccount,
+    route: clientRoute.createAccount,
   },
 ]
 
