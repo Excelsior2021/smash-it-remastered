@@ -1,5 +1,5 @@
-import LandingPage from "./landing/landing"
-import DashboardPage from "./dashboard/dashboard"
+import LandingPage from "../components/pages/landing/landing"
+import DashboardPage from "../components/pages/dashboard/dashboard"
 import { protectedRoute } from "../lib/auth"
 import clientRoute from "../lib/client-route"
 import { authOptions } from "./api/auth/[...nextauth]"

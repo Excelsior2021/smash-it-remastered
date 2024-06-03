@@ -1,5 +1,5 @@
 import userStore from "@/src/store/user"
-import LinkButton from "../../components/link-button/link-button"
+import LinkButton from "../../link-button/link-button"
 import { useEffect } from "react"
 import navStore from "@/src/store/nav"
 import clientRoute from "@/src/lib/client-route"
