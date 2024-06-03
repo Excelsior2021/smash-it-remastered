@@ -3,7 +3,14 @@ import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 
 import type { Dispatch, SetStateAction } from "react"
-import type { groupRequest as groupRequestType, userGroup } from "@/types"
+import type {
+  apiRouteType,
+  groupRequest as groupRequestType,
+  methodType,
+  userGroup,
+} from "@/types"
+import apiRoute from "@/src/lib/api-route"
+import method from "@/src/lib/http-method"
 
 type props = {
   name: string
@@ -48,9 +55,11 @@ const GroupQueryItem = ({
   const handleGroupRequest = async (
     userId: number,
     groupId: number,
-    setRequest: Dispatch<SetStateAction<string>>
+    setRequest: Dispatch<SetStateAction<string>>,
+    apiRoute: apiRouteType,
+    method: methodType
   ) => {
-    const res = await groupRequest(userId, groupId)
+    const res = await groupRequest(userId, groupId, apiRoute, method)
     if (res) if (res.ok) setRequest(requestState.requested)
   }
 
@@ -68,7 +77,9 @@ const GroupQueryItem = ({
               ? "opacity-50"
               : ""
           }`}
-          onClick={() => handleGroupRequest(id, groupId, setRequest)}
+          onClick={() =>
+            handleGroupRequest(id, groupId, setRequest, apiRoute, method)
+          }
           disabled={
             request === requestState.joined ||
             request === requestState.requested

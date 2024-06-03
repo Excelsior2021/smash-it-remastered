@@ -12,8 +12,10 @@ import {
 } from "@/src/lib/api"
 import clientRoute from "@/src/lib/client-route"
 import Modal from "../modal/modal"
+import apiRoute from "@/src/lib/api-route"
+import method from "@/src/lib/http-method"
 
-import type { member } from "@/types"
+import type { apiRouteType, member, methodType } from "@/types"
 
 type props = {
   member: member
@@ -35,10 +37,16 @@ const MemberListItem = ({
   const router = useRouter()
 
   const handleAction = useCallback(
-    async (action, memberId: number, groupId: number) => {
+    async (
+      action,
+      memberId: number,
+      groupId: number,
+      apiRoute: apiRouteType,
+      method: methodType
+    ) => {
       try {
         setLoading(true)
-        const res = await action(memberId, groupId)
+        const res = await action(memberId, groupId, apiRoute, method)
 
         if (res.ok) setActionSuccess(true)
       } catch (error) {
@@ -92,7 +100,13 @@ const MemberListItem = ({
                   action="confirm"
                   text={`Are you sure you want to remove ${member.username} from the group? All their data for this group will be lost.`}
                   onClick={async () =>
-                    await handleAction(removeUserFromGroup, member.id, groupId)
+                    await handleAction(
+                      removeUserFromGroup,
+                      member.id,
+                      groupId,
+                      apiRoute,
+                      method
+                    )
                   }
                 />
                 <RemoveUserImage
@@ -108,13 +122,25 @@ const MemberListItem = ({
                 <AddUserImage
                   onClick={async (e: Event) => {
                     e.stopPropagation()
-                    await handleAction(approveUserToGroup, member.id, groupId)
+                    await handleAction(
+                      approveUserToGroup,
+                      member.id,
+                      groupId,
+                      apiRoute,
+                      method
+                    )
                   }}
                 />
                 <RemoveUserImage
                   onClick={async (e: Event) => {
                     e.stopPropagation()
-                    await handleAction(declineUserToGroup, member.id, groupId)
+                    await handleAction(
+                      declineUserToGroup,
+                      member.id,
+                      groupId,
+                      apiRoute,
+                      method
+                    )
                   }}
                 />
               </>

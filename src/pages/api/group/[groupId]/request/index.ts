@@ -9,13 +9,14 @@ import type { NextApiRequest, NextApiResponse } from "next"
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const session = await getServerSession(req, res, authOptions)
 
-  if (!session) return res.status(401).json("not authenticated")
+  if (!session) return res.status(401).json({ message: "not authenticated" })
 
   switch (req.method) {
     case method.post: {
       const { userId } = req.body
       const maxUserGroups = await isMaxUserGroups(userId, prisma)
-      if (maxUserGroups) return res.status(400).json("max group count reached")
+      if (maxUserGroups)
+        return res.status(400).json({ error: "max group count reached" })
       const groupId = parseInt(req.query.groupId as string)
       try {
         const groupRequests = await prisma.groupRequests.create({
@@ -24,7 +25,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             groupId,
           },
         })
-        if (groupRequests) return res.status(201).json("success")
+        if (groupRequests)
+          return res.status(201).json({ message: "request submitted" })
       } catch (error) {
         console.log(error)
       }

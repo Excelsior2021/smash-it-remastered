@@ -10,12 +10,12 @@ import type { NextApiRequest, NextApiResponse } from "next"
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const session = await getServerSession(req, res, authOptions)
-  if (!session) return res.status(401).json("not authenticated")
+  if (!session) return res.status(401).json({ message: "not authenticated" })
 
   const groupId = parseInt(req.query.groupId as string)
   const admin = await isAdmin(prisma, session.user.id, groupId)
 
-  if (!admin) return res.status(401).json("unauthorized")
+  if (!admin) return res.status(401).json({ message: "unauthorized" })
 
   switch (req.method) {
     case method.post: {

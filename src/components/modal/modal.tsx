@@ -1,25 +1,32 @@
+import { ReactNode } from "react"
 import ModalMatchData from "../modal-match-data/modal-match-data"
 
 import type { matchData } from "@/types"
 
 type props = {
   heading: string
+  headingCapitalize?: boolean
   text?: string | null
-  onClick: () => {}
-  onClickClose: () => {}
+  onClick?: () => {}
+  onClickClose?: (() => {}) | undefined
   action?: string | null
   matchData?: matchData | null
+  accountFieldInput?: ReactNode
   loading?: boolean
+  errors?: string[] | null
 }
 
 const Modal = ({
   heading,
+  headingCapitalize,
   text,
   onClick,
   onClickClose,
   action,
   matchData,
+  accountFieldInput,
   loading = false,
+  errors,
 }: props) => (
   <dialog
     id="modal"
@@ -29,7 +36,10 @@ const Modal = ({
     }}>
     <div className="modal-box bg-accent">
       <div className="border-b-2 pb-2">
-        <h3 className="font-bold text-lg">{heading}</h3>
+        <h3
+          className={`font-bold text-lg ${headingCapitalize && "capitalize"}`}>
+          {heading}
+        </h3>
       </div>
 
       {loading && (
@@ -42,6 +52,16 @@ const Modal = ({
         <>
           <p className="text-center text-lg py-4">{text}</p>
           {matchData && <ModalMatchData matchData={matchData} />}
+          {accountFieldInput && <div>{accountFieldInput}</div>}
+          {errors && (
+            <ul>
+              {errors.server.message.map((error, i) => (
+                <li key={i}>
+                  <p className="text-error">{error}</p>
+                </li>
+              ))}
+            </ul>
+          )}
           <div className="modal-action">
             <form className="flex gap-4" method="dialog">
               {action && (

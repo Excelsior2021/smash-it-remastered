@@ -7,6 +7,8 @@ import headerStore from "@/src/store/header"
 import userStore from "@/src/store/user"
 import { useRouter } from "next/router"
 import { useEffect } from "react"
+import { authOptions } from "../../api/auth/[...nextauth]"
+import { getServerSession } from "next-auth"
 
 const ApproveMatches = ({ matchSubmissions, serverMessage }) => {
   const activeGroup = userStore(state => state.activeGroup)
@@ -43,12 +45,17 @@ const ApproveMatches = ({ matchSubmissions, serverMessage }) => {
 export default ApproveMatches
 
 export const getServerSideProps = async context => {
-  const props = await protectedRoute(context)
+  const props = await protectedRoute(
+    context,
+    getServerSession,
+    clientRoute,
+    authOptions
+  )
   const { authenticated, session } = props
   if (!authenticated) return props
 
   const admin = await adminRoute(context, session, prisma)
-  if (!admin) return notAdmin(routes, context)
+  if (!admin) return notAdmin(context, clientRoute)
 
   try {
     const groupId = parseInt(context.query.groupId)

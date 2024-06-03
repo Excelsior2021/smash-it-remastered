@@ -21,7 +21,9 @@ const DashboardPage = ({
     <div>
       <h1 className="text-3xl mb-6">
         Hi,{" "}
-        <span className="capitalize">{firstName ? firstName : username}</span>{" "}
+        <span className="capitalize">
+          {firstName ? firstName : username ? username : null}
+        </span>{" "}
       </h1>
       <ul className="flex flex-col gap-10 max-w-96 m-auto">
         <li className="w-full text-center">

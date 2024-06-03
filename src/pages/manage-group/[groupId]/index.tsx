@@ -8,6 +8,8 @@ import navStore from "@/src/store/nav"
 import userStore from "@/src/store/user"
 import { useRouter } from "next/router"
 import { useEffect } from "react"
+import { authOptions } from "../../api/auth/[...nextauth]"
+import { getServerSession } from "next-auth"
 
 const ManageGroup = () => {
   const activeGroup = userStore(state => state.activeGroup)
@@ -76,12 +78,17 @@ const ManageGroup = () => {
 export default ManageGroup
 
 export const getServerSideProps = async context => {
-  const props = await protectedRoute(context)
+  const props = await protectedRoute(
+    context,
+    getServerSession,
+    clientRoute,
+    authOptions
+  )
   const { authenticated, session } = props
   if (!authenticated) return props
 
   const admin = await adminRoute(context, session, prisma)
-  if (!admin) return notAdmin(routes, context)
+  if (!admin) return notAdmin(context, clientRoute)
   return {
     props: {},
   }

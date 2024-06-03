@@ -2,8 +2,16 @@ import { useForm } from "react-hook-form"
 import { deleteAccount } from "@/src/lib/api"
 import { signOut } from "next-auth/react"
 import { protectedRoute } from "@/src/lib/auth"
+import { authOptions } from "../api/auth/[...nextauth]"
+import { getServerSession } from "next-auth"
+import clientRoute from "@/src/lib/client-route"
+import apiRoute from "@/src/lib/api-route"
+import method from "@/src/lib/http-method"
 
 import type { FieldValues } from "react-hook-form"
+import { apiRouteType, methodType } from "@/types"
+import headerStore from "@/src/store/header"
+import { useEffect } from "react"
 
 const DeleteAccount = () => {
   const {
@@ -14,9 +22,21 @@ const DeleteAccount = () => {
     formState: { errors },
   } = useForm()
 
-  const handleDeleteAccount = async ({ deleteInput }: FieldValues) => {
+  const setBackRoute = headerStore(state => state.setBackRoute)
+  const clearBackRoute = headerStore(state => state.clearBackRoute)
+
+  useEffect(() => {
+    setBackRoute(clientRoute.account)
+    return () => clearBackRoute()
+  }, [setBackRoute, clearBackRoute])
+
+  const handleDeleteAccount = async (
+    { deleteInput }: FieldValues,
+    apiRoute: apiRouteType,
+    method: methodType
+  ) => {
     if (deleteInput === "delete") {
-      const res = await deleteAccount()
+      const res = await deleteAccount(apiRoute, method)
       if (res)
         if (res.ok) {
           await signOut()
@@ -45,7 +65,7 @@ const DeleteAccount = () => {
       <form
         className="flex flex-col items-center gap-6 w-full max-w-60 m-auto"
         onSubmit={handleSubmit(async formData =>
-          handleDeleteAccount(formData)
+          handleDeleteAccount(formData, apiRoute, method)
         )}>
         <label className="hidden" htmlFor="deleteAccount">
           delete account
@@ -72,7 +92,12 @@ const DeleteAccount = () => {
 export default DeleteAccount
 
 export const getServerSideProps = async context => {
-  const props = await protectedRoute(context)
+  const props = await protectedRoute(
+    context,
+    getServerSession,
+    clientRoute,
+    authOptions
+  )
   const { authenticated } = props
   if (!authenticated) return props
 

@@ -36,7 +36,7 @@ const MemberMatch = ({
       </div>
 
       <Input
-        className="text-black text-center w-[50%] p-2 rounded outline-none"
+        className="text-black text-center p-2 rounded outline-none w-48"
         label={inputLabel}
         name={inputName}
         type="number"

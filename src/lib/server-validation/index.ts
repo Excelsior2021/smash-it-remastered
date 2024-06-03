@@ -1,4 +1,76 @@
+import type { fieldPattern } from "@/types"
 import type { PrismaClient } from "@prisma/client"
+
+export const verifyPassword = async (
+  password: string,
+  hashedPassword: string,
+  compare
+) => await compare(password, hashedPassword)
+
+export const validateUsername = async (
+  username: string,
+  pattern: fieldPattern,
+  obscenity,
+  prisma: PrismaClient
+) => {
+  const usernameAlreadyExists = await prisma.user.findUnique({
+    where: {
+      username,
+    },
+    select: {
+      username: true,
+    },
+  })
+  if (usernameAlreadyExists)
+    //usernamePattern is true to avoid invalid error on client
+    return { usernameAlreadyExists, usernamePattern: true }
+  const usernameObscene = obscenity.hasMatch(username)
+  const usernamePattern = pattern.username.test(username)
+  return { usernameObscene, usernamePattern }
+}
+
+export const validateEmail = async (
+  email: string,
+  pattern: fieldPattern,
+  prisma: PrismaClient
+) => {
+  const emailAlreadyExists = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+    select: {
+      email: true,
+    },
+  })
+
+  if (emailAlreadyExists)
+    //emailPattern is true to avoid invalid error on client
+    return { emailAlreadyExists, emailPattern: true }
+
+  const emailPattern = pattern.email.test(email)
+  return { emailPattern }
+}
+
+export const validateName = (
+  name: string,
+  pattern: fieldPattern,
+  obscenity
+) => {
+  const nameObscene = obscenity.hasMatch(name)
+  const namePattern = pattern.name.test(name)
+  return { nameObscene, namePattern }
+}
+
+export const validatePassword = (
+  password: string,
+  confirmPassword: string,
+  pattern: fieldPattern
+) => {
+  const passwordMatch = password === confirmPassword
+  const passwordPattern = pattern.password.test(password)
+
+  return { passwordMatch, passwordPattern }
+}
 
 export const validateScores = (player1score: number, player2score: number) => {
   if (player1score === 11 && player2score === 11) return false
@@ -84,4 +156,25 @@ export const isMaxUserGroups = async (userId: number, prisma: PrismaClient) => {
 
   if (user) if (user._count.stats >= 3) return true
   return false
+}
+
+export const validateGroupName = async (
+  groupName: string,
+  pattern: fieldPattern,
+  obscenity,
+  prisma: PrismaClient
+) => {
+  const groupNameAlreadyExists = await prisma.group.findUnique({
+    where: {
+      name: groupName,
+    },
+  })
+
+  if (groupNameAlreadyExists)
+    return { groupNameAlreadyExists, groupNamePattern: true }
+
+  const groupNameObscene = obscenity.hasMatch(groupName)
+  const groupNamePattern = pattern.groupName.test(groupName)
+
+  return { groupNameObscene, groupNamePattern }
 }

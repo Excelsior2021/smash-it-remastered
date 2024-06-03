@@ -29,7 +29,7 @@ const LandingPage = () => (
         </div>
       </div>
 
-      <div className="flex flex-col gap-8  sm:items-center">
+      <div className="flex flex-col gap-8 max-w-[300px] m-auto">
         {links.map(({ name, route }) => (
           <LinkButton key={name} href={route} text={name} />
         ))}

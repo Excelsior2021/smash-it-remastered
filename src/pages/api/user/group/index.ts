@@ -8,7 +8,8 @@ import type { NextApiRequest, NextApiResponse } from "next"
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const session = await getServerSession(req, res, authOptions)
 
-  if (!session) return res.status(401).json("not authenticaticated")
+  if (!session)
+    return res.status(401).json({ message: "not authenticaticated" })
 
   switch (req.method) {
     case method.get: {

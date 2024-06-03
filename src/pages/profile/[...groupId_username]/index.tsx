@@ -12,6 +12,8 @@ import prisma from "@/src/lib/prisma"
 import statKeys from "@/src/lib/stat-keys"
 import { userInGroup } from "@/src/lib/server-validation"
 import LinkButton from "@/src/components/link-button/link-button"
+import { authOptions } from "../../api/auth/[...nextauth]"
+import { getServerSession } from "next-auth"
 
 import type { profile } from "@/types"
 
@@ -74,7 +76,7 @@ const Profile = ({ profile, serverMessage, noGroup }: props) => {
           </div>
         </div>
         <div className="text-center text-xl border-b mb-4 p-1">
-          <h1>
+          <h1 className="text-2xl">
             {generateDisplayName(
               profile.username,
               profile.firstName,
@@ -112,7 +114,12 @@ const Profile = ({ profile, serverMessage, noGroup }: props) => {
 export default Profile
 
 export const getServerSideProps = async context => {
-  const props = await protectedRoute(context)
+  const props = await protectedRoute(
+    context,
+    getServerSession,
+    clientRoute,
+    authOptions
+  )
   const { authenticated, session } = props
   if (!authenticated) return props
 
@@ -168,6 +175,9 @@ export const getServerSideProps = async context => {
           profile,
         },
       }
+    }
+    return {
+      notFound: true,
     }
   } catch (error) {
     console.log(error)

@@ -1,4 +1,10 @@
-const AddUserImage = ({ onClick }) => (
+import type { MouseEventHandler } from "react"
+
+type props = {
+  onClick: MouseEventHandler<HTMLDivElement>
+}
+
+const AddUserImage = ({ onClick }: props) => (
   <div className="p-2" onClick={onClick}>
     <svg
       xmlns="http://www.w3.org/2000/svg"

@@ -12,6 +12,8 @@ import { member } from "@/types"
 import { useRouter } from "next/router"
 import { useEffect } from "react"
 import { userInGroup } from "@/src/lib/server-validation"
+import { authOptions } from "../../api/auth/[...nextauth]"
+import { getServerSession } from "next-auth"
 
 type props = {
   groupJSON: any
@@ -56,7 +58,7 @@ const GroupPage = ({
       {group && (
         <>
           {isAdmin && activeGroup && (
-            <div className="max-w-96 mb-6">
+            <div className="mb-6 md:max-w-96">
               <LinkButton
                 href={`${clientRoute.manageGroup}/${activeGroup.id}`}
                 text="manage group"
@@ -72,7 +74,12 @@ const GroupPage = ({
 }
 
 export const getServerSideProps = async context => {
-  const props = await protectedRoute(context)
+  const props = await protectedRoute(
+    context,
+    getServerSession,
+    clientRoute,
+    authOptions
+  )
   const { authenticated, session } = props
   if (!authenticated) return props
 

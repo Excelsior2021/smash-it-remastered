@@ -4,6 +4,8 @@ import clientRoute from "@/src/lib/client-route"
 import navStore from "@/src/store/nav"
 import { signOut } from "next-auth/react"
 import { useEffect } from "react"
+import { authOptions } from "../api/auth/[...nextauth]"
+import { getServerSession } from "next-auth"
 
 const AccountPage = () => {
   const setActiveNavItem = navStore(state => state.setActiveNavItem)
@@ -18,10 +20,16 @@ const AccountPage = () => {
       <h1 className="text-3xl text-center capitalize mb-6">my account</h1>
       <ul className="flex flex-col items-center gap-8 max-w-96 m-auto">
         <li className="w-full">
-          <LinkButton href="#" text="personal details" />
+          <LinkButton
+            href={clientRoute.accountDetails}
+            text="account details"
+          />
         </li>
         <li className="w-full">
-          <LinkButton href="#" text="change password" />
+          <LinkButton
+            href={clientRoute.changePassword}
+            text="change password"
+          />
         </li>
         <li className="w-full">
           <LinkButton href={clientRoute.deleteAccount} text="delete account" />
@@ -40,7 +48,12 @@ const AccountPage = () => {
 export default AccountPage
 
 export const getServerSideProps = async context => {
-  const props = await protectedRoute(context)
+  const props = await protectedRoute(
+    context,
+    getServerSession,
+    clientRoute,
+    authOptions
+  )
   const { authenticated, session } = props
 
   if (!authenticated) return props

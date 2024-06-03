@@ -7,9 +7,13 @@ import userStore from "@/src/store/user"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import prisma from "@/src/lib/prisma"
+import { authOptions } from "../api/auth/[...nextauth]"
+import { getServerSession } from "next-auth"
+import apiRoute from "@/src/lib/api-route"
+import method from "@/src/lib/http-method"
 
 import type { Dispatch, SetStateAction } from "react"
-import type { groupRequest, userGroup } from "@/types"
+import type { apiRouteType, groupRequest, methodType, userGroup } from "@/types"
 
 type props = {
   groupRequests: groupRequest[]
@@ -17,17 +21,19 @@ type props = {
 
 const JoinGroup = ({ groupRequests }: props) => {
   const { register, handleSubmit, setError } = useForm()
-  const [groups, setGroups] = useState(null)
+  const [groups, setGroups] = useState<userGroup[] | null>(null)
   const userGroups = userStore(state => state.groups)
   const setBackRoute = headerStore(state => state.setBackRoute)
   const clearBackRoute = headerStore(state => state.clearBackRoute)
 
   const handleQueryGroups = async (
     query: string,
-    setGroups: Dispatch<SetStateAction<userGroup[]>>,
-    queryGroups
+    setGroups: Dispatch<SetStateAction<userGroup[] | null>>,
+    queryGroups,
+    apiRoute: apiRouteType,
+    method: methodType
   ) => {
-    setGroups(await queryGroups(query.toLowerCase()))
+    setGroups(await queryGroups(query.toLowerCase(), apiRoute, method))
   }
 
   useEffect(() => {
@@ -48,7 +54,7 @@ const JoinGroup = ({ groupRequests }: props) => {
           <form
             className="flex flex-col gap-8"
             onChange={handleSubmit(async ({ query }) =>
-              handleQueryGroups(query, setGroups, queryGroups)
+              handleQueryGroups(query, setGroups, queryGroups, apiRoute, method)
             )}>
             <label className="hidden" htmlFor="query">
               search for groups
@@ -76,7 +82,12 @@ const JoinGroup = ({ groupRequests }: props) => {
 export default JoinGroup
 
 export const getServerSideProps = async context => {
-  const props = await protectedRoute(context)
+  const props = await protectedRoute(
+    context,
+    getServerSession,
+    clientRoute,
+    authOptions
+  )
   const { authenticated, session } = props
   if (!authenticated) return props
 

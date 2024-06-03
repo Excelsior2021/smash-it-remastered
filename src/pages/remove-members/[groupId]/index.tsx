@@ -9,6 +9,8 @@ import userStore from "@/src/store/user"
 import { member } from "@/types"
 import { useRouter } from "next/router"
 import { useEffect } from "react"
+import { authOptions } from "../../api/auth/[...nextauth]"
+import { getServerSession } from "next-auth"
 
 type props = {
   users: member[]
@@ -51,12 +53,17 @@ const RemoveMembers = ({ users, groupId }: props) => {
 export default RemoveMembers
 
 export const getServerSideProps = async context => {
-  const props = await protectedRoute(context)
+  const props = await protectedRoute(
+    context,
+    getServerSession,
+    clientRoute,
+    authOptions
+  )
   const { authenticated, session } = props
   if (!authenticated) return props
 
   const admin = await adminRoute(context, session, prisma)
-  if (!admin) notAdmin(routes, context)
+  if (!admin) notAdmin(context, clientRoute)
 
   try {
     const groupId = parseInt(context.query.groupId)

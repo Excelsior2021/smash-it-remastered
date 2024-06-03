@@ -2,8 +2,9 @@ import LinkButton from "@/src/components/link-button/link-button"
 import { protectedRoute } from "@/src/lib/auth"
 import clientRoute from "@/src/lib/client-route"
 import headerStore from "@/src/store/header"
-import Link from "next/link"
 import { useEffect } from "react"
+import { authOptions } from "../api/auth/[...nextauth]"
+import { getServerSession } from "next-auth"
 
 const JoinCreateGroup = () => {
   const setBackRoute = headerStore(state => state.setBackRoute)
@@ -30,7 +31,12 @@ const JoinCreateGroup = () => {
 export default JoinCreateGroup
 
 export const getServerSideProps = async context => {
-  const props = await protectedRoute(context)
+  const props = await protectedRoute(
+    context,
+    getServerSession,
+    clientRoute,
+    authOptions
+  )
   const { authenticated, session } = props
   if (!authenticated) return props
 

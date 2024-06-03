@@ -13,8 +13,13 @@ import headerStore from "@/src/store/header"
 import clientRoute from "@/src/lib/client-route"
 import prisma from "@/src/lib/prisma"
 import { validateScores } from "@/src/lib/server-validation"
+import { authOptions } from "../../api/auth/[...nextauth]"
+import { getServerSession } from "next-auth"
+import apiRoute from "@/src/lib/api-route"
+import method from "@/src/lib/http-method"
 
-import type { member, player } from "@/types"
+import type { apiRouteType, member, methodType, player } from "@/types"
+import type { FieldValues } from "react-hook-form"
 
 type props = {
   opponents: member[]
@@ -78,10 +83,12 @@ const RecordMatch = ({ opponents, groupId, isAdmin }: props) => {
   )
 
   const handleSubmitScores = async (
-    formData,
+    formData: FieldValues,
     groupId: number,
     userId: number,
-    opponentId: number
+    opponentId: number,
+    apiRoute: apiRouteType,
+    method: methodType
   ) => {
     setScoresSubmitting(true)
     const userScore = parseInt(formData.userScore)
@@ -98,7 +105,10 @@ const RecordMatch = ({ opponents, groupId, isAdmin }: props) => {
           groupId,
           userId,
           opponentId,
-          userId
+          userId,
+          userId,
+          apiRoute,
+          method
         )
       } else {
         res = await submitMatch(
@@ -107,7 +117,9 @@ const RecordMatch = ({ opponents, groupId, isAdmin }: props) => {
           matchDate,
           groupId,
           userId,
-          opponentId
+          opponentId,
+          apiRoute,
+          method
         )
       }
 
@@ -144,10 +156,16 @@ const RecordMatch = ({ opponents, groupId, isAdmin }: props) => {
               formData,
               groupId,
               session.data?.user.id,
-              chosenOpponent.id
+              chosenOpponent.id,
+              apiRoute,
+              method
             )
         )}
-        onClickClose={() => router.push(clientRoute.root)}
+        onClickClose={
+          scoresSubmitted === scoresSubmissionStatus.success
+            ? () => router.push(clientRoute.root)
+            : null
+        }
       />
 
       <h1 className="text-3xl text-center mb-6">Record Match</h1>
@@ -272,7 +290,12 @@ const RecordMatch = ({ opponents, groupId, isAdmin }: props) => {
 export default RecordMatch
 
 export const getServerSideProps = async context => {
-  const props = await protectedRoute(context)
+  const props = await protectedRoute(
+    context,
+    getServerSession,
+    clientRoute,
+    authOptions
+  )
   const { authenticated, session } = props
   if (!authenticated) return props
 

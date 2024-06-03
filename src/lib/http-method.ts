@@ -1,4 +1,4 @@
-enum httpMethod {
+enum method {
   get = "GET",
   post = "POST",
   put = "PUT",
@@ -6,4 +6,4 @@ enum httpMethod {
   delete = "DELETE",
 }
 
-export default httpMethod
+export default method

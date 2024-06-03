@@ -11,7 +11,7 @@ import type { NextApiRequest, NextApiResponse } from "next"
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const session = await getServerSession(req, res, authOptions)
 
-  if (!session) return res.status(401).json("not authenticated")
+  if (!session) return res.status(401).json({ message: "not authenticated" })
 
   switch (req.method) {
     case method.post: {
@@ -20,7 +20,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       if (admin) {
         const maxGroupMembers = await isMaxGroupMembers(groupId, prisma)
         if (maxGroupMembers)
-          return res.status(400).json("max member count reached")
+          return res.status(400).json({ error: "max member count reached" })
+
         const { userId } = req.body
         try {
           const [user, userRequest] = await prisma.$transaction([
@@ -39,11 +40,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               },
             }),
           ])
-          if (user && userRequest) return res.status(201).json("user approved")
+          if (user && userRequest)
+            return res.status(201).json({ message: "user approved" })
         } catch (error) {
           return res.status(500).json(error)
         }
-      } else return res.status(403).json("not admin of the group")
+      } else return res.status(403).json({ message: "unauthorized" })
     }
   }
   return res.status(405)

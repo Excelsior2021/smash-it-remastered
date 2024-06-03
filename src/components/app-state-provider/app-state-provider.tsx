@@ -1,4 +1,5 @@
 import { getUserGroups } from "@/src/lib/api"
+import apiRoute from "@/src/lib/api-route"
 import userStore from "@/src/store/user"
 import { useSession } from "next-auth/react"
 import { useEffect } from "react"
@@ -13,7 +14,7 @@ const AppStateProvider = () => {
 
   useEffect(() => {
     if (data) {
-      const setUserGroups = async () => setGroups(await getUserGroups())
+      const setUserGroups = async () => setGroups(await getUserGroups(apiRoute))
       setUserGroups()
     }
   }, [setGroups, data])

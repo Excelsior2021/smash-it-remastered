@@ -8,20 +8,22 @@ datasource db {
 }
 
 model User {
-  id               Int               @id @unique @default(autoincrement())
-  username         String            @unique
-  email            String            @unique
-  firstName        String            @map("first_name")
-  lastName         String            @map("last_name")
-  password         String
-  createdAt        DateTime          @default(now()) @map("created_at")
-  groupRequests    GroupRequests[]
-  approvedMatches  Match[]
-  asOpponent       MatchSubmission[] @relation("opponent")
-  matchSubmissions MatchSubmission[] @relation("user")
-  stats            Stat[]
-  matchesAsPlayer1 Match[]           @relation("player1")
-  matchesAsPlayer2 Match[]           @relation("player2")
+  id                Int                @id @unique @default(autoincrement())
+  username          String             @unique
+  email             String             @unique
+  firstName         String?             @map("first_name")
+  lastName          String?             @map("last_name")
+  password          String?
+  createdAt         DateTime           @default(now()) @map("created_at")
+  groupRequests     GroupRequests[]
+  approvedMatches   Match[]
+  asOpponent        MatchSubmission[]  @relation("opponent")
+  matchSubmissions  MatchSubmission[]  @relation("user")
+  stats             Stat[]
+  matchesAsPlayer1  Match[]            @relation("player1")
+  matchesAsPlayer2  Match[]            @relation("player2")
+  emailVerified     DateTime?          @map("email_verified")
+  emailVerification EmailVerification?
 
   @@map("user")
 }
@@ -49,17 +51,17 @@ model GroupRequests {
 }
 
 model Stat {
-  userId           Int     @map("user_id")
-  groupId          Int     @map("group_id")
-  wins             Float   @default(0) @db.Real
-  loses            Float   @default(0) @db.Real
-  ptsFor           Int     @default(0) @map("pts_for")
-  ptsAgainst       Int     @default(0) @map("pts_against")
-  isAdmin          Boolean @default(false) @map("is_admin")
-  matches          Int     @default(dbgenerated("\nCASE\n    WHEN ((wins + loses) = (0)::double precision) THEN (0)::real\n    ELSE (wins + loses)\nEND"))
-  winRatio         Float   @default(dbgenerated("\nCASE\n    WHEN ((wins + loses) = (0)::double precision) THEN (0)::real\n    ELSE (wins / (wins + loses))\nEND")) @map("win_ratio") @db.Real
-  group            Group   @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  user             User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     Int     @map("user_id")
+  groupId    Int     @map("group_id")
+  wins       Float   @default(0) @db.Real
+  loses      Float   @default(0) @db.Real
+  ptsFor     Int     @default(0) @map("pts_for")
+  ptsAgainst Int     @default(0) @map("pts_against")
+  isAdmin    Boolean @default(false) @map("is_admin")
+  matches    Int     @default(dbgenerated("\nCASE\n    WHEN ((wins + loses) = (0)::double precision) THEN (0)::real\n    ELSE (wins + loses)\nEND"))
+  winRatio   Float   @default(dbgenerated("\nCASE\n    WHEN ((wins + loses) = (0)::double precision) THEN (0)::real\n    ELSE (wins / (wins + loses))\nEND")) @map("win_ratio") @db.Real
+  group      Group   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, groupId])
   @@map("stat")
@@ -98,4 +100,14 @@ model MatchSubmission {
   user          User?    @relation("user", fields: [userId], references: [id])
 
   @@map("match_submission")
+}
+
+model EmailVerification {
+  id      Int      @id @unique @default(autoincrement())
+  email   String   @unique
+  token   String   @unique
+  expires DateTime
+  user    User     @relation(fields: [email], references: [email], onDelete: Cascade)
+
+  @@map("email_verification")
 }

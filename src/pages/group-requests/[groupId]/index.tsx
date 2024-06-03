@@ -8,6 +8,8 @@ import { useRouter } from "next/router"
 import headerStore from "@/src/store/header"
 import clientRoute from "@/src/lib/client-route"
 import prisma from "@/src/lib/prisma"
+import { authOptions } from "../../api/auth/[...nextauth]"
+import { getServerSession } from "next-auth"
 
 import type { member } from "@/types"
 
@@ -61,12 +63,17 @@ const GroupRequests = ({ users, groupId, serverMessage }: props) => {
 export default GroupRequests
 
 export const getServerSideProps = async context => {
-  const props = await protectedRoute(context)
+  const props = await protectedRoute(
+    context,
+    getServerSession,
+    clientRoute,
+    authOptions
+  )
   const { authenticated, session } = props
   if (!authenticated) return props
 
   const admin = await adminRoute(context, session, prisma)
-  if (!admin) return notAdmin(routes, context)
+  if (!admin) return notAdmin(context, clientRoute)
 
   try {
     const groupId = parseInt(context.query.groupId)

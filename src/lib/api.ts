@@ -1,12 +1,14 @@
-import apiRoute from "./api-route"
-import method from "./http-method"
+import type { clientRouteType, apiRouteType, methodType } from "@/types"
+import type { FieldValues } from "react-hook-form"
 
-import type { clientRoute } from "@/types"
+const headers = {
+  "Content-Type": "application/json",
+}
 
 export const login = async (
   signIn,
-  { userId, password }: { userId: number; password: string },
-  clientRoute: clientRoute
+  { userId, password }: FieldValues,
+  clientRoute: clientRouteType
 ) =>
   await signIn("credentials", {
     userId,
@@ -15,13 +17,15 @@ export const login = async (
     callbackUrl: clientRoute.root,
   })
 
-export const createAccount = async createAccountStore => {
+export const createAccount = async (
+  createAccountStore,
+  apiRoute: apiRouteType,
+  method: methodType
+) => {
   try {
     const res = await fetch(apiRoute.user, {
       method: method.post,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify(createAccountStore.formState),
     })
     return res
@@ -31,13 +35,15 @@ export const createAccount = async createAccountStore => {
   }
 }
 
-export const createGroup = async ({ groupName }: { groupName: string }) => {
+export const createGroup = async (
+  { groupName }: { groupName: string },
+  apiRoute: apiRouteType,
+  method: methodType
+) => {
   try {
     const res = await fetch(apiRoute.group, {
       method: method.post,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({ groupName }),
     })
 
@@ -47,14 +53,16 @@ export const createGroup = async ({ groupName }: { groupName: string }) => {
   }
 }
 
-export const queryGroups = async (query: string) => {
+export const queryGroups = async (
+  query: string,
+  apiRoute: apiRouteType,
+  method: methodType
+) => {
   if (query.trim() === "") return
   try {
     const res = await fetch(`${apiRoute.group}/query`, {
       method: method.post,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({ query }),
     })
     return await res.json()
@@ -63,13 +71,16 @@ export const queryGroups = async (query: string) => {
   }
 }
 
-export const groupRequest = async (userId: number, groupId: number) => {
+export const groupRequest = async (
+  userId: number,
+  groupId: number,
+  apiRoute: apiRouteType,
+  method: methodType
+) => {
   try {
     const res = await fetch(`${apiRoute.group}/${groupId}/request`, {
       method: method.post,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({
         userId,
       }),
@@ -80,18 +91,19 @@ export const groupRequest = async (userId: number, groupId: number) => {
   }
 }
 
-export const getUserGroups = async () => (await fetch(`/api/user/group`)).json()
+export const getUserGroups = async (apiRoute: apiRouteType) =>
+  (await fetch(`${apiRoute.user}/group`)).json()
 
 export const removeUserFromGroup = async (
   memberId: number,
-  groupId: number
+  groupId: number,
+  apiRoute: apiRouteType,
+  method: methodType
 ) => {
   try {
     const res = await fetch(`${apiRoute.group}/${groupId}/member`, {
       method: method.delete,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({
         userId: memberId,
       }),
@@ -104,13 +116,16 @@ export const removeUserFromGroup = async (
   }
 }
 
-export const approveUserToGroup = async (memberId: number, groupId: number) => {
+export const approveUserToGroup = async (
+  memberId: number,
+  groupId: number,
+  apiRoute: apiRouteType,
+  method: methodType
+) => {
   try {
     const res = await fetch(`${apiRoute.group}/${groupId}/approve`, {
       method: method.post,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({ userId: memberId }),
     })
     return res
@@ -119,13 +134,16 @@ export const approveUserToGroup = async (memberId: number, groupId: number) => {
   }
 }
 
-export const declineUserToGroup = async (memberId: number, groupId: number) => {
+export const declineUserToGroup = async (
+  memberId: number,
+  groupId: number,
+  apiRoute: apiRouteType,
+  method: methodType
+) => {
   try {
     const res = await fetch(`${apiRoute.group}/${groupId}/decline`, {
       method: method.post,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({ userId: memberId }),
     })
     return res
@@ -142,14 +160,14 @@ export const recordMatch = async (
   userId: number,
   opponentId: number,
   approvedBy: number,
-  matchId: number | null = null
+  matchId: number | null = null,
+  apiRoute: apiRouteType,
+  method: methodType
 ) => {
   try {
     const res = await fetch(`${apiRoute.group}/${groupId}/match`, {
       method: method.post,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({
         userScore,
         opponentScore,
@@ -172,14 +190,14 @@ export const submitMatch = async (
   matchDate: string,
   groupId: number,
   userId: number,
-  opponentId: number
+  opponentId: number,
+  apiRoute: apiRouteType,
+  method: methodType
 ) => {
   try {
     const res = await fetch(`${apiRoute.group}/${groupId}/match-submission`, {
       method: method.post,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({
         userScore,
         opponentScore,
@@ -196,14 +214,14 @@ export const submitMatch = async (
 
 export const removeMatchSubmission = async (
   matchId: number,
-  groupId: number
+  groupId: number,
+  apiRoute: apiRouteType,
+  method: methodType
 ) => {
   try {
     const res = await fetch(`${apiRoute.group}/${groupId}/match-submission`, {
       method: method.delete,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({ matchId }),
     })
   } catch (error) {
@@ -211,13 +229,62 @@ export const removeMatchSubmission = async (
   }
 }
 
-export const deleteAccount = async () => {
+export const changeAccountDetail = async (
+  field: FieldValues,
+  apiRoute: apiRouteType,
+  method: methodType
+) => {
+  try {
+    const res = await fetch(`${apiRoute.user}`, {
+      method: method.patch,
+      headers,
+      body: JSON.stringify(field),
+    })
+
+    return res
+  } catch (error) {}
+}
+
+export const changePassword = async (
+  passwordData: FieldValues,
+  apiRoute: apiRouteType,
+  method: methodType
+) => {
+  try {
+    const res = await fetch(`${apiRoute.user}`, {
+      method: method.patch,
+      headers,
+      body: JSON.stringify(passwordData),
+    })
+
+    return res
+  } catch (error) {}
+}
+
+export const setPassword = async (
+  passwordData: FieldValues,
+  apiRoute: apiRouteType,
+  method: methodType
+) => {
+  try {
+    const res = await fetch(`${apiRoute.user}/password`, {
+      method: method.post,
+      headers,
+      body: JSON.stringify(passwordData),
+    })
+
+    return res
+  } catch (error) {}
+}
+
+export const deleteAccount = async (
+  apiRoute: apiRouteType,
+  method: methodType
+) => {
   try {
     const res = await fetch(apiRoute.user, {
       method: method.delete,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
     })
     return res
   } catch (error) {

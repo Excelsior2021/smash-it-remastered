@@ -1,8 +1,10 @@
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { env } from "process"
-import { verifyPassword } from "@/src/lib/auth"
 import prisma from "@/src/lib/prisma"
+import { compare } from "bcryptjs"
+import GoogleProvider from "next-auth/providers/google"
+import { verifyPassword } from "@/src/lib/server-validation"
 
 export const authOptions = {
   secret: env.NEXTAUTH_SECRET,
@@ -26,45 +28,100 @@ export const authOptions = {
         userId: string
         password: string
       }) => {
-        let user
         try {
-          user = await prisma.user.findUnique({
+          const user = await prisma.user.findFirst({
             where: {
-              username: userId,
+              OR: [{ username: userId }, { email: userId }],
             },
           })
-          if (!user) {
-            user = await prisma.user.findUnique({
-              where: {
-                email: userId,
-              },
-            })
+          if (user) {
+            const passwordVerified = await verifyPassword(
+              password,
+              user.password!,
+              compare
+            )
+            if (passwordVerified) return user
+            else return null
           }
-          if (!user) return null
-
-          const passwordVerified = await verifyPassword(password, user.password)
-
-          if (passwordVerified) return user
-          else return null
+          return null
         } catch (error) {
           console.log(error)
           return null
         }
       },
     }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
   ],
   callbacks: {
-    jwt: async ({ token, user }) => {
-      //pass additional user data to token
-      if (user) {
-        return {
-          ...token,
-          id: user.id,
-          username: user.username,
-          firstName: user.firstName,
-          lastName: user.lastName,
+    signIn: async ({ account, profile }) => {
+      if (account)
+        switch (account.provider) {
+          case "credentials": {
+            return true
+          }
+          case "google": {
+            const user = await prisma.user.upsert({
+              where: {
+                email: profile.email,
+              },
+              create: {
+                username: (
+                  profile.given_name + Math.floor(Math.random() * 1000)
+                ).toLowerCase(),
+                email: profile.email,
+                firstName: profile.given_name,
+              },
+              update: {
+                firstName: profile.given_name,
+              },
+            })
+            if (user) return true
+            else return false
+          }
         }
+    },
+    jwt: async ({ token, user, account, trigger, session }) => {
+      //pass additional user data to token
+      if (account)
+        switch (account.provider) {
+          case "credentials": {
+            if (user) {
+              return {
+                ...token,
+                id: user.id,
+                username: user.username,
+                firstName: user.firstName,
+                lastName: user.lastName,
+              }
+            }
+            return token
+          }
+          case "google": {
+            const user = await prisma.user.findUnique({
+              where: {
+                email: token.email,
+              },
+            })
+            if (user) {
+              return {
+                ...token,
+                id: user.id,
+                username: user.username,
+                firstName: user.firstName,
+                lastName: user.lastName,
+              }
+            }
+            return token
+          }
+        }
+
+      if (trigger === "update") {
+        return { ...token, ...session.user }
       }
+
       return token
     },
     session: async ({ token, session }) => {

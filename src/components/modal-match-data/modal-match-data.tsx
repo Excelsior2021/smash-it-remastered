@@ -15,7 +15,7 @@ const ModalMatchData = ({ matchData }: props) => {
         </div>
       ))}
       <div className="flex justify-between">
-        <span>match date</span>
+        <span className="capitalize">match date</span>
         <span>{date.toDateString()}</span>
       </div>
     </div>

@@ -1,3 +1,5 @@
+import pattern from "./field-validation"
+
 export const loginFormFields = [
   {
     label: "username/email",
@@ -20,11 +22,11 @@ export const personalFormFields = [
     type: "email",
     required: "please enter your email",
     pattern: {
-      value: /\S+@\S+\.\S+/,
+      value: pattern.email,
       message: "please enter a valid email",
     },
     validate: (value: string) => {
-      ;/\S+@\S+\.\S+/.test(value) || "please enter a valid email"
+      pattern.email.test(value) || "please enter a valid email"
     },
   },
   {
@@ -45,17 +47,51 @@ export const accountFormFields = [
     name: "username",
     type: "text",
     required: "please enter a username",
+    pattern: {
+      value: pattern.username,
+      message: "please enter a valid username",
+    },
+    info: "username must be between 6 - 15 characters long. Characters must be alphanumeric ('_', '-' are also allowed). First character must be alphanumeric.",
   },
   {
     label: "password",
     name: "password",
     type: "password",
     required: "please enter a password",
+    info: "password must be between 6 - 20 characters long. password must start with an alphanumeric char or '_'.",
   },
   {
     label: "confirm password",
     name: "confirmPassword",
     type: "password",
     required: "please confirm your password",
+  },
+]
+
+export const changePasswordFormFields = [
+  {
+    label: "current password",
+    name: "currentPassword",
+    type: "password",
+    required: "please enter your current password",
+  },
+  {
+    label: "new password",
+    name: "newPassword",
+    type: "password",
+    info: "password must be between 6 - 20 characters long. password must start with an alphanumeric char or '_'.",
+    required: "please enter a new password",
+    pattern: {
+      value: pattern.password,
+      message: "please enter a valid password",
+    },
+  },
+  {
+    label: "confirm new password",
+    name: "confirmNewPassword",
+    type: "password",
+    required: "please confirm your new password",
+    validate: (value: string, newPassword: string) =>
+      newPassword === value || "passwords do not match",
   },
 ]

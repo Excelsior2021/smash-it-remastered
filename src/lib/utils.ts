@@ -1,5 +1,5 @@
-import { userGroup } from "@/types"
-import { NextRouter } from "next/router"
+import type { userGroup } from "@/types"
+import type { NextRouter } from "next/router"
 
 export const updateGroupDataForPage = (
   activeGroup: userGroup,

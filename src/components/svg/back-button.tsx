@@ -1,4 +1,8 @@
-const BackButton = ({ className }: { className: string }) => (
+type props = {
+  className: string
+}
+
+const BackButton = ({ className }: props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"

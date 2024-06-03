@@ -8,6 +8,8 @@ import headerStore from "@/src/store/header"
 import userStore from "@/src/store/user"
 import { useRouter } from "next/router"
 import { useEffect } from "react"
+import { authOptions } from "../../api/auth/[...nextauth]"
+import { getServerSession } from "next-auth"
 
 type props = {
   profileUser: {
@@ -95,7 +97,12 @@ const MatchHistory = ({
 export default MatchHistory
 
 export const getServerSideProps = async context => {
-  const props = await protectedRoute(context)
+  const props = await protectedRoute(
+    context,
+    getServerSession,
+    clientRoute,
+    authOptions
+  )
   const { authenticated, session } = props
   if (!authenticated) return props
 

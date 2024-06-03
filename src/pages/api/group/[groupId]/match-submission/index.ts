@@ -9,7 +9,7 @@ import type { NextApiRequest, NextApiResponse } from "next"
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const session = await getServerSession(req, res, authOptions)
 
-  if (!session) return res.status(401).json("not authenticated")
+  if (!session) return res.status(401).json({ message: "not authenticated" })
 
   const groupId = parseInt(req.query.groupId as string)
 
@@ -34,7 +34,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           },
         })
 
-        if (submission) return res.status(201).json("match submitted")
+        if (submission)
+          return res.status(201).json({ message: "match submitted" })
       } catch (error) {
         console.log(error)
       }
@@ -51,9 +52,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             },
           })
           if (submission)
-            return res.status(200).json("match submission removed")
+            return res.status(200).json({ message: "match submission removed" })
         }
-      } catch (error) {}
+      } catch (error) {
+        console.log(error)
+      }
     }
   }
 

@@ -59,3 +59,19 @@
   transform: translateY(-200px);
   opacity: 0;
 }
+
+.btn-secondary:is(.btn-disabled, [disabled], :disabled) {
+  background-color: #0c3a57;
+}
+
+.toggle {
+  background-color: grey;
+}
+
+.toggle:hover {
+  background-color: grey;
+}
+
+.toggle:hover:checked {
+  background-color: #0c3a57;
+}
