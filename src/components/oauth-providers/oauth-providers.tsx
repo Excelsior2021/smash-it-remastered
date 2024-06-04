@@ -16,6 +16,11 @@ const OauthProviders = ({ providers, signIn }: props) => (
         return (
           <div key={provider.id}>
             <button
+              className="btn btn-secondary"
+              onClick={() => signIn(provider.id)}>
+              continue with google
+            </button>
+            {/* <button
               className="btn gsi-material-button"
               onClick={() => signIn(provider.id)}>
               <div className="gsi-material-button-state" />
@@ -51,7 +56,7 @@ const OauthProviders = ({ providers, signIn }: props) => (
                 </span>
                 <span style={{ display: "none" }}>Continue with Google</span>
               </div>
-            </button>
+            </button> */}
           </div>
         )
     })}

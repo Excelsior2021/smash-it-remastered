@@ -53,7 +53,7 @@ const Login = ({ providers }) => {
       <div className="sm:w-[500px]">
         <h1 className="text-3xl mb-10">Login to your account</h1>
 
-        {/* <OauthProviders providers={providers} signIn={signIn} /> */}
+        <OauthProviders providers={providers} signIn={signIn} />
 
         <form
           className="flex flex-col gap-8 mb-6"
