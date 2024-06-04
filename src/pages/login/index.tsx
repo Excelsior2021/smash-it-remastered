@@ -28,6 +28,8 @@ const Login = ({ providers }) => {
   const [submitting, setSubmmiting] = useState(false)
   const [showPassword, setShowPassowrd] = useState(false)
 
+  console.log(providers)
+
   const handleLogin = async (
     signIn,
     formData: FieldValues,
