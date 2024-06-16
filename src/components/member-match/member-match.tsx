@@ -1,15 +1,24 @@
+//components
 import Avatar from "../avatar/avatar"
 import Input from "../input/input"
+
+//lib
 import { generateDisplayName } from "@/src/lib/utils"
 
+//types
 import type { member } from "@/types"
-import type { FieldValues, UseFormRegister } from "react-hook-form"
+import type {
+  FieldValues,
+  UseFormClearErrors,
+  UseFormRegister,
+} from "react-hook-form"
 
 type props = {
   member: member
   register: UseFormRegister<FieldValues>
   inputLabel: string
   inputName: string
+  clearErrors: UseFormClearErrors<FieldValues>
 }
 
 const MemberMatch = ({

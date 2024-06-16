@@ -72,38 +72,33 @@ export const authRedirect = async (
     }
 }
 
-export const getVerificationToken = async (email: string, tx) => {
+export const getToken = async (email: string, tx, type: string) => {
   try {
-    const token = await tx.emailVerification.findUnique({
+    const token = await tx[type].findUnique({
       where: {
         email,
       },
     })
-
     return token
   } catch (error) {
     console.log(error)
   }
 }
 
-export const generateEmailVerificationToken = async (
-  email: string,
-  uuid,
-  tx
-) => {
+export const generateToken = async (email: string, uuid, tx, type: string) => {
   const token = uuid()
   const expire = new Date().getTime() + 1000 * 60 * 60 * 24
 
-  const existingToken = await getVerificationToken(email, tx)
+  const existingToken = await getToken(email, tx, type)
 
   if (existingToken)
-    await tx.emailVerification.delete({
+    await tx[type].delete({
       where: {
         email,
       },
     })
 
-  const verificationToken = await tx.emailVerification.create({
+  const newToken = await tx[type].create({
     data: {
       email,
       token,
@@ -111,7 +106,7 @@ export const generateEmailVerificationToken = async (
     },
   })
 
-  return verificationToken
+  return newToken
 }
 
 export const sendEmailVerificationToken = async (
@@ -134,6 +129,37 @@ export const sendEmailVerificationToken = async (
       <p>Please verify your email with the link below.</p>
 
       <a href=${confirmationLink}>${confirmationLink}</a>
+    </div>`,
+    })
+
+    if (error) throw new Error(error)
+
+    return data
+  } catch (error) {
+    return error
+  }
+}
+
+export const sendResetPasswordToken = async (
+  email: string,
+  token: string,
+  username: string,
+  resend
+) => {
+  try {
+    const resetPasswordLink = `${process.env.CLIENT_DOMAIN}/reset-password?token=${token}`
+
+    const { data, error } = await resend.emails.send({
+      from: "Smash It! <onboarding@resend.dev>",
+      to: email,
+      subject: "Reset your password",
+      text: resetPasswordLink,
+      html: `  <div>
+      <h1>Hi, ${username}!</h1>
+
+      <p>Reset your password with the link below.</p>
+
+      <a href=${resetPasswordLink}>${resetPasswordLink}</a>
     </div>`,
     })
 

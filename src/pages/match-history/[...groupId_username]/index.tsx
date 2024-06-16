@@ -1,33 +1,45 @@
+//components
 import MatchHistoryItem from "@/src/components/match-history-item/match-history-item"
+
+//react
+import { useEffect } from "react"
+
+//next
+import { useRouter } from "next/router"
+
+//lib
 import { protectedRoute } from "@/src/lib/auth"
 import clientRoute from "@/src/lib/client-route"
 import prisma from "@/src/lib/prisma"
 import { userInGroup } from "@/src/lib/server-validation"
 import { updateGroupDataForPage } from "@/src/lib/utils"
+
+//store
 import headerStore from "@/src/store/header"
 import userStore from "@/src/store/user"
-import { useRouter } from "next/router"
-import { useEffect } from "react"
+
+//next-auth
 import { authOptions } from "../../api/auth/[...nextauth]"
 import { getServerSession } from "next-auth"
 
+//types
+import type { match, profileUser } from "@/types"
+import type { GetServerSidePropsContext } from "next"
+
 type props = {
-  profileUser: {
-    username: string
-    id: number
-  }
-  matches: any
+  profileUser: profileUser
+  matches: string
   noMatches: boolean
   notInGroup: string
 }
 
 const MatchHistory = ({
   profileUser,
-  matches,
+  matches, //comes as a string from the server but is then converted back into an object (matchesObj)
   noMatches,
   notInGroup,
 }: props) => {
-  let matchesObj
+  let matchesObj: match[] = []
   if (matches) matchesObj = JSON.parse(matches)
 
   const activeGroup = userStore(state => state.activeGroup)
@@ -74,13 +86,13 @@ const MatchHistory = ({
           {profileUser.username} currently has no matches in this group.
         </p>
       )}
-      {matches && (
+      {matchesObj && (
         <div>
-          <div className="text-center mb-2 text-xl">
+          <div className="text-center mb-6 text-xl">
             {matchesObj.length} matches
           </div>
           <ul className="flex flex-col gap-6 min-[640px]:items-center min-[640px]:gap-10 max-h-[400px] overflow-auto">
-            {matchesObj.map(match => (
+            {matchesObj.map((match: match) => (
               <MatchHistoryItem
                 key={match.id}
                 match={match}
@@ -96,7 +108,9 @@ const MatchHistory = ({
 
 export default MatchHistory
 
-export const getServerSideProps = async context => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const props = await protectedRoute(
     context,
     getServerSession,
@@ -105,6 +119,11 @@ export const getServerSideProps = async context => {
   )
   const { authenticated, session } = props
   if (!authenticated) return props
+
+  if (!context.query.groupId_username)
+    return {
+      notFound: true,
+    }
 
   const groupId = parseInt(context.query.groupId_username[0])
   const username = context.query.groupId_username[1]
@@ -154,6 +173,9 @@ export const getServerSideProps = async context => {
       groupId,
       OR: [{ player1Id: user.id }, { player2Id: user.id }],
     },
+    orderBy: {
+      matchDate: "desc",
+    },
     include: {
       player1: {
         select: {
@@ -170,17 +192,20 @@ export const getServerSideProps = async context => {
     },
   })
 
+  //remove stats from user object for profileUser variable
+  const profileUser = { id: user.id, username: user.username }
+
   if (matches.length > 0)
     return {
       props: {
-        profileUser: user,
+        profileUser,
         matches: JSON.stringify(matches),
       },
     }
   else
     return {
       props: {
-        profileUser: user,
+        profileUser,
         noMatches: true,
       },
     }

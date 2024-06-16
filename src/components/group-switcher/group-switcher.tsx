@@ -1,4 +1,9 @@
+//store
 import userStore from "@/src/store/user"
+
+//types
+import type { userGroup } from "@/types"
+import type { ChangeEvent } from "react"
 
 const GroupSwitcher = () => {
   const { groups, activeGroup, setActiveGroup } = userStore(state => ({
@@ -9,8 +14,10 @@ const GroupSwitcher = () => {
 
   if (!groups || !activeGroup || groups.length < 2) return
 
-  const changeGroup = e => {
-    const group = groups.find(group => group.name === e.target.value)
+  const changeGroup = (e: ChangeEvent) => {
+    const group = groups.find(
+      (group: userGroup) => group.name === e.target.value
+    )
     setActiveGroup(group)
   }
 
@@ -43,7 +50,7 @@ const GroupSwitcher = () => {
           name="group"
           className="select text-lg bg-secondary outline-none rounded-xl w-24 min-[380px]:w-44 p-2 cursor-pointer lg:bg-accent lg:w-28"
           onChange={changeGroup}>
-          {groups.map(({ id, name }) => (
+          {groups.map(({ id, name }: userGroup) => (
             <option key={id}>{name}</option>
           ))}
         </select>

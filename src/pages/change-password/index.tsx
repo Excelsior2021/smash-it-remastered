@@ -1,28 +1,42 @@
+//components
 import Input from "@/src/components/input/input"
-import apiRoute from "@/src/lib/api-route"
-import { changePasswordFormFields } from "@/src/lib/form-fields"
-import method from "@/src/lib/http-method"
-import { useForm } from "react-hook-form"
-import { changePassword, setPassword } from "@/src/lib/api"
 import Modal from "@/src/components/modal/modal"
-import { useEffect, useState } from "react"
+import EmailUnverifiedMessage from "@/src/components/email-unverified-message/email-unverified-message"
 import Toggle from "@/src/components/toggle/toggle"
-import { protectedRoute } from "@/src/lib/auth"
-import { getServerSession } from "next-auth"
-import clientRoute from "@/src/lib/client-route"
-import { authOptions } from "../api/auth/[...nextauth]"
-import prisma from "@/src/lib/prisma"
 
+//react
+import { useEffect, useState } from "react"
+import { useForm } from "react-hook-form"
+
+//next
+import { useRouter } from "next/router"
+
+//lib
+import prisma from "@/src/lib/prisma"
+import { changePasswordFormFields } from "@/src/lib/form-fields"
+import { changePassword, setPassword } from "@/src/lib/api"
+import { protectedRoute } from "@/src/lib/auth"
+import clientRoute from "@/src/lib/client-route"
+import apiRoute from "@/src/lib/api-route"
+import method from "@/src/lib/http-method"
+
+//store
+import headerStore from "@/src/store/header"
+
+import { getServerSession } from "next-auth"
+import { authOptions } from "../api/auth/[...nextauth]"
+
+//types
 import type { apiRouteType, methodType } from "@/types"
 import type { FieldValues } from "react-hook-form"
-import { useRouter } from "next/router"
-import headerStore from "@/src/store/header"
+import type { GetServerSidePropsContext } from "next"
 
 type props = {
   hasPassword: boolean
+  emailUnverified: true | undefined
 }
 
-const ChangePassword = ({ hasPassword }: props) => {
+const ChangePassword = ({ hasPassword, emailUnverified }: props) => {
   const {
     register,
     handleSubmit,
@@ -71,6 +85,8 @@ const ChangePassword = ({ hasPassword }: props) => {
       setSubmitting(false)
     }
   }
+
+  if (emailUnverified) return <EmailUnverifiedMessage />
 
   return (
     <div>
@@ -140,7 +156,9 @@ const ChangePassword = ({ hasPassword }: props) => {
 
 export default ChangePassword
 
-export const getServerSideProps = async context => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const props = await protectedRoute(
     context,
     getServerSession,
@@ -149,6 +167,13 @@ export const getServerSideProps = async context => {
   )
   const { authenticated, session } = props
   if (!authenticated) return props
+
+  if (!session.user.emailVerified)
+    return {
+      props: {
+        emailUnverified: true,
+      },
+    }
 
   const user = await prisma.user.findUnique({
     where: {

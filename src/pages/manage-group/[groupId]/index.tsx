@@ -1,15 +1,52 @@
+//components
 import LinkButton from "@/src/components/link-button/link-button"
+
+//react
+import { useEffect } from "react"
+
+//next
+import { useRouter } from "next/router"
+
+//lib
 import { adminRoute, notAdmin, protectedRoute } from "@/src/lib/auth"
 import prisma from "@/src/lib/prisma"
 import clientRoute from "@/src/lib/client-route"
 import { updateGroupDataForPage } from "@/src/lib/utils"
+
+//store
 import headerStore from "@/src/store/header"
 import navStore from "@/src/store/nav"
 import userStore from "@/src/store/user"
-import { useRouter } from "next/router"
-import { useEffect } from "react"
-import { authOptions } from "../../api/auth/[...nextauth]"
+
+//next-auth
 import { getServerSession } from "next-auth"
+import { authOptions } from "../../api/auth/[...nextauth]"
+
+//types
+import type { GetServerSidePropsContext } from "next"
+
+const manageGroupLinks = [
+  {
+    key: 1,
+    hrefPrefix: clientRoute.groupRequests,
+    text: "requests",
+  },
+  {
+    key: 2,
+    hrefPrefix: clientRoute.approveMatches,
+    text: "approve matches",
+  },
+  {
+    key: 3,
+    hrefPrefix: clientRoute.addAdmin,
+    text: "add to admins",
+  },
+  {
+    key: 4,
+    hrefPrefix: clientRoute.removeMembers,
+    text: "remove members",
+  },
+]
 
 const ManageGroup = () => {
   const activeGroup = userStore(state => state.activeGroup)
@@ -49,26 +86,14 @@ const ManageGroup = () => {
       <h1 className="text-center text-3xl mb-10">Manage Group</h1>
       {activeGroup && (
         <ul className="flex flex-col gap-10 items-center max-w-96 m-auto">
-          <li className="w-full">
-            <LinkButton
-              href={`${clientRoute.groupRequests}/${groupId}`}
-              text="requests"
-            />
-          </li>
-
-          <li className="w-full">
-            <LinkButton
-              href={`${clientRoute.approveMatches}/${groupId}`}
-              text="approve matches"
-            />
-          </li>
-
-          <li className="w-full">
-            <LinkButton
-              href={`${clientRoute.removeMembers}/${groupId}`}
-              text="remove members"
-            />
-          </li>
+          {manageGroupLinks.map(link => (
+            <li key={link.key} className="w-full">
+              <LinkButton
+                href={`${link.hrefPrefix}/${groupId}`}
+                text={link.text}
+              />
+            </li>
+          ))}
         </ul>
       )}
     </div>
@@ -77,7 +102,9 @@ const ManageGroup = () => {
 
 export default ManageGroup
 
-export const getServerSideProps = async context => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const props = await protectedRoute(
     context,
     getServerSession,
@@ -89,6 +116,7 @@ export const getServerSideProps = async context => {
 
   const admin = await adminRoute(context, session, prisma)
   if (!admin) return notAdmin(context, clientRoute)
+
   return {
     props: {},
   }

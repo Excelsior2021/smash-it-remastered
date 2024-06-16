@@ -1,31 +1,50 @@
+//components
 import Avatar from "@/src/components/avatar/avatar"
 import NoGroup from "@/src/components/no-group/no-group"
+import LinkButton from "@/src/components/link-button/link-button"
+
+//react
+import { useEffect } from "react"
+
+//next
+import { useRouter } from "next/router"
+
+//lib
 import { protectedRoute } from "@/src/lib/auth"
 import clientRoute from "@/src/lib/client-route"
 import { generateDisplayName, updateGroupDataForPage } from "@/src/lib/utils"
-import navStore from "@/src/store/nav"
-import userStore from "@/src/store/user"
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/router"
-import { useEffect } from "react"
 import prisma from "@/src/lib/prisma"
 import statKeys from "@/src/lib/stat-keys"
 import { userInGroup } from "@/src/lib/server-validation"
-import LinkButton from "@/src/components/link-button/link-button"
+
+//store
+import navStore from "@/src/store/nav"
+import userStore from "@/src/store/user"
+
+//next-auth
 import { authOptions } from "../../api/auth/[...nextauth]"
 import { getServerSession } from "next-auth"
 
-import type { profile } from "@/types"
+//types
+import type { profile, stats } from "@/types"
+import type { GetServerSidePropsContext } from "next"
 
 type props = {
   profile: profile
-  serverMessage: string
-  noGroup: boolean
+  stats: stats
+  notGroupMember: string
+  noGroup?: boolean
+  sessionUserId: number
 }
 
-const Profile = ({ profile, serverMessage, noGroup }: props) => {
+const Profile = ({
+  profile,
+  stats,
+  notGroupMember,
+  noGroup,
+  sessionUserId,
+}: props) => {
   const router = useRouter()
-  const session = useSession()
   const activeGroup = userStore(state => state.activeGroup)
   const setActiveNavItem = navStore(state => state.setActiveNavItem)
 
@@ -40,9 +59,8 @@ const Profile = ({ profile, serverMessage, noGroup }: props) => {
   useEffect(() => {
     if (noGroup) setActiveNavItem("profile")
 
-    if (!noGroup && !serverMessage) {
-      if (profile)
-        if (profile.id === session.data?.user.id) setActiveNavItem("profile")
+    if (!noGroup && !notGroupMember) {
+      if (profile) if (profile.id === sessionUserId) setActiveNavItem("profile")
       if (activeGroup)
         updateGroupDataForPage(
           activeGroup,
@@ -55,17 +73,17 @@ const Profile = ({ profile, serverMessage, noGroup }: props) => {
   }, [
     router,
     activeGroup,
-    session,
+    sessionUserId,
     noGroup,
     profile,
     setActiveNavItem,
-    serverMessage,
+    notGroupMember,
     groupId,
   ])
 
   if (noGroup) return <NoGroup />
 
-  if (serverMessage) return <p className="text-center">{serverMessage}</p>
+  if (notGroupMember) return <p className="text-center">{notGroupMember}</p>
 
   return (
     <div className="flex justify-center">
@@ -89,7 +107,7 @@ const Profile = ({ profile, serverMessage, noGroup }: props) => {
             {statKeys
               .filter(statKey => statKey.name !== "username")
               .map(statKey => {
-                let value = profile.stats[statKey.serverName]
+                let value = stats[statKey.serverName]
                 if (statKey.serverName === "winRatio")
                   value = `${Math.round(value * 100)}%`
                 return (
@@ -113,7 +131,9 @@ const Profile = ({ profile, serverMessage, noGroup }: props) => {
 
 export default Profile
 
-export const getServerSideProps = async context => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const props = await protectedRoute(
     context,
     getServerSession,
@@ -122,6 +142,11 @@ export const getServerSideProps = async context => {
   )
   const { authenticated, session } = props
   if (!authenticated) return props
+
+  if (!context.query.groupId_username)
+    return {
+      notFound: true,
+    }
 
   try {
     const groupId = parseInt(context.query.groupId_username[0])
@@ -165,14 +190,16 @@ export const getServerSideProps = async context => {
       if (profile.stats.length === 0) {
         return {
           props: {
-            serverMessage: `${profile.username} is not a member of the current group`,
+            notGroupMember: `${profile.username} is not a member of the current group`,
           },
         }
       }
-      profile.stats = profile.stats[0]
+      const stats = profile.stats[0]
       return {
         props: {
           profile,
+          stats,
+          sessionUserId: session.user.id,
         },
       }
     }

@@ -1,22 +1,35 @@
-import clientRoute from "@/src/lib/client-route"
-import { getServerSession } from "next-auth"
-import { authOptions } from "../api/auth/[...nextauth]"
-import { protectedRoute } from "@/src/lib/auth"
-import Input from "@/src/components/input/input"
-import { useForm } from "react-hook-form"
-import prisma from "@/src/lib/prisma"
-import Edit from "@/src/components/svg/edit"
+//components
 import Modal from "@/src/components/modal/modal"
-import { useEffect, useRef, useState } from "react"
+import Input from "@/src/components/input/input"
+import Edit from "@/src/components/svg/edit"
+
+//react
+import { ReactNode, useEffect, useRef, useState } from "react"
+import { useForm } from "react-hook-form"
+
+//next
+import { useRouter } from "next/router"
+
+//lib
+import prisma from "@/src/lib/prisma"
+import clientRoute from "@/src/lib/client-route"
+import { protectedRoute } from "@/src/lib/auth"
 import apiRoute from "@/src/lib/api-route"
 import method from "@/src/lib/http-method"
 import { changeAccountDetail } from "@/src/lib/api"
-import { useRouter } from "next/router"
-import { useSession } from "next-auth/react"
+
+//store
 import headerStore from "@/src/store/header"
 
+//next-auth
+import { getServerSession } from "next-auth"
+import { authOptions } from "../api/auth/[...nextauth]"
+import { useSession } from "next-auth/react"
+
+//types
 import type { apiRouteType, methodType } from "@/types"
 import type { FieldValues } from "react-hook-form"
+import type { GetServerSidePropsContext } from "next"
 
 enum submissionStatus {
   pending,
@@ -24,7 +37,25 @@ enum submissionStatus {
   failed,
 }
 
-const AccountDetails = ({ fields }) => {
+type props = {
+  fields: {
+    label: string
+    name: string
+    type: string
+    value: string
+    text: string
+  }[]
+}
+
+type accountFieldsModalDataType = {
+  heading: string
+  text: string
+  input: ReactNode
+  onClick: (e: Event) => void
+  onClickClose: () => void
+}
+
+const AccountDetails = ({ fields }: props) => {
   const { update } = useSession()
   const {
     register,
@@ -34,7 +65,8 @@ const AccountDetails = ({ fields }) => {
     clearErrors,
     formState: { errors },
   } = useForm()
-  const [accountFieldModalData, setAccountFieldModalData] = useState({})
+  const [accountFieldsModalData, setAccountFieldsModalData] =
+    useState<accountFieldsModalDataType | null>(null)
   const [submitting, setSubmmiting] = useState(false)
   const [submission, setSubmission] = useState(submissionStatus.pending)
   const [serverError, setServerError] = useState(false)
@@ -59,12 +91,11 @@ const AccountDetails = ({ fields }) => {
       if (res && res.ok) {
         router.replace(router.asPath)
         const data = await res?.json()
-        console.log(data)
-        update({ user: { [data.field]: data.value } })
+        update({ [data.field]: data.value })
         setSubmission(submissionStatus.success)
       } else {
         const data = await res?.json()
-        const errors = data.errors.filter(error => error && error)
+        const errors = data.errors.filter((error: string) => error && error)
         setServerError(true)
         setError("server", {
           type: "server",
@@ -80,27 +111,29 @@ const AccountDetails = ({ fields }) => {
 
   return (
     <div className="max-w-[500px] m-auto">
-      <Modal
-        heading={accountFieldModalData.heading}
-        headingCapitalize={true}
-        text={
-          submission === submissionStatus.pending
-            ? accountFieldModalData.text
-            : submissionStatus.success
-            ? "updated successfully"
-            : null
-        }
-        accountFieldInput={
-          submission === submissionStatus.pending
-            ? accountFieldModalData.input
-            : null
-        }
-        errors={serverError ? errors : null}
-        action={submission === submissionStatus.pending ? "submit" : null}
-        loading={submitting}
-        onClick={accountFieldModalData.onClick}
-        onClickClose={accountFieldModalData.onClickClose}
-      />
+      {accountFieldsModalData && (
+        <Modal
+          heading={accountFieldsModalData.heading}
+          headingCapitalize={true}
+          text={
+            submission === submissionStatus.pending
+              ? accountFieldsModalData.text
+              : submissionStatus.success
+              ? "updated successfully"
+              : null
+          }
+          accountFieldInput={
+            submission === submissionStatus.pending
+              ? accountFieldsModalData.input
+              : null
+          }
+          errors={serverError ? errors : null}
+          action={submission === submissionStatus.pending ? "submit" : null}
+          loading={submitting}
+          onClick={accountFieldsModalData.onClick}
+          onClickClose={accountFieldsModalData.onClickClose}
+        />
+      )}
 
       <h1 className="text-3xl text-center capitalize mb-6">account details</h1>
       <ul className="flex flex-col gap-8">
@@ -111,7 +144,7 @@ const AccountDetails = ({ fields }) => {
               <div
                 className="cursor-pointer"
                 onClick={() => {
-                  setAccountFieldModalData({
+                  setAccountFieldsModalData({
                     heading: `new ${field.label}`,
                     text: field.text,
                     input: (
@@ -138,7 +171,7 @@ const AccountDetails = ({ fields }) => {
                         />
                       </form>
                     ),
-                    onClick: e => {
+                    onClick: (e: Event) => {
                       e.preventDefault()
                       formRef.current.requestSubmit()
                     },
@@ -164,7 +197,9 @@ const AccountDetails = ({ fields }) => {
 
 export default AccountDetails
 
-export const getServerSideProps = async context => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const props = await protectedRoute(
     context,
     getServerSession,
@@ -226,5 +261,9 @@ export const getServerSideProps = async context => {
         fields,
       },
     }
+  }
+
+  return {
+    notFound: true,
   }
 }

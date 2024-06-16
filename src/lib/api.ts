@@ -1,4 +1,9 @@
-import type { clientRouteType, apiRouteType, methodType } from "@/types"
+import type {
+  clientRouteType,
+  apiRouteType,
+  methodType,
+  signInNextAuth,
+} from "@/types"
 import type { FieldValues } from "react-hook-form"
 
 const headers = {
@@ -6,7 +11,7 @@ const headers = {
 }
 
 export const login = async (
-  signIn,
+  signIn: signInNextAuth,
   { userId, password }: FieldValues,
   clientRoute: clientRouteType
 ) =>
@@ -65,7 +70,7 @@ export const queryGroups = async (
       headers,
       body: JSON.stringify({ query }),
     })
-    return await res.json()
+    return res
   } catch (error) {
     console.log(error)
   }
@@ -95,7 +100,7 @@ export const getUserGroups = async (apiRoute: apiRouteType) =>
   (await fetch(`${apiRoute.user}/group`)).json()
 
 export const removeUserFromGroup = async (
-  memberId: number,
+  userId: number,
   groupId: number,
   apiRoute: apiRouteType,
   method: methodType
@@ -105,7 +110,7 @@ export const removeUserFromGroup = async (
       method: method.delete,
       headers,
       body: JSON.stringify({
-        userId: memberId,
+        userId,
       }),
     })
 
@@ -117,7 +122,7 @@ export const removeUserFromGroup = async (
 }
 
 export const approveUserToGroup = async (
-  memberId: number,
+  userId: number,
   groupId: number,
   apiRoute: apiRouteType,
   method: methodType
@@ -126,7 +131,7 @@ export const approveUserToGroup = async (
     const res = await fetch(`${apiRoute.group}/${groupId}/approve`, {
       method: method.post,
       headers,
-      body: JSON.stringify({ userId: memberId }),
+      body: JSON.stringify({ userId }),
     })
     return res
   } catch (error) {
@@ -135,7 +140,7 @@ export const approveUserToGroup = async (
 }
 
 export const declineUserToGroup = async (
-  memberId: number,
+  userId: number,
   groupId: number,
   apiRoute: apiRouteType,
   method: methodType
@@ -144,7 +149,25 @@ export const declineUserToGroup = async (
     const res = await fetch(`${apiRoute.group}/${groupId}/decline`, {
       method: method.post,
       headers,
-      body: JSON.stringify({ userId: memberId }),
+      body: JSON.stringify({ userId }),
+    })
+    return res
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const makeUserAdminOfGroup = async (
+  userId: number,
+  groupId: number,
+  apiRoute: apiRouteType,
+  method: methodType
+) => {
+  try {
+    const res = await fetch(`${apiRoute.group}/${groupId}/admin`, {
+      method: method.patch,
+      headers,
+      body: JSON.stringify({ userId }),
     })
     return res
   } catch (error) {
@@ -160,9 +183,9 @@ export const recordMatch = async (
   userId: number,
   opponentId: number,
   approvedBy: number,
-  matchId: number | null = null,
   apiRoute: apiRouteType,
-  method: methodType
+  method: methodType,
+  matchId: number | null = null
 ) => {
   try {
     const res = await fetch(`${apiRoute.group}/${groupId}/match`, {
@@ -224,6 +247,7 @@ export const removeMatchSubmission = async (
       headers,
       body: JSON.stringify({ matchId }),
     })
+    return res
   } catch (error) {
     console.log(error)
   }
@@ -242,9 +266,12 @@ export const changeAccountDetail = async (
     })
 
     return res
-  } catch (error) {}
+  } catch (error) {
+    console.log(error)
+  }
 }
 
+//if password already exists
 export const changePassword = async (
   passwordData: FieldValues,
   apiRoute: apiRouteType,
@@ -261,6 +288,7 @@ export const changePassword = async (
   } catch (error) {}
 }
 
+//if password was not set initially. e.g. oauth sign up
 export const setPassword = async (
   passwordData: FieldValues,
   apiRoute: apiRouteType,
@@ -274,7 +302,48 @@ export const setPassword = async (
     })
 
     return res
-  } catch (error) {}
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+//forgotten password
+export const forgottenPassword = async (
+  email: string,
+  apiRoute: apiRouteType,
+  method: methodType
+) => {
+  try {
+    const res = await fetch(`${apiRoute.email}`, {
+      method: method.post,
+      headers,
+      body: JSON.stringify({ email }),
+    })
+
+    return res
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+//reset password if user has forgotten
+export const resetPassword = async (
+  passwordData: FieldValues,
+  token: string,
+  apiRoute: apiRouteType,
+  method: methodType
+) => {
+  try {
+    const res = await fetch(`${apiRoute.user}/password`, {
+      method: method.patch,
+      headers,
+      body: JSON.stringify({ ...passwordData, token }),
+    })
+
+    return res
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 export const deleteAccount = async (
@@ -285,6 +354,20 @@ export const deleteAccount = async (
     const res = await fetch(apiRoute.user, {
       method: method.delete,
       headers,
+    })
+    return res
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const verifyEmail = async (
+  apiRoute: apiRouteType,
+  method: methodType
+) => {
+  try {
+    const res = await fetch(apiRoute.email, {
+      method: method.get,
     })
     return res
   } catch (error) {

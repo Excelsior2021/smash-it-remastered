@@ -1,24 +1,41 @@
+//components
 import FormSection from "@/src/components/form-section/form-section"
+import OauthProviders from "@/src/components/oauth-providers/oauth-providers"
+
+//react
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+
+//next
+import Link from "next/link"
+import { useRouter } from "next/router"
+
+//lib
 import { createAccount } from "@/src/lib/api"
 import { authRedirect } from "@/src/lib/auth"
 import { accountFormFields, personalFormFields } from "@/src/lib/form-fields"
 import clientRoute from "@/src/lib/client-route"
-import createAccountFormStore from "@/src/store/create-account"
-import Link from "next/link"
-import { useRouter } from "next/router"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { authOptions } from "../api/auth/[...nextauth]"
-import { getServerSession } from "next-auth"
-import OauthProviders from "@/src/components/oauth-providers/oauth-providers"
-import { getProviders, signIn } from "next-auth/react"
 import apiRoute from "@/src/lib/api-route"
 import method from "../../lib/http-method"
 
-import type { NextRouter } from "next/router"
-import type { apiRouteType, methodType } from "@/types"
+//store
+import createAccountFormStore from "@/src/store/create-account"
 
-const CreateAccount = ({ providers }) => {
+//next-auth
+import { authOptions } from "../api/auth/[...nextauth]"
+import { getServerSession } from "next-auth"
+import { getProviders, signIn } from "next-auth/react"
+
+//types
+import type { NextRouter } from "next/router"
+import type { apiRouteType, methodType, providers } from "@/types"
+import type { GetServerSidePropsContext } from "next"
+
+type props = {
+  providers: providers
+}
+
+const CreateAccount = ({ providers }: props) => {
   const {
     register,
     handleSubmit,
@@ -148,7 +165,9 @@ const CreateAccount = ({ providers }) => {
 
 export default CreateAccount
 
-export const getServerSideProps = async context => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const session = await authRedirect(
     context,
     getServerSession,

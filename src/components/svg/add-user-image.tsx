@@ -1,10 +1,11 @@
 import type { MouseEventHandler } from "react"
 
 type props = {
+  className: string
   onClick: MouseEventHandler<HTMLDivElement>
 }
 
-const AddUserImage = ({ onClick }: props) => (
+const AddUserImage = ({ className, onClick }: props) => (
   <div className="p-2" onClick={onClick}>
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -12,7 +13,7 @@ const AddUserImage = ({ onClick }: props) => (
       viewBox="0 0 24 24"
       strokeWidth={1}
       stroke="currentColor"
-      className="add-member w-6 h-6 lg:w-8 lg:h-8">
+      className={className}>
       <path
         strokeLinecap="round"
         strokeLinejoin="round"

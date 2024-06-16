@@ -8,9 +8,10 @@ async function main() {
 
   await seed.$resetDatabase()
 
-  const { user } = await seed.user(x =>
+  await seed.user(x =>
     x(20, {
       password: "$2a$12$.vyDhv90QFEI3mUz89MNEukfR8.1h6l0xQsPolIzKTv5aM.8r9S5a",
+      emailVerified: new Date(),
     })
   )
 
@@ -59,7 +60,7 @@ async function main() {
       groupMembersStats[Math.floor(Math.random() * groupMembersStats.length)]
         .userId
 
-    const { match } = await seed.match(x =>
+    await seed.match(x =>
       x(
         { min: 1, max: 10 },
         {

@@ -14,10 +14,12 @@ enum clientRoute {
   groupRequests = "/group-requests",
   joinCreateGroup = "/join-or-create-group",
   manageGroup = "/manage-group",
+  addAdmin = "/add-admin",
   recordMatch = "/record-match",
   removeMembers = "/remove-members",
   deleteAccount = "/delete-account",
-  resetPassword = "/reset-password",
+  forgottenPassword = "/forgotten-password",
+  emailVerification = "email-verification",
 }
 
 export default clientRoute

@@ -1,23 +1,36 @@
 import MemberList from "@/src/components/member-list/member-list"
+
+//react
+import { useEffect } from "react"
+
+//next
+import { useRouter } from "next/router"
+
+//lib
 import { adminRoute, notAdmin, protectedRoute } from "@/src/lib/auth"
 import memberListItemType from "@/src/lib/member-list-item-types"
 import prisma from "@/src/lib/prisma"
 import clientRoute from "@/src/lib/client-route"
 import { updateGroupDataForPage } from "@/src/lib/utils"
+
+//store
 import headerStore from "@/src/store/header"
 import userStore from "@/src/store/user"
-import { member } from "@/types"
-import { useRouter } from "next/router"
-import { useEffect } from "react"
+
+//next-auth
 import { authOptions } from "../../api/auth/[...nextauth]"
 import { getServerSession } from "next-auth"
+
+import type { member } from "@/types"
+import type { GetServerSidePropsContext } from "next"
 
 type props = {
   users: member[]
   groupId: number
+  notInGroup: string
 }
 
-const RemoveMembers = ({ users, groupId }: props) => {
+const RemoveMembers = ({ users, groupId, notInGroup }: props) => {
   const activeGroup = userStore(state => state.activeGroup)
   const setBackRoute = headerStore(state => state.setBackRoute)
   const clearBackRoute = headerStore(state => state.clearBackRoute)
@@ -36,6 +49,8 @@ const RemoveMembers = ({ users, groupId }: props) => {
     return () => clearBackRoute()
   }, [activeGroup, router, setBackRoute, clearBackRoute])
 
+  if (notInGroup) return <p>{notInGroup}</p>
+
   return (
     <div>
       <h1 className="text-3xl text-center capitalize mb-6">remove members</h1>
@@ -52,7 +67,9 @@ const RemoveMembers = ({ users, groupId }: props) => {
 
 export default RemoveMembers
 
-export const getServerSideProps = async context => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const props = await protectedRoute(
     context,
     getServerSession,
@@ -63,14 +80,11 @@ export const getServerSideProps = async context => {
   if (!authenticated) return props
 
   const admin = await adminRoute(context, session, prisma)
-  if (!admin) notAdmin(context, clientRoute)
+  console.log(admin)
+  if (!admin) return notAdmin(context, clientRoute)
 
   try {
-    const groupId = parseInt(context.query.groupId)
-    if (groupId === -1)
-      return {
-        props: { noGroup: true },
-      }
+    const groupId = parseInt(context.query.groupId as string)
 
     const stats = await prisma.stat.findMany({
       where: {
@@ -78,6 +92,7 @@ export const getServerSideProps = async context => {
         AND: {
           NOT: {
             userId: session.user.id,
+            isAdmin: true,
           },
         },
       },

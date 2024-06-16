@@ -1,16 +1,17 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "../auth/[...nextauth]"
 import prisma from "@/src/lib/prisma"
+import resend, { resendType } from "@/src/lib/resend"
 import {
-  generateEmailVerificationToken,
+  generateToken,
   hashPassword,
   sendEmailVerificationToken,
 } from "@/src/lib/auth"
 import method from "@/src/lib/http-method"
 import { compare, hash } from "bcryptjs"
 import { v4 as uuid } from "uuid"
-import { Resend } from "resend"
 import {
+  getAdminCount,
   validateEmail,
   validateName,
   validatePassword,
@@ -23,6 +24,7 @@ import obscenity from "@/src/lib/obscenity-matcher"
 import type { NextApiRequest, NextApiResponse } from "next"
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  console.log(req.body)
   switch (req.method) {
     case method.post: {
       const {
@@ -124,8 +126,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           })
         }
 
-        const resend = new Resend(process.env.RESEND_API_KEY)
-
         const user = await prisma.$transaction(async tx => {
           const user = await tx.user.create({
             data: {
@@ -137,10 +137,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             },
           })
 
-          const verificationToken = await generateEmailVerificationToken(
+          const verificationToken = await generateToken(
             email,
             uuid,
-            tx
+            tx,
+            resendType.emailVerification
           )
 
           const emailSent = await sendEmailVerificationToken(
@@ -150,7 +151,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             resend
           )
 
-          if (!emailSent.id) throw new Error("email not sent")
+          // if (!emailSent.id) throw new Error("email not sent")
 
           return user
         })
@@ -352,12 +353,61 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const session = await getServerSession(req, res, authOptions)
         if (!session)
           return res.status(401).json({ message: "not authenticaticated" })
-        const user = await prisma.user.delete({
+
+        const user = await prisma.user.findUnique({
           where: {
             id: session.user.id,
           },
+          select: {
+            stats: {
+              select: {
+                groupId: true,
+                isAdmin: true,
+                group: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
         })
-        if (user) return res.status(204).json("account deleted")
+
+        if (user) {
+          const userAdminGroups = user.stats.filter(group => group.isAdmin)
+
+          const needsAdmin: string[] = []
+
+          if (userAdminGroups.length > 0) {
+            for (const _ of userAdminGroups) {
+              const adminCount = await getAdminCount(_.groupId, prisma)
+
+              if (adminCount === 1) needsAdmin.push(_.group.name)
+            }
+
+            if (needsAdmin.length !== 0) {
+              return res.status(409).json({
+                needsAdmin,
+              })
+            } else {
+              const user = await prisma.user.delete({
+                where: {
+                  id: session.user.id,
+                },
+              })
+              if (user) return res.status(204).json("account deleted")
+            }
+          } else {
+            const user = await prisma.user.delete({
+              where: {
+                id: session.user.id,
+              },
+            })
+            if (user) return res.status(204).json("account deleted")
+          }
+        }
+
+        return res.status(500).json({ error: "an error occured" })
       } catch (error) {
         console.log(error)
         return error

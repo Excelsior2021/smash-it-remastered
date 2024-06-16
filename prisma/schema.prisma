@@ -15,7 +15,7 @@ model User {
   lastName          String?             @map("last_name")
   password          String?
   createdAt         DateTime           @default(now()) @map("created_at")
-  groupRequests     GroupRequests[]
+  groupRequests     GroupRequests[]    
   approvedMatches   Match[]
   asOpponent        MatchSubmission[]  @relation("opponent")
   matchSubmissions  MatchSubmission[]  @relation("user")
@@ -24,6 +24,7 @@ model User {
   matchesAsPlayer2  Match[]            @relation("player2")
   emailVerified     DateTime?          @map("email_verified")
   emailVerification EmailVerification?
+  resetPassword     ResetPassword?
 
   @@map("user")
 }
@@ -80,7 +81,7 @@ model Match {
   approvedBy   Int?     @map("approved_by")
   approver     User?    @relation(fields: [approvedBy], references: [id])
   group        Group    @relation(fields: [groupId], references: [id])
-  player1      User?    @relation("player1", fields: [player1Id], references: [id], onDelete: SetNull)
+  player1      User?    @relation("player1", fields: [player1Id], references: [id], onDelete: SetNull )
   player2      User?    @relation("player2", fields: [player2Id], references: [id], onDelete: SetNull)
 
   @@map("match")
@@ -110,4 +111,14 @@ model EmailVerification {
   user    User     @relation(fields: [email], references: [email], onDelete: Cascade)
 
   @@map("email_verification")
+}
+
+model ResetPassword {
+  id      Int      @id @unique @default(autoincrement())
+  email   String   @unique
+  token   String   @unique
+  expires DateTime
+  user    User     @relation(fields: [email], references: [email], onDelete: Cascade)
+
+  @@map("reset_password")
 }

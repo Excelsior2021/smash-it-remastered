@@ -1,19 +1,23 @@
-import { ReactNode } from "react"
+//components
 import ModalMatchData from "../modal-match-data/modal-match-data"
+import ModalGroupList from "../modal-group-list/modal-group-list"
 
+//types
 import type { matchData } from "@/types"
+import type { ReactNode } from "react"
 
 type props = {
   heading: string
   headingCapitalize?: boolean
   text?: string | null
-  onClick?: () => {}
-  onClickClose?: (() => {}) | undefined
+  onClick?: () => void
+  onClickClose?: (() => void) | null
   action?: string | null
   matchData?: matchData | null
   accountFieldInput?: ReactNode
   loading?: boolean
   errors?: string[] | null
+  groups?: string[] | null
 }
 
 const Modal = ({
@@ -27,6 +31,7 @@ const Modal = ({
   accountFieldInput,
   loading = false,
   errors,
+  groups,
 }: props) => (
   <dialog
     id="modal"
@@ -62,6 +67,7 @@ const Modal = ({
               ))}
             </ul>
           )}
+          {groups && <ModalGroupList groups={groups} />}
           <div className="modal-action">
             <form className="flex gap-4" method="dialog">
               {action && (

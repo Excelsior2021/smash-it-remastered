@@ -1,22 +1,37 @@
+//components
 import Input from "@/src/components/input/input"
+import Toggle from "@/src/components/toggle/toggle"
+import OauthProviders from "@/src/components/oauth-providers/oauth-providers"
+
+//react
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+
+//next
+import Link from "next/link"
+import { useRouter } from "next/router"
+
+//lib
 import { login } from "@/src/lib/api"
 import { authRedirect } from "@/src/lib/auth"
 import { loginFormFields } from "@/src/lib/form-fields"
 import clientRoute from "@/src/lib/client-route"
-import Link from "next/link"
-import { useRouter } from "next/router"
-import { useForm } from "react-hook-form"
+
+//next-auth
 import { getProviders, signIn } from "next-auth/react"
 import { authOptions } from "../api/auth/[...nextauth]"
 import { getServerSession } from "next-auth"
-import OauthProviders from "@/src/components/oauth-providers/oauth-providers"
-import { FieldValues } from "react-hook-form"
-import { useState } from "react"
-import Toggle from "@/src/components/toggle/toggle"
 
-import type { clientRouteType } from "@/types"
+//types
+import type { clientRouteType, providers } from "@/types"
+import type { FieldValues } from "react-hook-form"
+import type { GetServerSidePropsContext } from "next"
 
-const Login = ({ providers }) => {
+type props = {
+  providers: providers
+}
+
+const Login = ({ providers }: props) => {
   const {
     register,
     handleSubmit,
@@ -26,9 +41,7 @@ const Login = ({ providers }) => {
   } = useForm()
   const router = useRouter()
   const [submitting, setSubmmiting] = useState(false)
-  const [showPassword, setShowPassowrd] = useState(false)
-
-  console.log(providers)
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleLogin = async (
     signIn,
@@ -85,7 +98,7 @@ const Login = ({ providers }) => {
           ) : null}
           <Toggle
             text="show password"
-            onChange={() => setShowPassowrd(prev => !prev)}
+            onChange={() => setShowPassword(prev => !prev)}
           />
           <button
             className="btn btn-secondary sm:w-1/2 sm:self-end"
@@ -100,7 +113,7 @@ const Login = ({ providers }) => {
         </form>
         <Link
           className="block link text-center m-6"
-          href={clientRoute.resetPassword}>
+          href={clientRoute.forgottenPassword}>
           Forgot password?
         </Link>
         <p className="text-center">
@@ -116,7 +129,9 @@ const Login = ({ providers }) => {
 
 export default Login
 
-export const getServerSideProps = async context => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const session = await authRedirect(
     context,
     getServerSession,

@@ -73,6 +73,7 @@ export const authOptions = {
                 ).toLowerCase(),
                 email: profile.email,
                 firstName: profile.given_name,
+                emailVerified: new Date(),
               },
               update: {
                 firstName: profile.given_name,
@@ -95,6 +96,7 @@ export const authOptions = {
                 username: user.username,
                 firstName: user.firstName,
                 lastName: user.lastName,
+                emailVerified: user.emailVerified,
               }
             }
             return token
@@ -112,19 +114,18 @@ export const authOptions = {
                 username: user.username,
                 firstName: user.firstName,
                 lastName: user.lastName,
+                emailVerified: user.emailVerified,
               }
             }
             return token
           }
         }
 
-      if (trigger === "update") {
-        return { ...token, ...session.user }
-      }
+      if (trigger === "update") return { ...token, ...session }
 
       return token
     },
-    session: async ({ token, session }) => {
+    session: async ({ token, session, trigger, newSession }) => {
       //remove undefined values from session object
       for (const key in session.user)
         if (session.user[key] === undefined) delete session.user[key]
@@ -138,6 +139,7 @@ export const authOptions = {
           username: token.username,
           firstName: token.firstName,
           lastName: token.lastName,
+          emailVerified: token.emailVerified,
         },
       }
     },

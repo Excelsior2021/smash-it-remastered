@@ -1,5 +1,7 @@
+//components
 import GroupQueryItem from "../group-query-item/group-query-item"
 
+//types
 import type { groupRequest, userGroup } from "@/types"
 
 type props = {
@@ -11,12 +13,12 @@ type props = {
           stats: number
         }
       }[]
-    | null
   userGroups: userGroup[]
   groupRequests: groupRequest[]
+  userId: number
 }
 
-const GroupResults = ({ groups, userGroups, groupRequests }: props) => {
+const GroupResults = ({ groups, userGroups, groupRequests, userId }: props) => {
   if (!groups) return
   if (groups.length === 0) return <p>no groups found</p>
 
@@ -36,6 +38,7 @@ const GroupResults = ({ groups, userGroups, groupRequests }: props) => {
             memberCount={group._count.stats}
             userGroups={userGroups}
             groupRequests={groupRequests}
+            userId={userId}
           />
         ))}
       </ul>

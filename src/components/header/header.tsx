@@ -1,21 +1,26 @@
-import userStore from "@/src/store/user"
-import clientRoute from "@/src/lib/client-route"
+//component
+import BackButton from "../svg/back-button"
+
+//next
 import Image from "next/image"
 import Link from "next/link"
-import BackButton from "../svg/back-button"
 import { useRouter } from "next/router"
-import { useSession } from "next-auth/react"
+
+//lib
+import clientRoute from "@/src/lib/client-route"
+
+//store
 import headerStore from "@/src/store/header"
+import userStore from "@/src/store/user"
 
 const Header = () => {
-  const session = useSession()
   const router = useRouter()
   const activeGroup = userStore(state => state.activeGroup)
   const backRoute = headerStore(state => state.backRoute)
 
   return (
     <header className="flex flex-col items-center p-4 relative">
-      {session.status === "authenticated" && backRoute && (
+      {backRoute && (
         <div
           className="absolute left-[24px] top-[24px] cursor-pointer lg:left-[40px]"
           onClick={() => router.push(backRoute)}>

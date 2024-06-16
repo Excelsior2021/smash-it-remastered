@@ -1,7 +1,18 @@
-import clientRoute from "@/src/lib/client-route"
+//next
 import { useRouter } from "next/router"
 
-const MatchHistoryItem = ({ match, profileUser }) => {
+//lib
+import clientRoute from "@/src/lib/client-route"
+
+//types
+import type { match, profileUser } from "@/types"
+
+type props = {
+  match: match
+  profileUser: profileUser
+}
+
+const MatchHistoryItem = ({ match, profileUser }: props) => {
   const router = useRouter()
   const matchDate = new Date(match.matchDate)
 
@@ -16,7 +27,7 @@ const MatchHistoryItem = ({ match, profileUser }) => {
       id: match.player2Id,
       username: match.player2 ? match.player2.username : "deleted user",
       score: match.player2Score,
-      onClick: match.player1Id !== (profileUser.id || null),
+      onClick: match.player2Id !== (profileUser.id || null),
     },
   ]
 

@@ -1,5 +1,9 @@
 [
   {
+    "shape": "TOKEN",
+    "examples": []
+  },
+  {
     "shape": "PASSWORD",
     "examples": []
   },

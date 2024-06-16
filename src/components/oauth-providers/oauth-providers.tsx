@@ -1,11 +1,8 @@
-import type { BuiltInProviderType } from "next-auth/providers/index"
-import type { ClientSafeProvider, LiteralUnion } from "next-auth/react"
+//types
+import type { providers } from "@/types"
 
 type props = {
-  providers: Record<
-    LiteralUnion<BuiltInProviderType, string>,
-    ClientSafeProvider
-  >
+  providers: providers
   signIn: any
 }
 
@@ -15,23 +12,18 @@ const OauthProviders = ({ providers, signIn }: props) => (
       if (provider.type === "oauth")
         return (
           <div key={provider.id}>
-            <button
+            {/* <button
               className="btn btn-secondary"
               onClick={() => signIn(provider.id)}>
               continue with google
-            </button>
-            {/* <button
+            </button> */}
+            <button
               className="btn gsi-material-button"
               onClick={() => signIn(provider.id)}>
               <div className="gsi-material-button-state" />
               <div className="gsi-material-button-content-wrapper">
                 <div className="gsi-material-button-icon">
-                  <svg
-                    version="1.1"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 48 48"
-                    xmlnsXlink="http://www.w3.org/1999/xlink"
-                    style={{ display: "block" }}>
+                  <svg viewBox="0 0 48 48">
                     <path
                       fill="#EA4335"
                       d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
@@ -54,9 +46,8 @@ const OauthProviders = ({ providers, signIn }: props) => (
                 <span className="gsi-material-button-contents">
                   Continue with {provider.name}
                 </span>
-                <span style={{ display: "none" }}>Continue with Google</span>
               </div>
-            </button> */}
+            </button>
           </div>
         )
     })}

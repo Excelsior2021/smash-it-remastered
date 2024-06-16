@@ -1,30 +1,45 @@
+//components
 import MemberList from "@/src/components/member-list/member-list"
 import MemberMatch from "@/src/components/member-match/member-match"
-import { protectedRoute } from "@/src/lib/auth"
-import { updateGroupDataForPage } from "@/src/lib/utils"
-import userStore from "@/src/store/user"
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/router"
+import EmailUnverifiedMessage from "@/src/components/email-unverified-message/email-unverified-message"
+import Modal from "@/src/components/modal/modal"
+
+//react
 import { useCallback, useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
-import Modal from "@/src/components/modal/modal"
-import { recordMatch, submitMatch } from "@/src/lib/api"
-import headerStore from "@/src/store/header"
-import clientRoute from "@/src/lib/client-route"
+
+//next
+import { useRouter } from "next/router"
+
+//lib
 import prisma from "@/src/lib/prisma"
+import { protectedRoute } from "@/src/lib/auth"
+import { updateGroupDataForPage } from "@/src/lib/utils"
+import { recordMatch, submitMatch } from "@/src/lib/api"
+import clientRoute from "@/src/lib/client-route"
 import { validateScores } from "@/src/lib/server-validation"
-import { authOptions } from "../../api/auth/[...nextauth]"
-import { getServerSession } from "next-auth"
 import apiRoute from "@/src/lib/api-route"
 import method from "@/src/lib/http-method"
 
+//store
+import userStore from "@/src/store/user"
+import headerStore from "@/src/store/header"
+
+//next-auth
+import { authOptions } from "../../api/auth/[...nextauth]"
+import { getServerSession } from "next-auth"
+
+//types
 import type { apiRouteType, member, methodType, player } from "@/types"
 import type { FieldValues } from "react-hook-form"
+import type { GetServerSidePropsContext } from "next"
 
 type props = {
   opponents: member[]
   groupId: number
   isAdmin: boolean
+  emailUnverified: true | undefined
+  session: any
 }
 
 enum scoresSubmissionStatus {
@@ -33,8 +48,13 @@ enum scoresSubmissionStatus {
   failed,
 }
 
-const RecordMatch = ({ opponents, groupId, isAdmin }: props) => {
-  const session = useSession()
+const RecordMatch = ({
+  opponents,
+  groupId,
+  isAdmin,
+  emailUnverified,
+  session,
+}: props) => {
   const {
     register,
     handleSubmit,
@@ -105,8 +125,7 @@ const RecordMatch = ({ opponents, groupId, isAdmin }: props) => {
           groupId,
           userId,
           opponentId,
-          userId,
-          userId,
+          userId, //automatically approved by admin
           apiRoute,
           method
         )
@@ -132,41 +151,47 @@ const RecordMatch = ({ opponents, groupId, isAdmin }: props) => {
     }
   }
 
+  if (emailUnverified) return <EmailUnverifiedMessage />
+
   return (
     <div>
-      <Modal
-        heading="submit scores"
-        text={
-          scoresSubmitted === scoresSubmissionStatus.success
-            ? "match submitted!"
-            : scoresSubmitted === scoresSubmissionStatus.failed
-            ? "an error occured. please try again."
-            : null
-        }
-        action={
-          scoresSubmitted === scoresSubmissionStatus.pending ? "submit" : null
-        }
-        matchData={
-          scoresSubmitted === scoresSubmissionStatus.pending ? matchData : null
-        }
-        loading={scoresSubmitting}
-        onClick={handleSubmit(
-          async formData =>
-            await handleSubmitScores(
-              formData,
-              groupId,
-              session.data?.user.id,
-              chosenOpponent.id,
-              apiRoute,
-              method
-            )
-        )}
-        onClickClose={
-          scoresSubmitted === scoresSubmissionStatus.success
-            ? () => router.push(clientRoute.root)
-            : null
-        }
-      />
+      {chosenOpponent && (
+        <Modal
+          heading="submit scores"
+          text={
+            scoresSubmitted === scoresSubmissionStatus.success
+              ? "match submitted!"
+              : scoresSubmitted === scoresSubmissionStatus.failed
+              ? "an error occured. please try again."
+              : null
+          }
+          action={
+            scoresSubmitted === scoresSubmissionStatus.pending ? "submit" : null
+          }
+          matchData={
+            scoresSubmitted === scoresSubmissionStatus.pending
+              ? matchData
+              : null
+          }
+          loading={scoresSubmitting}
+          onClick={handleSubmit(
+            async formData =>
+              await handleSubmitScores(
+                formData,
+                groupId,
+                session.user.id,
+                chosenOpponent.id,
+                apiRoute,
+                method
+              )
+          )}
+          onClickClose={
+            scoresSubmitted === scoresSubmissionStatus.success
+              ? () => router.push(clientRoute.root)
+              : null
+          }
+        />
+      )}
 
       <h1 className="text-3xl text-center mb-6">Record Match</h1>
 
@@ -198,7 +223,7 @@ const RecordMatch = ({ opponents, groupId, isAdmin }: props) => {
                   setMatchData({
                     players: [
                       {
-                        username: session.data?.user.username,
+                        username: session.user.username,
                         score: userScore,
                       },
                       {
@@ -230,7 +255,7 @@ const RecordMatch = ({ opponents, groupId, isAdmin }: props) => {
                 <div className="flex flex-col gap-10 mb-4 w-full lg:flex-row lg:justify-between">
                   <div className="w-full">
                     <MemberMatch
-                      member={session.data!.user}
+                      member={session.user}
                       register={register}
                       inputLabel="your score"
                       inputName="userScore"
@@ -289,7 +314,9 @@ const RecordMatch = ({ opponents, groupId, isAdmin }: props) => {
 
 export default RecordMatch
 
-export const getServerSideProps = async context => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const props = await protectedRoute(
     context,
     getServerSession,
@@ -299,8 +326,15 @@ export const getServerSideProps = async context => {
   const { authenticated, session } = props
   if (!authenticated) return props
 
+  if (!session.user.emailVerified)
+    return {
+      props: {
+        emailUnverified: true,
+      },
+    }
+
   try {
-    const groupId = parseInt(context.query.groupId)
+    const groupId = parseInt(context.query.groupId as string)
     const stat = await prisma.stat.findUnique({
       where: {
         userId_groupId: {
@@ -337,7 +371,7 @@ export const getServerSideProps = async context => {
     if (groupWithoutUser) {
       const opponents = groupWithoutUser.map(member => member.user)
       return {
-        props: { opponents, groupId, isAdmin: stat?.isAdmin },
+        props: { opponents, groupId, isAdmin: stat?.isAdmin, session },
       }
     } else {
       return {

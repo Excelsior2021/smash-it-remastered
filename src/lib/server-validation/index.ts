@@ -1,16 +1,17 @@
-import type { fieldPattern } from "@/types"
+import type { compareBcrypt, fieldPattern } from "@/types"
 import type { PrismaClient } from "@prisma/client"
+import type { RegExpMatcher } from "obscenity"
 
 export const verifyPassword = async (
   password: string,
   hashedPassword: string,
-  compare
+  compare: compareBcrypt
 ) => await compare(password, hashedPassword)
 
 export const validateUsername = async (
   username: string,
   pattern: fieldPattern,
-  obscenity,
+  obscenity: RegExpMatcher,
   prisma: PrismaClient
 ) => {
   const usernameAlreadyExists = await prisma.user.findUnique({
@@ -54,7 +55,7 @@ export const validateEmail = async (
 export const validateName = (
   name: string,
   pattern: fieldPattern,
-  obscenity
+  obscenity: RegExpMatcher
 ) => {
   const nameObscene = obscenity.hasMatch(name)
   const namePattern = pattern.name.test(name)
@@ -161,7 +162,7 @@ export const isMaxUserGroups = async (userId: number, prisma: PrismaClient) => {
 export const validateGroupName = async (
   groupName: string,
   pattern: fieldPattern,
-  obscenity,
+  obscenity: RegExpMatcher,
   prisma: PrismaClient
 ) => {
   const groupNameAlreadyExists = await prisma.group.findUnique({
@@ -177,4 +178,19 @@ export const validateGroupName = async (
   const groupNamePattern = pattern.groupName.test(groupName)
 
   return { groupNameObscene, groupNamePattern }
+}
+
+export const getAdminCount = async (groupId: number, prisma: PrismaClient) => {
+  const members = await prisma.stat.findMany({
+    where: {
+      groupId,
+    },
+    select: {
+      isAdmin: true,
+    },
+  })
+
+  const admins = members.filter(member => member.isAdmin)
+
+  return admins.length
 }

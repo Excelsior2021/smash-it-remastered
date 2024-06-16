@@ -1,4 +1,5 @@
 import type { userGroup } from "@/types"
+import type { PrismaClient } from "@prisma/client"
 import type { NextRouter } from "next/router"
 
 export const updateGroupDataForPage = (

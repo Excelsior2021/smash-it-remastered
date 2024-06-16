@@ -1,14 +1,27 @@
-import userStore from "@/src/store/user"
+//components
 import LinkButton from "../../link-button/link-button"
+
+//react
 import { useEffect } from "react"
-import navStore from "@/src/store/nav"
+
+//lib
 import clientRoute from "@/src/lib/client-route"
+
+//store
+import userStore from "@/src/store/user"
+import navStore from "@/src/store/nav"
+
+type props = {
+  session: {
+    user: { username: string; firstName?: string }
+  }
+}
 
 const DashboardPage = ({
   session: {
     user: { username, firstName },
   },
-}) => {
+}: props) => {
   const activeGroup = userStore(state => state.activeGroup)
   const setActiveNavItem = navStore(state => state.setActiveNavItem)
 
@@ -21,7 +34,7 @@ const DashboardPage = ({
     <div>
       <h1 className="text-3xl mb-6">
         Hi,{" "}
-        <span className="capitalize">
+        <span className={firstName && "capitalize"}>
           {firstName ? firstName : username ? username : null}
         </span>{" "}
       </h1>

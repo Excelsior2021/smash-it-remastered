@@ -1,10 +1,23 @@
-import statKeys from "@/src/lib/stat-keys"
-import statsTableStore from "@/src/store/stats-table"
-import { stats } from "@/types"
-import Image from "next/image"
+//react
 import { useEffect } from "react"
 
-const StatsTable = ({ stats }: { stats: stats }) => {
+//next
+import Image from "next/image"
+
+//lib
+import statKeys from "@/src/lib/stat-keys"
+
+//store
+import statsTableStore from "@/src/store/stats-table"
+
+//types
+import type { stats } from "@/types"
+
+type props = {
+  stats: stats[]
+}
+
+const StatsTable = ({ stats }: props) => {
   const { statsState, setStats, table, sortTable } = statsTableStore(state => ({
     statsState: state.stats,
     setStats: state.setStats,
@@ -63,10 +76,10 @@ const StatsTable = ({ stats }: { stats: stats }) => {
             </tr>
           </thead>
           <tbody>
-            {statsState.map((userStats, i) => (
+            {statsState.map((userStats: stats, i: number) => (
               <tr
                 className={`${i % 2 === 0 ? "bg-accent" : "bg-secondary"}`}
-                key={userStats.user.id}>
+                key={userStats.user!.id}>
                 {statKeys.map(statKeys => {
                   let stats = userStats
                   if (statKeys.serverName === "username") stats = userStats.user

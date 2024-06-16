@@ -1,16 +1,40 @@
+//components
 import ApproveMatchList from "@/src/components/approve-match-list/approve-match-list"
-import { adminRoute, notAdmin, protectedRoute } from "@/src/lib/auth"
+
+//react
+import { useEffect } from "react"
+
+//next
+import { useRouter } from "next/router"
+
+//lib
 import prisma from "@/src/lib/prisma"
+import { adminRoute, notAdmin, protectedRoute } from "@/src/lib/auth"
 import clientRoute from "@/src/lib/client-route"
 import { updateGroupDataForPage } from "@/src/lib/utils"
+
+//store
 import headerStore from "@/src/store/header"
 import userStore from "@/src/store/user"
-import { useRouter } from "next/router"
-import { useEffect } from "react"
+
+//next-auth
 import { authOptions } from "../../api/auth/[...nextauth]"
 import { getServerSession } from "next-auth"
 
-const ApproveMatches = ({ matchSubmissions, serverMessage }) => {
+//types
+import type { GetServerSidePropsContext } from "next"
+
+type props = {
+  matchSubmissions?: string
+  noMatches?: string
+  adminUserId?: number
+}
+
+const ApproveMatches = ({
+  matchSubmissions,
+  noMatches,
+  adminUserId,
+}: props) => {
   const activeGroup = userStore(state => state.activeGroup)
   const setBackRoute = headerStore(state => state.setBackRoute)
   const clearBackRoute = headerStore(state => state.clearBackRoute)
@@ -32,10 +56,13 @@ const ApproveMatches = ({ matchSubmissions, serverMessage }) => {
   return (
     <div className="flex flex-col justify-center items-center">
       <h1 className="text-3xl capitalize mb-6">approve matches</h1>
-      {serverMessage && <p>{serverMessage}</p>}
+      {noMatches && <p>{noMatches}</p>}
       {matchSubmissions && (
         <div className="w-full">
-          <ApproveMatchList matchSubmissions={JSON.parse(matchSubmissions)} />
+          <ApproveMatchList
+            matchSubmissions={JSON.parse(matchSubmissions)}
+            adminUserId={adminUserId}
+          />
         </div>
       )}
     </div>
@@ -44,7 +71,9 @@ const ApproveMatches = ({ matchSubmissions, serverMessage }) => {
 
 export default ApproveMatches
 
-export const getServerSideProps = async context => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const props = await protectedRoute(
     context,
     getServerSession,
@@ -58,7 +87,7 @@ export const getServerSideProps = async context => {
   if (!admin) return notAdmin(context, clientRoute)
 
   try {
-    const groupId = parseInt(context.query.groupId)
+    const groupId = parseInt(context.query.groupId as string)
     const matchSubmissions = await prisma.matchSubmission.findMany({
       where: {
         groupId,
@@ -81,12 +110,13 @@ export const getServerSideProps = async context => {
       return {
         props: {
           matchSubmissions: JSON.stringify(matchSubmissions),
+          adminUserId: session.user.id,
         },
       }
     else
       return {
         props: {
-          serverMessage: "no matches to approve",
+          noMatches: "no matches to approve",
         },
       }
   } catch (error) {

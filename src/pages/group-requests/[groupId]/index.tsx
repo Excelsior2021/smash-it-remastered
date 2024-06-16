@@ -1,17 +1,31 @@
+//components
 import MemberList from "@/src/components/member-list/member-list"
+
+//react
+import { useEffect } from "react"
+
+//next
+import { useRouter } from "next/router"
+
+//lib
+import prisma from "@/src/lib/prisma"
+
 import { adminRoute, notAdmin, protectedRoute } from "@/src/lib/auth"
 import memberListItemType from "@/src/lib/member-list-item-types"
-import userStore from "@/src/store/user"
-import { useEffect } from "react"
 import { updateGroupDataForPage } from "@/src/lib/utils"
-import { useRouter } from "next/router"
-import headerStore from "@/src/store/header"
 import clientRoute from "@/src/lib/client-route"
-import prisma from "@/src/lib/prisma"
+
+//store
+import userStore from "@/src/store/user"
+import headerStore from "@/src/store/header"
+
+//next-auth
 import { authOptions } from "../../api/auth/[...nextauth]"
 import { getServerSession } from "next-auth"
 
+//types
 import type { member } from "@/types"
+import type { GetServerSidePropsContext } from "next"
 
 type props = {
   users: member[]
@@ -62,7 +76,9 @@ const GroupRequests = ({ users, groupId, serverMessage }: props) => {
 
 export default GroupRequests
 
-export const getServerSideProps = async context => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const props = await protectedRoute(
     context,
     getServerSession,
@@ -76,7 +92,7 @@ export const getServerSideProps = async context => {
   if (!admin) return notAdmin(context, clientRoute)
 
   try {
-    const groupId = parseInt(context.query.groupId)
+    const groupId = parseInt(context.query.groupId as string)
     const userId = session.user.id
     if (groupId === -1)
       return {

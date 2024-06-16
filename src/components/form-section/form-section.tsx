@@ -1,5 +1,11 @@
+//components
 import Input from "../input/input"
+import Toggle from "../toggle/toggle"
 
+//react
+import { useState } from "react"
+
+//types
 import type { formField } from "@/types"
 import type {
   FieldErrors,
@@ -7,8 +13,6 @@ import type {
   UseFormClearErrors,
   UseFormRegister,
 } from "react-hook-form"
-import Toggle from "../toggle/toggle"
-import { useState } from "react"
 
 type props = {
   heading: string

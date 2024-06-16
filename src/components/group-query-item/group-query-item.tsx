@@ -1,7 +1,12 @@
-import { groupRequest } from "@/src/lib/api"
-import { useSession } from "next-auth/react"
+//react
 import { useEffect, useState } from "react"
 
+//lib
+import { groupRequest } from "@/src/lib/api"
+import apiRoute from "@/src/lib/api-route"
+import method from "@/src/lib/http-method"
+
+//types
 import type { Dispatch, SetStateAction } from "react"
 import type {
   apiRouteType,
@@ -9,8 +14,6 @@ import type {
   methodType,
   userGroup,
 } from "@/types"
-import apiRoute from "@/src/lib/api-route"
-import method from "@/src/lib/http-method"
 
 type props = {
   name: string
@@ -18,6 +21,7 @@ type props = {
   memberCount: number
   userGroups: userGroup[]
   groupRequests: groupRequestType[]
+  userId: number
 }
 
 enum requestState {
@@ -32,12 +36,8 @@ const GroupQueryItem = ({
   memberCount,
   userGroups,
   groupRequests,
+  userId,
 }: props) => {
-  const {
-    data: {
-      user: { id },
-    },
-  } = useSession()
   const [request, setRequest] = useState("")
 
   useEffect(() => {
@@ -59,8 +59,14 @@ const GroupQueryItem = ({
     apiRoute: apiRouteType,
     method: methodType
   ) => {
-    const res = await groupRequest(userId, groupId, apiRoute, method)
-    if (res) if (res.ok) setRequest(requestState.requested)
+    const res = (await groupRequest(
+      userId,
+      groupId,
+      apiRoute,
+      method
+    )) as Response
+
+    if (res.ok) setRequest(requestState.requested)
   }
 
   return (
@@ -78,7 +84,7 @@ const GroupQueryItem = ({
               : ""
           }`}
           onClick={() =>
-            handleGroupRequest(id, groupId, setRequest, apiRoute, method)
+            handleGroupRequest(userId, groupId, setRequest, apiRoute, method)
           }
           disabled={
             request === requestState.joined ||

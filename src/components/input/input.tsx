@@ -1,5 +1,7 @@
+//components
 import InfoCircle from "../svg/infomation-circle"
 
+//types
 import type { ChangeEventHandler } from "react"
 import type { FieldValues, UseFormRegister } from "react-hook-form"
 

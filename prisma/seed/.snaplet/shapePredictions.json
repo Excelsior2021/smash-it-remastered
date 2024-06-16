@@ -1,6 +1,20 @@
 [
   {
     "schemaName": "public",
+    "tableName": "email_verification",
+    "predictions": [
+      {
+        "input": "public email_verification token",
+        "column": "token",
+        "shape": "TOKEN",
+        "confidence": 0.9955287575721741,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "public",
     "tableName": "group",
     "predictions": [
       {

@@ -42,7 +42,8 @@
   stroke: orange;
 }
 
-.add-member:hover {
+.add-member:hover,
+.add-admin:hover {
   stroke: green;
 }
 

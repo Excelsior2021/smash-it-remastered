@@ -1,25 +1,30 @@
-import { recordMatch, removeMatchSubmission } from "@/src/lib/api"
+//components
 import Tick from "../svg/tick"
 import XMark from "../svg/x-mark"
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/router"
 
-import type { apiRouteType, match, methodType } from "@/types"
-import type { NextRouter } from "next/router"
+//react
+import { useState } from "react"
+
+//next
+
+//lib
+import { recordMatch, removeMatchSubmission } from "@/src/lib/api"
 import apiRoute from "@/src/lib/api-route"
 import method from "@/src/lib/http-method"
 
+//types
+import type { apiRouteType, matchSubmission, methodType } from "@/types"
+
 type props = {
-  match: match
+  matchSubmission: matchSubmission
+  adminUserId: number
 }
 
-const ApproveMatchItem = ({ match }: props) => {
-  const session = useSession()
-  const router = useRouter()
+const ApproveMatchItem = ({ matchSubmission, adminUserId }: props) => {
+  const [submitted, setSubmitted] = useState(false)
 
   const handleApproveMatch = async (
-    match: match,
-    router: NextRouter,
+    matchSubmission: matchSubmission,
     apiRoute: apiRouteType,
     method: methodType
   ) => {
@@ -31,45 +36,53 @@ const ApproveMatchItem = ({ match }: props) => {
       userId,
       opponentId,
       id,
-    } = match
-    if (session.data?.user)
-      await recordMatch(
-        userScore,
-        opponentScore,
-        matchDate,
-        groupId,
-        userId,
-        opponentId,
-        session.data.user.id,
-        id,
-        apiRoute,
-        method
-      )
-    router.replace(router.asPath)
+    } = matchSubmission
+    const res = (await recordMatch(
+      userScore,
+      opponentScore,
+      matchDate,
+      groupId,
+      userId,
+      opponentId,
+      adminUserId,
+      apiRoute,
+      method,
+      id //matchId
+    )) as Response
+
+    if (res.ok) setSubmitted(true)
   }
 
   const handleDeclineMatch = async (
     matchId: number,
     groupId: number,
-    router: NextRouter,
     apiRoute: apiRouteType,
     method: methodType
   ) => {
-    await removeMatchSubmission(matchId, groupId, apiRoute, method)
-    router.replace(router.asPath)
+    const res = (await removeMatchSubmission(
+      matchId,
+      groupId,
+      apiRoute,
+      method
+    )) as Response
+
+    if (res.ok) setSubmitted(true)
   }
 
-  const matchDate = new Date(match.matchDate)
-  const submittedAt = new Date(match.submittedAt)
-  const user = match.user
-    ? match.user
-    : { ...match.user, username: "deleted user" }
-  const opponent = match.opponent
-    ? match.opponent
-    : { ...match.opponent, username: "deleted user" }
+  const matchDate = new Date(matchSubmission.matchDate)
+  const submittedAt = new Date(matchSubmission.submittedAt)
+  const user = matchSubmission.user
+    ? matchSubmission.user
+    : { username: "deleted user" }
+  const opponent = matchSubmission.opponent
+    ? matchSubmission.opponent
+    : { username: "deleted user" }
 
   return (
-    <li className="card gap-8  bg-secondary text-sm p-6 min-[640px]:flex-row min-[640px]:justify-between capitalize">
+    <li
+      className={`card gap-8 bg-secondary text-sm p-6 min-[640px]:flex-row min-[640px]:justify-between capitalize ${
+        submitted ? "hidden" : null
+      }`}>
       <div className="flex flex-col capitalize">
         <span>submitted by: {user.username}</span>
         <span>on {submittedAt.toDateString()}</span>
@@ -77,10 +90,11 @@ const ApproveMatchItem = ({ match }: props) => {
 
       <div className="flex flex-col gap-2">
         <div className="flex gap-4 justify-between">
-          <span>{user.username}</span> <span>{match.userScore}</span>
+          <span>{user.username}</span> <span>{matchSubmission.userScore}</span>
         </div>
         <div className="flex justify-between">
-          <span>{opponent.username}</span> <span>{match.opponentScore}</span>
+          <span>{opponent.username}</span>{" "}
+          <span>{matchSubmission.opponentScore}</span>
         </div>
         <span>date: {matchDate.toDateString()}</span>
       </div>
@@ -90,9 +104,8 @@ const ApproveMatchItem = ({ match }: props) => {
           className="p-2 rounded-full bg-red-700/70 hover:bg-red-600/70 cursor-pointer"
           onClick={() =>
             handleDeclineMatch(
-              match.id,
-              match.groupId,
-              router,
+              matchSubmission.id,
+              matchSubmission.groupId,
               apiRoute,
               method
             )
@@ -101,7 +114,7 @@ const ApproveMatchItem = ({ match }: props) => {
         </div>
         <div
           className="p-2 rounded-full bg-green-700/70 hover:bg-green-600/70 cursor-pointer"
-          onClick={() => handleApproveMatch(match, router, apiRoute, method)}>
+          onClick={() => handleApproveMatch(matchSubmission, apiRoute, method)}>
           <Tick />
         </div>
       </div>

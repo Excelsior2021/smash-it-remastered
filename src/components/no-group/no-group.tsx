@@ -1,5 +1,8 @@
-import clientRoute from "@/src/lib/client-route"
+//component
 import LinkButton from "../link-button/link-button"
+
+//lib
+import clientRoute from "@/src/lib/client-route"
 
 const NoGroup = () => (
   <div className="flex flex-col justify-center items-center gap-4 mt-[15vh] max-w-[500px] m-auto">

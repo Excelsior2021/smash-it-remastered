@@ -1,23 +1,41 @@
+//components
 import Input from "@/src/components/input/input"
+import EmailUnverifiedMessage from "@/src/components/email-unverified-message/email-unverified-message"
+
+//react
+import { useEffect } from "react"
+import { useForm } from "react-hook-form"
+
+//next
+import { useRouter } from "next/router"
+
+//lib
 import { createGroup } from "@/src/lib/api"
 import clientRoute from "@/src/lib/client-route"
-import { useRouter } from "next/router"
-import { useForm } from "react-hook-form"
-import { useEffect } from "react"
-import headerStore from "@/src/store/header"
 import { protectedRoute } from "@/src/lib/auth"
-import userStore from "@/src/store/user"
-import { authOptions } from "../api/auth/[...nextauth]"
-import { getServerSession } from "next-auth"
 import apiRoute from "@/src/lib/api-route"
 import method from "@/src/lib/http-method"
+import pattern from "@/src/lib/field-validation"
 
+//store
+import headerStore from "@/src/store/header"
+import userStore from "@/src/store/user"
+
+//next-auth
+import { authOptions } from "../api/auth/[...nextauth]"
+import { getServerSession } from "next-auth"
+
+//types
 import type { clientRouteType, apiRouteType, methodType } from "@/types"
 import type { NextRouter } from "next/router"
 import type { FieldValues, UseFormSetError } from "react-hook-form"
-import pattern from "@/src/lib/field-validation"
+import type { GetServerSidePropsContext } from "next"
 
-const CreateGroup = () => {
+type props = {
+  emailUnverified?: true
+}
+
+const CreateGroup = ({ emailUnverified }: props) => {
   const {
     register,
     handleSubmit,
@@ -71,11 +89,11 @@ const CreateGroup = () => {
     return () => clearBackRoute()
   }, [setBackRoute, clearBackRoute])
 
+  if (emailUnverified) return <EmailUnverifiedMessage />
+
   return (
     <div>
-      <h1 className="text-3xl text-center mb-8 capitalize">
-        create a new group
-      </h1>
+      <h1 className="text-3xl text-center mb-8 capitalize">create a group</h1>
       <form
         className="flex flex-col gap-8 max-w-96 m-auto"
         onSubmit={handleSubmit(formData =>
@@ -130,7 +148,9 @@ const CreateGroup = () => {
 
 export default CreateGroup
 
-export const getServerSideProps = async context => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const props = await protectedRoute(
     context,
     getServerSession,
@@ -139,6 +159,13 @@ export const getServerSideProps = async context => {
   )
   const { authenticated, session } = props
   if (!authenticated) return props
+
+  if (!session.user.emailVerified)
+    return {
+      props: {
+        emailUnverified: true,
+      },
+    }
 
   return {
     props: {},

@@ -1,17 +1,29 @@
+//components
+import Modal from "@/src/components/modal/modal"
+
+//react
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
+
+//lib
 import { deleteAccount } from "@/src/lib/api"
-import { signOut } from "next-auth/react"
-import { protectedRoute } from "@/src/lib/auth"
-import { authOptions } from "../api/auth/[...nextauth]"
-import { getServerSession } from "next-auth"
 import clientRoute from "@/src/lib/client-route"
 import apiRoute from "@/src/lib/api-route"
 import method from "@/src/lib/http-method"
+import { protectedRoute } from "@/src/lib/auth"
 
-import type { FieldValues } from "react-hook-form"
-import { apiRouteType, methodType } from "@/types"
+//store
 import headerStore from "@/src/store/header"
-import { useEffect } from "react"
+
+//next-auth
+import { signOut } from "next-auth/react"
+import { authOptions } from "../api/auth/[...nextauth]"
+import { getServerSession } from "next-auth"
+
+//types
+import type { FieldValues } from "react-hook-form"
+import type { apiRouteType, methodType } from "@/types"
+import { GetServerSidePropsContext } from "next"
 
 const DeleteAccount = () => {
   const {
@@ -21,9 +33,9 @@ const DeleteAccount = () => {
     clearErrors,
     formState: { errors },
   } = useForm()
-
   const setBackRoute = headerStore(state => state.setBackRoute)
   const clearBackRoute = headerStore(state => state.clearBackRoute)
+  const [groups, setGroups] = useState(null)
 
   useEffect(() => {
     setBackRoute(clientRoute.account)
@@ -37,10 +49,16 @@ const DeleteAccount = () => {
   ) => {
     if (deleteInput === "delete") {
       const res = await deleteAccount(apiRoute, method)
-      if (res)
-        if (res.ok) {
-          await signOut()
-        }
+
+      if (res && res.ok) {
+        await signOut()
+      }
+
+      if (res && res.status === 409) {
+        const data = await res.json()
+        setGroups(data.needsAdmin)
+        document.getElementById("modal").showModal()
+      }
     } else {
       setError("delete", {
         message: "please enter 'delete' in the input field",
@@ -85,13 +103,20 @@ const DeleteAccount = () => {
           delete account
         </button>
       </form>
+      <Modal
+        heading="Action Required"
+        text="Please assign at least one other admin to the following group(s) below before deleting your account. This is to ensure the group(s) can be managed."
+        groups={groups}
+      />
     </div>
   )
 }
 
 export default DeleteAccount
 
-export const getServerSideProps = async context => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const props = await protectedRoute(
     context,
     getServerSession,

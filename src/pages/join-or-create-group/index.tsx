@@ -1,28 +1,46 @@
+//component
 import LinkButton from "@/src/components/link-button/link-button"
+
+//react
+import { useEffect } from "react"
+
+//lib
 import { protectedRoute } from "@/src/lib/auth"
 import clientRoute from "@/src/lib/client-route"
+
+//store
 import headerStore from "@/src/store/header"
-import { useEffect } from "react"
+
+//next-auth
 import { authOptions } from "../api/auth/[...nextauth]"
 import { getServerSession } from "next-auth"
+
+//types
+import type { GetServerSidePropsContext } from "next"
+
+const joinCreateGroupLinks = [
+  { key: 1, href: clientRoute.joinGroup, text: "join group" },
+  { key: 2, href: clientRoute.createGroup, text: "create group" },
+]
 
 const JoinCreateGroup = () => {
   const setBackRoute = headerStore(state => state.setBackRoute)
   const clearBackRoute = headerStore(state => state.clearBackRoute)
+
   useEffect(() => {
     setBackRoute(clientRoute.root)
     return () => clearBackRoute()
   }, [setBackRoute, clearBackRoute])
+
   return (
     <div>
       <h1 className="text-3xl text-center mb-10">join or create a group</h1>
       <ul className="flex flex-col items-center gap-10 max-w-96 m-auto">
-        <li className="w-full text-center">
-          <LinkButton href={clientRoute.joinGroup} text="join group" />
-        </li>
-        <li className="w-full text-center">
-          <LinkButton href={clientRoute.createGroup} text="create group" />
-        </li>
+        {joinCreateGroupLinks.map(link => (
+          <li key={link.key} className="w-full text-center">
+            <LinkButton href={link.href} text={link.text} />
+          </li>
+        ))}
       </ul>
     </div>
   )
@@ -30,14 +48,16 @@ const JoinCreateGroup = () => {
 
 export default JoinCreateGroup
 
-export const getServerSideProps = async context => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const props = await protectedRoute(
     context,
     getServerSession,
     clientRoute,
     authOptions
   )
-  const { authenticated, session } = props
+  const { authenticated } = props
   if (!authenticated) return props
 
   return {

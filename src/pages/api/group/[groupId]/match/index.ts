@@ -36,8 +36,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         if (!validateScores(player1Score, player2Score))
           return res.status(422).json("invalid scores")
 
-        const [match, userStats, opponentStats] = await prisma.$transaction([
-          prisma.match.create({
+        console.log(player1Id)
+
+        const match = await prisma.$transaction(async tx => {
+          const match = await tx.match.create({
             data: {
               player1Id,
               player2Id,
@@ -48,31 +50,42 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               matchDate,
               submittedAt: new Date(),
             },
-          }),
-          prisma.stat.update({
-            where: { userId_groupId: { userId: player1Id, groupId } },
-            data: {
-              wins: { increment: player1Score > player2Score ? 1 : 0 },
-              loses: { increment: player1Score < player2Score ? 1 : 0 },
-              ptsFor: { increment: player1Score },
-              ptsAgainst: { increment: player2Score },
-            },
-          }),
-          prisma.stat.update({
-            where: { userId_groupId: { userId: player2Id, groupId } },
-            data: {
-              wins: { increment: player2Score > player1Score ? 1 : 0 },
-              loses: { increment: player2Score < player1Score ? 1 : 0 },
-              ptsFor: { increment: player2Score },
-              ptsAgainst: { increment: player1Score },
-            },
-          }),
-          // prisma.matchSubmission.delete({
-          //   where: {
-          //     id: matchId,
-          //   },
-          // }),
-        ])
+          })
+
+          //update player1 stats
+          if (player1Id)
+            await tx.stat.update({
+              where: { userId_groupId: { userId: player1Id, groupId } },
+              data: {
+                wins: { increment: player1Score > player2Score ? 1 : 0 },
+                loses: { increment: player1Score < player2Score ? 1 : 0 },
+                ptsFor: { increment: player1Score },
+                ptsAgainst: { increment: player2Score },
+              },
+            })
+
+          //update player2 stats
+          if (player2Id)
+            await tx.stat.update({
+              where: { userId_groupId: { userId: player2Id, groupId } },
+              data: {
+                wins: { increment: player2Score > player1Score ? 1 : 0 },
+                loses: { increment: player2Score < player1Score ? 1 : 0 },
+                ptsFor: { increment: player2Score },
+                ptsAgainst: { increment: player1Score },
+              },
+            })
+
+          //delete matchSubmission from matchSubmission table if exists
+          if (matchId)
+            await tx.matchSubmission.delete({
+              where: {
+                id: matchId,
+              },
+            })
+
+          return match
+        })
 
         if (match) return res.status(201).json(match)
       } catch (error) {

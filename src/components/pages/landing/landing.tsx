@@ -1,5 +1,8 @@
-import clientRoute from "@/src/lib/client-route"
+//components
 import LinkButton from "../../link-button/link-button"
+
+//lib
+import clientRoute from "@/src/lib/client-route"
 
 const links = [
   {
