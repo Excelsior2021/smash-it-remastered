@@ -15,7 +15,7 @@ import { useRouter } from "next/router"
 import { protectedRoute } from "@/src/lib/auth"
 import prisma from "@/src/lib/prisma"
 import clientRoute from "@/src/lib/client-route"
-import { updateGroupDataForPage } from "@/src/lib/utils"
+import { handleGetUserGroups, updateGroupDataForPage } from "@/src/lib/utils"
 import { userInGroup } from "@/src/lib/server-validation"
 import { getUserGroups, removeUserFromGroup } from "@/src/lib/api"
 import apiRoute from "@/src/lib/api-route"
@@ -156,7 +156,9 @@ const GroupPage = ({
         <Modal
           heading="confirmation"
           text={`You have left ${activeGroup.name}.`}
-          onClickClose={async () => setGroups(await getUserGroups(apiRoute))}
+          onClickClose={async () =>
+            await handleGetUserGroups(getUserGroups, setGroups, apiRoute)
+          }
         />
       )}
     </div>

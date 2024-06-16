@@ -2,7 +2,7 @@ import type { MouseEventHandler } from "react"
 
 type props = {
   className: string
-  onClick: (e: MouseEventHandler) => void
+  onClick: MouseEventHandler<HTMLDivElement>
 }
 
 const RemoveUserImage = ({ className, onClick }: props) => (

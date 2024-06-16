@@ -22,19 +22,40 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         if (userId !== session.user.id)
           if (!admin) return res.status(401).json({ message: "unauthorized" })
 
-        if (admin) {
+        if (admin && session.user.id === userId) {
           const adminCount = await getAdminCount(groupId, prisma)
           if (adminCount === 1) {
-            return res
-              .status(409)
-              .json({
+            const members = await prisma.stat.findMany({
+              where: {
+                groupId,
+              },
+              select: {
+                userId: true,
+              },
+            })
+
+            if (members.length > 1)
+              return res.status(409).json({
                 message:
                   "please make at least one other member an admin before leaving the group.",
               })
+            else {
+              const group = await prisma.group.delete({
+                where: {
+                  id: groupId,
+                },
+              })
+
+              if (group)
+                return res
+                  .status(200)
+                  .json({ message: `group ${group.name} deleted.` })
+              else return res.status(500).json({ error: "an error occured." })
+            }
           }
         }
 
-        const stats = await prisma.stat.delete({
+        const stat = await prisma.stat.delete({
           where: {
             userId_groupId: {
               userId,
@@ -43,14 +64,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           },
         })
 
-        if (stats)
+        if (stat)
           return res
             .status(200)
             .json({ message: "member removed successfully" })
         else res.status(404).json({ message: "member not found" })
       } catch (error) {
         console.log(error)
-        res.status(500).json(error)
       }
     }
   }

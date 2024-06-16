@@ -36,7 +36,6 @@ export const createAccount = async (
     return res
   } catch (error) {
     console.log(error)
-    return error
   }
 }
 
@@ -96,8 +95,14 @@ export const groupRequest = async (
   }
 }
 
-export const getUserGroups = async (apiRoute: apiRouteType) =>
-  (await fetch(`${apiRoute.user}/group`)).json()
+export const getUserGroups = async (apiRoute: apiRouteType) => {
+  try {
+    const res = await fetch(`${apiRoute.user}/group`)
+    return res
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 export const removeUserFromGroup = async (
   userId: number,

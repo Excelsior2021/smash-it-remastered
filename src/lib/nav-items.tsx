@@ -45,7 +45,8 @@ const navItems = [
   {
     activeRoute: "group",
     name: "group",
-    route: ({ groupId } = {}) => `${clientRoute.group}/${groupId}`,
+    route: ({ groupId }: { groupId: number }) =>
+      `${clientRoute.group}/${groupId}`,
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"

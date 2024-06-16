@@ -1,5 +1,4 @@
-import type { userGroup } from "@/types"
-import type { PrismaClient } from "@prisma/client"
+import type { apiRouteType, userGroup } from "@/types"
 import type { NextRouter } from "next/router"
 
 export const updateGroupDataForPage = (
@@ -20,4 +19,14 @@ export const generateDisplayName = (
   if (firstName && lastName) return `${username} (${firstName} ${lastName})`
   else if (firstName) return `${username} (${firstName})`
   return username
+}
+
+export const handleGetUserGroups = async (
+  getUserGroups: (apiRoute: apiRouteType) => Promise<Response | undefined>,
+  setGroups: any,
+  apiRoute: apiRouteType
+) => {
+  const res = (await getUserGroups(apiRoute)) as Response
+
+  if (res.ok) setGroups(await res.json())
 }

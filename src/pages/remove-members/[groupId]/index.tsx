@@ -80,7 +80,6 @@ export const getServerSideProps = async (
   if (!authenticated) return props
 
   const admin = await adminRoute(context, session, prisma)
-  console.log(admin)
   if (!admin) return notAdmin(context, clientRoute)
 
   try {

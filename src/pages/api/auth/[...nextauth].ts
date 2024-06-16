@@ -125,7 +125,7 @@ export const authOptions = {
 
       return token
     },
-    session: async ({ token, session, trigger, newSession }) => {
+    session: async ({ token, session }) => {
       //remove undefined values from session object
       for (const key in session.user)
         if (session.user[key] === undefined) delete session.user[key]

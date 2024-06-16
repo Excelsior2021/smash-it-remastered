@@ -4,6 +4,7 @@ import { isAdmin, isMaxGroupMembers } from "@/src/lib/server-validation"
 import prisma from "@/src/lib/prisma"
 import method from "@/src/lib/http-method"
 
+//types
 import type { NextApiRequest, NextApiResponse } from "next"
 
 //admin authorization required

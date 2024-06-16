@@ -1,8 +1,11 @@
-import { getServerSession } from "next-auth"
-import { authOptions } from "../../../auth/[...nextauth]"
+//lib
 import { isAdmin } from "@/src/lib/server-validation"
 import prisma from "@/src/lib/prisma"
 import method from "@/src/lib/http-method"
+
+//next-auth
+import { getServerSession } from "next-auth"
+import { authOptions } from "../../../auth/[...nextauth]"
 
 import type { NextApiRequest, NextApiResponse } from "next"
 

@@ -1,8 +1,18 @@
-import { useRouter } from "next/router"
+//components
+import Modal from "../modal/modal"
 import Avatar from "../avatar/avatar"
 import RemoveUserImage from "../svg/remove-user-image"
 import AddUserImage from "../svg/add-user-image"
+import Key from "../svg/key"
+import Unlock from "../svg/unlock"
+
+//react
 import { useCallback, useState } from "react"
+
+//next
+import { useRouter } from "next/router"
+
+//lib
 import memberListItemType from "@/src/lib/member-list-item-types"
 import { generateDisplayName } from "@/src/lib/utils"
 import {
@@ -12,13 +22,17 @@ import {
   removeUserFromGroup,
 } from "@/src/lib/api"
 import clientRoute from "@/src/lib/client-route"
-import Modal from "../modal/modal"
 import apiRoute from "@/src/lib/api-route"
 import method from "@/src/lib/http-method"
 
-import type { apiRouteType, member, methodType } from "@/types"
-import Key from "../svg/key"
-import Unlock from "../svg/unlock"
+//types
+import type {
+  apiRouteType,
+  member,
+  memberListItemAction,
+  methodType,
+} from "@/types"
+import type { MouseEvent } from "react"
 
 type props = {
   member: member
@@ -42,7 +56,7 @@ const MemberListItem = ({
 
   const handleAction = useCallback(
     async (
-      action,
+      action: memberListItemAction,
       userId: number,
       groupId: number,
       apiRoute: apiRouteType,
@@ -50,7 +64,12 @@ const MemberListItem = ({
     ) => {
       try {
         setLoading(true)
-        const res = await action(userId, groupId, apiRoute, method)
+        const res = (await action(
+          userId,
+          groupId,
+          apiRoute,
+          method
+        )) as Response
 
         if (res.ok) setActionSuccess(true)
       } catch (error) {
@@ -118,7 +137,7 @@ const MemberListItem = ({
                 )}
                 <RemoveUserImage
                   className="remove w-6 h-6 lg:w-8 lg:h-8"
-                  onClick={(e: Event) => {
+                  onClick={(e: MouseEvent) => {
                     e.stopPropagation()
                     setShowMemberModal(true)
                     setTimeout(() =>
@@ -132,7 +151,7 @@ const MemberListItem = ({
               <>
                 <AddUserImage
                   className="add-member w-6 h-6 lg:w-8 lg:h-8"
-                  onClick={async (e: Event) => {
+                  onClick={async (e: MouseEvent) => {
                     e.stopPropagation()
                     await handleAction(
                       approveUserToGroup,
@@ -145,7 +164,7 @@ const MemberListItem = ({
                 />
                 <RemoveUserImage
                   className="remove w-6 h-6 lg:w-8 lg:h-8"
-                  onClick={async (e: Event) => {
+                  onClick={async (e: MouseEvent) => {
                     e.stopPropagation()
                     await handleAction(
                       declineUserToGroup,

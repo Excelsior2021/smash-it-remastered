@@ -20,7 +20,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const opponentScore = parseInt(req.body.opponentScore)
 
       if (!validateScores(userScore, opponentScore))
-        return res.status(422).json("invalid scores")
+        return res.status(422).json({ error: "invalid scores" })
 
       try {
         const submission = await prisma.matchSubmission.create({

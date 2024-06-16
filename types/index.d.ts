@@ -1,6 +1,7 @@
 import type apiRoute from "@/src/lib/api-route"
 import type clientRoute from "@/src/lib/client-route"
 import type method from "@/src/lib/http-method"
+import type { v4 } from "uuid"
 
 export type group = {
   id: number
@@ -127,10 +128,20 @@ export type passwordData = {
   confirmNewPassword: string
 }
 
+export type txPrisma = Omit<
+  PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
+  "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
+>
+
 export type providers = Record<
   LiteralUnion<BuiltInProviderType, string>,
   ClientSafeProvider
 >
+
+export type hashBcrypt = (
+  password: string,
+  salt: number | string
+) => Promise<string>
 
 export type compareBcrypt = (
   password: string,
@@ -150,3 +161,23 @@ export type signInNextAuth = <
 ) => Promise<
   P extends RedirectableProviderType ? SignInResponse | undefined : undefined
 >
+
+export type getServerSession = <
+  O extends GetServerSessionOptions,
+  R = O["callbacks"] extends {
+    session: (...args: any[]) => infer U
+  }
+    ? U
+    : Session
+>(
+  ...args: GetServerSessionParams<O>
+) => Promise<R | null>
+
+export type uuidType = typeof v4
+
+export type memberListItemAction = (
+  userId: number,
+  groupId: number,
+  apiRoute: apiRouteType,
+  method: methodType
+) => Promise<Response | unknown>

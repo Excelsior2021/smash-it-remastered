@@ -34,7 +34,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const player2Score = parseInt(opponentScore)
 
         if (!validateScores(player1Score, player2Score))
-          return res.status(422).json("invalid scores")
+          return res.status(422).json({ error: "invalid scores" })
 
         console.log(player1Id)
 

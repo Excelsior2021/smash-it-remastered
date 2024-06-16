@@ -382,7 +382,30 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             for (const _ of userAdminGroups) {
               const adminCount = await getAdminCount(_.groupId, prisma)
 
-              if (adminCount === 1) needsAdmin.push(_.group.name)
+              if (adminCount === 1) {
+                const members = await prisma.stat.findMany({
+                  where: {
+                    groupId: _.groupId,
+                  },
+                  select: {
+                    userId: true,
+                  },
+                })
+
+                if (members.length === 1) {
+                  const group = await prisma.group.delete({
+                    where: {
+                      id: _.groupId,
+                    },
+                  })
+
+                  if (group)
+                    return res
+                      .status(200)
+                      .json({ message: `group ${group.name} deleted.` })
+                }
+                needsAdmin.push(_.group.name)
+              }
             }
 
             if (needsAdmin.length !== 0) {
@@ -395,7 +418,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                   id: session.user.id,
                 },
               })
-              if (user) return res.status(204).json("account deleted")
+              if (user)
+                return res.status(204).json({ message: "account deleted" })
             }
           } else {
             const user = await prisma.user.delete({
@@ -403,7 +427,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 id: session.user.id,
               },
             })
-            if (user) return res.status(204).json("account deleted")
+            if (user)
+              return res.status(204).json({ message: "account deleted" })
           }
         }
 

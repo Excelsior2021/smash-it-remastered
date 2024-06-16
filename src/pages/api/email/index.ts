@@ -1,25 +1,32 @@
-import { getServerSession } from "next-auth"
-import { authOptions } from "../auth/[...nextauth]"
+//third party
+import { v4 as uuid } from "uuid"
+
+//lib
 import method from "@/src/lib/http-method"
 import prisma from "@/src/lib/prisma"
 import resend, { resendType } from "@/src/lib/resend"
-import { v4 as uuid } from "uuid"
 import {
   generateToken,
   sendEmailVerificationToken,
   sendResetPasswordToken,
 } from "@/src/lib/auth"
 
+//next-auth
+import { getServerSession } from "next-auth"
+import { authOptions } from "../auth/[...nextauth]"
+
 import type { NextApiRequest, NextApiResponse } from "next"
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (req.method) {
+    //verify email
     case method.get: {
-      const session = await getServerSession(req, res, authOptions)
-
-      if (!session)
-        return res.status(401).json({ message: "not authenticaticated" })
       try {
+        const session = await getServerSession(req, res, authOptions)
+
+        if (!session)
+          return res.status(401).json({ message: "not authenticaticated" })
+
         const emailSent = await prisma.$transaction(async tx => {
           const verificationToken = await generateToken(
             session.user.email,
@@ -47,6 +54,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         console.log(error)
       }
     }
+    //reset password
     case method.post: {
       try {
         const { email } = req.body

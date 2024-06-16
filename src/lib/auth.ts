@@ -1,16 +1,25 @@
+import type {
+  clientRouteType,
+  getServerSession,
+  hashBcrypt,
+  txPrisma,
+  uuidType,
+} from "@/types"
 import type { PrismaClient } from "@prisma/client"
+import type { GetServerSidePropsContext } from "next"
+import type { Resend } from "resend"
 
-export const hashPassword = async (password: string, hash) =>
+export const hashPassword = async (password: string, hash: hashBcrypt) =>
   await hash(password, 12)
 
 export const protectedRoute = async (
-  { req, res },
-  getServerSession,
-  clientRoute,
+  context: GetServerSidePropsContext,
+  getServerSession: getServerSession,
+  clientRoute: clientRouteType,
   authOptions,
   route = ""
 ) => {
-  const session = await getServerSession(req, res, authOptions)
+  const session = await getServerSession(context.req, context.res, authOptions)
 
   if (!session) {
     if (route === clientRoute.root)
@@ -31,13 +40,17 @@ export const protectedRoute = async (
   return { authenticated: true, session }
 }
 
-export const adminRoute = async (context, session, prisma: PrismaClient) => {
+export const adminRoute = async (
+  context: GetServerSidePropsContext,
+  session,
+  prisma: PrismaClient
+) => {
   try {
     const stat = await prisma.stat.findUnique({
       where: {
         userId_groupId: {
           userId: session.user.id,
-          groupId: parseInt(context.query.groupId),
+          groupId: parseInt(context.query.groupId as string),
         },
       },
       select: {
@@ -51,7 +64,10 @@ export const adminRoute = async (context, session, prisma: PrismaClient) => {
   }
 }
 
-export const notAdmin = (context, clientRoute) => ({
+export const notAdmin = (
+  context: GetServerSidePropsContext,
+  clientRoute: clientRouteType
+) => ({
   redirect: {
     destination: `${clientRoute.group}/${context.query.groupId}`,
     permanent: false,
@@ -59,12 +75,12 @@ export const notAdmin = (context, clientRoute) => ({
 })
 
 export const authRedirect = async (
-  { req, res },
-  getServerSession,
-  clientRoute,
+  context: GetServerSidePropsContext,
+  getServerSession: getServerSession,
+  clientRoute: clientRouteType,
   authOptions
 ) => {
-  const session = await getServerSession(req, res, authOptions)
+  const session = await getServerSession(context.req, context.res, authOptions)
 
   if (session)
     return {
@@ -72,7 +88,7 @@ export const authRedirect = async (
     }
 }
 
-export const getToken = async (email: string, tx, type: string) => {
+export const getToken = async (email: string, tx: txPrisma, type: string) => {
   try {
     const token = await tx[type].findUnique({
       where: {
@@ -85,7 +101,12 @@ export const getToken = async (email: string, tx, type: string) => {
   }
 }
 
-export const generateToken = async (email: string, uuid, tx, type: string) => {
+export const generateToken = async (
+  email: string,
+  uuid: uuidType,
+  tx: txPrisma,
+  type: string
+) => {
   const token = uuid()
   const expire = new Date().getTime() + 1000 * 60 * 60 * 24
 
@@ -113,7 +134,7 @@ export const sendEmailVerificationToken = async (
   email: string,
   token: string,
   username: string,
-  resend
+  resend: Resend
 ) => {
   try {
     const confirmationLink = `${process.env.CLIENT_DOMAIN}/verify-email?token=${token}`
@@ -144,7 +165,7 @@ export const sendResetPasswordToken = async (
   email: string,
   token: string,
   username: string,
-  resend
+  resend: Resend
 ) => {
   try {
     const resetPasswordLink = `${process.env.CLIENT_DOMAIN}/reset-password?token=${token}`

@@ -80,8 +80,8 @@ model Match {
   submittedAt  DateTime @map("submitted_at")
   approvedBy   Int?     @map("approved_by")
   approver     User?    @relation(fields: [approvedBy], references: [id])
-  group        Group    @relation(fields: [groupId], references: [id])
-  player1      User?    @relation("player1", fields: [player1Id], references: [id], onDelete: SetNull )
+  group        Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  player1      User?    @relation("player1", fields: [player1Id], references: [id], onDelete: SetNull)
   player2      User?    @relation("player2", fields: [player2Id], references: [id], onDelete: SetNull)
 
   @@map("match")
