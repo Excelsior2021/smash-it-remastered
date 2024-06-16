@@ -4,7 +4,7 @@ import OauthProviders from "@/src/components/oauth-providers/oauth-providers"
 
 //react
 import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { FieldValues, useForm } from "react-hook-form"
 
 //next
 import Link from "next/link"
@@ -17,9 +17,6 @@ import { accountFormFields, personalFormFields } from "@/src/lib/form-fields"
 import clientRoute from "@/src/lib/client-route"
 import apiRoute from "@/src/lib/api-route"
 import method from "../../lib/http-method"
-
-//store
-import createAccountFormStore from "@/src/store/create-account"
 
 //next-auth
 import { authOptions } from "../api/auth/[...nextauth]"
@@ -47,25 +44,19 @@ const CreateAccount = ({ providers }: props) => {
   const [accountSection, setAccountSection] = useState(false)
   const [submitting, setSubmmiting] = useState(false)
   const router = useRouter()
-  const createAccountStore = createAccountFormStore()
 
   const handleCreateAccount = async (
-    createAccountStore,
+    formData: FieldValues,
     router: NextRouter,
     apiRoute: apiRouteType,
     method: methodType
   ) => {
+    setSubmmiting(true)
     try {
-      setSubmmiting(true)
-      const res = (await createAccount(
-        createAccountStore,
-        apiRoute,
-        method
-      )) as Response
+      const res = (await createAccount(formData, apiRoute, method)) as Response
 
       if (res.ok) {
         router.replace("/")
-        createAccountStore.clearState()
         return
       } else {
         const serverErrors = await res.json()
@@ -97,41 +88,43 @@ const CreateAccount = ({ providers }: props) => {
 
         <form
           className="flex flex-col gap-6 mb-6"
-          onSubmit={handleSubmit(() =>
-            handleCreateAccount(createAccountStore, router, apiRoute, method)
+          onSubmit={handleSubmit(async formData =>
+            handleCreateAccount(formData, router, apiRoute, method)
           )}>
-          {!accountSection && (
+          <div className={`${accountSection ? "hidden" : null}`}>
             <FormSection
               heading="personal details"
               fields={personalFormFields}
               register={register}
-              createAccountStore={createAccountStore}
               errors={errors}
               clearErrors={clearErrors}
               disabled={submitting}
             />
-          )}
-          {accountSection && (
+          </div>
+
+          <div className={`${accountSection ? null : "hidden"}`}>
             <FormSection
               heading="account details"
               fields={accountFormFields}
               register={register}
-              createAccountStore={createAccountStore}
               errors={errors}
               clearErrors={clearErrors}
               disabled={submitting}
               toggle={true}
             />
-          )}
+          </div>
+
           {!accountSection && (
             <button
               className="btn btn-secondary sm:w-1/2 sm:self-end"
               onClick={async () => {
-                if (await trigger()) setAccountSection(true)
-              }}>
+                if (await trigger("email")) setAccountSection(true)
+              }}
+              type="button">
               next
             </button>
           )}
+
           {accountSection && (
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
               <button

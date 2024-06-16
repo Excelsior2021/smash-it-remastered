@@ -18,7 +18,6 @@ type props = {
   heading: string
   fields: any
   register: UseFormRegister<FieldValues>
-  createAccountStore: any
   errors: FieldErrors<FieldValues>
   clearErrors: UseFormClearErrors<FieldValues>
   disabled: boolean
@@ -29,7 +28,6 @@ const FormSection = ({
   heading,
   fields,
   register,
-  createAccountStore,
   errors,
   clearErrors,
   disabled,
@@ -52,7 +50,6 @@ const FormSection = ({
               required={field.required}
               pattern={field.pattern}
               validate={field.validate}
-              createAccountStore={createAccountStore}
               info={field.info}
               onChange={() => clearErrors(field.name)}
               disabled={disabled}

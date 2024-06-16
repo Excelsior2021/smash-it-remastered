@@ -23,7 +23,7 @@ export const login = async (
   })
 
 export const createAccount = async (
-  createAccountStore,
+  createAccountFormData: FieldValues,
   apiRoute: apiRouteType,
   method: methodType
 ) => {
@@ -31,7 +31,7 @@ export const createAccount = async (
     const res = await fetch(apiRoute.user, {
       method: method.post,
       headers,
-      body: JSON.stringify(createAccountStore.formState),
+      body: JSON.stringify(createAccountFormData),
     })
     return res
   } catch (error) {
