@@ -4,7 +4,7 @@ import EmailUnverifiedMessage from "@/src/components/email-unverified-message/em
 
 //react
 import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
+import { FieldValues, useForm } from "react-hook-form"
 
 //lib
 import prisma from "@/src/lib/prisma"
@@ -24,7 +24,13 @@ import { getServerSession } from "next-auth"
 
 //types
 import type { Dispatch, SetStateAction } from "react"
-import type { apiRouteType, groupRequest, methodType, userGroup } from "@/types"
+import type {
+  apiRouteType,
+  changeAccountDetailType,
+  groupRequest,
+  methodType,
+  userGroup,
+} from "@/types"
 import type { GetServerSidePropsContext } from "next"
 
 type props = {
@@ -41,17 +47,13 @@ const JoinGroup = ({ groupRequests, emailUnverified, userId }: props) => {
   const clearBackRoute = headerStore(state => state.clearBackRoute)
 
   const handleQueryGroups = async (
-    query: string,
+    queryGroups: changeAccountDetailType,
+    formData: FieldValues,
     setGroups: Dispatch<SetStateAction<userGroup[] | null>>,
-    queryGroups: (...args: any) => Promise<Response | undefined>,
     apiRoute: apiRouteType,
     method: methodType
   ) => {
-    const res = (await queryGroups(
-      query.toLowerCase(),
-      apiRoute,
-      method
-    )) as Response
+    const res = (await queryGroups(formData, apiRoute, method)) as Response
     if (res && res.ok) setGroups(await res.json())
     else setGroups(null)
   }
@@ -75,8 +77,14 @@ const JoinGroup = ({ groupRequests, emailUnverified, userId }: props) => {
         <search className="mb-6 w-full max-w-96">
           <form
             className="flex flex-col gap-8"
-            onChange={handleSubmit(async ({ query }) =>
-              handleQueryGroups(query, setGroups, queryGroups, apiRoute, method)
+            onChange={handleSubmit(async (formData: FieldValues) =>
+              handleQueryGroups(
+                queryGroups,
+                formData,
+                setGroups,
+                apiRoute,
+                method
+              )
             )}>
             <label className="hidden" htmlFor="query">
               search for groups

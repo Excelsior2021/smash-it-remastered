@@ -1,4 +1,4 @@
-import type { apiRouteType, userGroup } from "@/types"
+import type { apiRouteType, getUserGroupsType, userGroup } from "@/types"
 import type { NextRouter } from "next/router"
 
 export const updateGroupDataForPage = (
@@ -22,7 +22,7 @@ export const generateDisplayName = (
 }
 
 export const handleGetUserGroups = async (
-  getUserGroups: (apiRoute: apiRouteType) => Promise<Response | undefined>,
+  getUserGroups: getUserGroupsType,
   setGroups: any,
   apiRoute: apiRouteType
 ) => {

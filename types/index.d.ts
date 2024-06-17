@@ -3,6 +3,8 @@ import type clientRoute from "@/src/lib/client-route"
 import type method from "@/src/lib/http-method"
 import type { v4 } from "uuid"
 
+const apiResponse = Response | undefined
+
 export type group = {
   id: number
   _count: {
@@ -175,9 +177,50 @@ export type getServerSession = <
 
 export type uuidType = typeof v4
 
-export type memberListItemAction = (
+//api handlers
+export type userGroupApiType = (
   userId: number,
   groupId: number,
   apiRoute: apiRouteType,
   method: methodType
-) => Promise<Response | unknown>
+) => Promise<apiResponse>
+
+export type recordMatchType = (
+  userScore: number,
+  opponentScore: number,
+  matchDate: string,
+  groupId: number,
+  userId: number,
+  opponentId: number,
+  approvedBy: number,
+  apiRoute: apiRouteType,
+  method: methodType,
+  matchId: number | null = null
+) => Promise<apiResponse>
+
+export type removeMatchSubmissionType = (
+  matchId: number,
+  groupId: number,
+  apiRoute: apiRouteType,
+  method: methodType
+) => Promise<apiResponse>
+
+export type getUserGroupsType = (apiRoute: apiRouteType) => Promise<apiResponse>
+
+export type changeAccountDetailType = (
+  field: FieldValues,
+  apiRoute: apiRouteType,
+  method: methodType
+) => Promise<apiResponse>
+
+export type noBodyApiType = (
+  apiRoute: apiRouteType,
+  method: methodType
+) => Promise<apiResponse>
+
+export type resetPasswordType = (
+  passwordData: FieldValues,
+  token: string,
+  apiRoute: apiRouteType,
+  method: methodType
+) => Promise<apiResponse>

@@ -25,7 +25,12 @@ import { getServerSession } from "next-auth"
 import { getProviders, signIn } from "next-auth/react"
 
 //types
-import type { apiRouteType, methodType, providers } from "@/types"
+import type {
+  apiRouteType,
+  changeAccountDetailType,
+  methodType,
+  providers,
+} from "@/types"
 import type { GetServerSidePropsContext } from "next"
 
 type props = {
@@ -46,6 +51,7 @@ const CreateAccount = ({ providers }: props) => {
   const router = useRouter()
 
   const handleCreateAccount = async (
+    createAccount: changeAccountDetailType,
     formData: FieldValues,
     apiRoute: apiRouteType,
     method: methodType
@@ -95,7 +101,7 @@ const CreateAccount = ({ providers }: props) => {
         <form
           className="flex flex-col gap-6 mb-6"
           onSubmit={handleSubmit(async formData =>
-            handleCreateAccount(formData, apiRoute, method)
+            handleCreateAccount(createAccount, formData, apiRoute, method)
           )}>
           <div className={`${accountSection ? "hidden" : null}`}>
             <FormSection

@@ -51,6 +51,7 @@ const Login = ({ providers }: props) => {
     setSubmmiting(true)
     try {
       const res = await login(signIn, formData, clientRoute)
+
       if (!res.ok) {
         setError("server", {
           message:

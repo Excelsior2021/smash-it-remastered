@@ -13,7 +13,13 @@ import apiRoute from "@/src/lib/api-route"
 import method from "@/src/lib/http-method"
 
 //types
-import type { apiRouteType, matchSubmission, methodType } from "@/types"
+import type {
+  apiRouteType,
+  matchSubmission,
+  methodType,
+  recordMatchType,
+  removeMatchSubmissionType,
+} from "@/types"
 
 type props = {
   matchSubmission: matchSubmission
@@ -24,6 +30,7 @@ const ApproveMatchItem = ({ matchSubmission, adminUserId }: props) => {
   const [submitted, setSubmitted] = useState(false)
 
   const handleApproveMatch = async (
+    recordMatch: recordMatchType,
     matchSubmission: matchSubmission,
     apiRoute: apiRouteType,
     method: methodType
@@ -54,6 +61,7 @@ const ApproveMatchItem = ({ matchSubmission, adminUserId }: props) => {
   }
 
   const handleDeclineMatch = async (
+    removeMatchSubmission: removeMatchSubmissionType,
     matchId: number,
     groupId: number,
     apiRoute: apiRouteType,
@@ -104,6 +112,7 @@ const ApproveMatchItem = ({ matchSubmission, adminUserId }: props) => {
           className="p-2 rounded-full bg-red-700/70 hover:bg-red-600/70 cursor-pointer"
           onClick={() =>
             handleDeclineMatch(
+              removeMatchSubmission,
               matchSubmission.id,
               matchSubmission.groupId,
               apiRoute,
@@ -114,7 +123,9 @@ const ApproveMatchItem = ({ matchSubmission, adminUserId }: props) => {
         </div>
         <div
           className="p-2 rounded-full bg-green-700/70 hover:bg-green-600/70 cursor-pointer"
-          onClick={() => handleApproveMatch(matchSubmission, apiRoute, method)}>
+          onClick={() =>
+            handleApproveMatch(recordMatch, matchSubmission, apiRoute, method)
+          }>
           <Tick />
         </div>
       </div>

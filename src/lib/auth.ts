@@ -140,7 +140,7 @@ export const sendEmailVerificationToken = async (
     const confirmationLink = `${process.env.CLIENT_DOMAIN}/verify-email?token=${token}`
 
     const { data, error } = await resend.emails.send({
-      from: "Smash It! <onboarding@resend.dev>",
+      from: "Smash It! <info@smash-it-table-tennis.com>",
       to: email,
       subject: "Please verify your email",
       text: confirmationLink,
@@ -171,7 +171,7 @@ export const sendResetPasswordToken = async (
     const resetPasswordLink = `${process.env.CLIENT_DOMAIN}/reset-password?token=${token}`
 
     const { data, error } = await resend.emails.send({
-      from: "Smash It! <onboarding@resend.dev>",
+      from: "Smash It! <info@smash-it-table-tennis.com>",
       to: email,
       subject: "Reset your password",
       text: resetPasswordLink,

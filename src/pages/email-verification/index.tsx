@@ -20,12 +20,13 @@ import { authOptions } from "../api/auth/[...nextauth]"
 
 //types
 import type { GetServerSidePropsContext } from "next"
+import { noBodyApiType } from "@/types"
 
 const EmailVerification = () => {
   const [error, setError] = useState(null)
   const router = useRouter()
 
-  const handleVerifyEmail = async () => {
+  const handleVerifyEmail = async (verifyEmail: noBodyApiType) => {
     const res = await verifyEmail(apiRoute, method)
 
     if (res && !res.ok) {
@@ -49,7 +50,7 @@ const EmailVerification = () => {
       </p>
       <button
         className="btn btn-secondary text-lg capitalize block m-auto mt-16"
-        onClick={handleVerifyEmail}>
+        onClick={() => handleVerifyEmail(verifyEmail)}>
         verify email
       </button>
       {error && <p className="text-error text-center my-6">{error}</p>}

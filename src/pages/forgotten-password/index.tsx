@@ -27,7 +27,7 @@ import { authOptions } from "../api/auth/[...nextauth]"
 
 //type
 import type { FieldValues } from "react-hook-form"
-import type { apiRouteType, methodType } from "@/types"
+import type { apiRouteType, changeAccountDetailType, methodType } from "@/types"
 import type { GetServerSidePropsContext } from "next"
 
 const ForgottenPassword = () => {
@@ -49,6 +49,7 @@ const ForgottenPassword = () => {
   }, [setBackRoute, clearBackRoute])
 
   const handleForgottenPassword = async (
+    forgottenPassword: changeAccountDetailType,
     { email }: FieldValues,
     apiRoute: apiRouteType,
     method: methodType
@@ -87,7 +88,12 @@ const ForgottenPassword = () => {
         className="flex flex-col gap-8 mt-12 mb-6"
         onSubmit={handleSubmit(
           async formData =>
-            await handleForgottenPassword(formData, apiRoute, method)
+            await handleForgottenPassword(
+              forgottenPassword,
+              formData,
+              apiRoute,
+              method
+            )
         )}>
         <div>
           <Input

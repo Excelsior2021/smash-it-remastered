@@ -29,8 +29,8 @@ import method from "@/src/lib/http-method"
 import type {
   apiRouteType,
   member,
-  memberListItemAction,
   methodType,
+  userGroupApiType,
 } from "@/types"
 import type { MouseEvent } from "react"
 
@@ -56,7 +56,7 @@ const MemberListItem = ({
 
   const handleAction = useCallback(
     async (
-      action: memberListItemAction,
+      action: userGroupApiType,
       userId: number,
       groupId: number,
       apiRoute: apiRouteType,

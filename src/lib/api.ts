@@ -42,7 +42,7 @@ export const createAccount = async (
 }
 
 export const createGroup = async (
-  { groupName }: { groupName: string },
+  formData: FieldValues,
   apiRoute: apiRouteType,
   method: methodType
 ) => {
@@ -50,7 +50,7 @@ export const createGroup = async (
     const res = await fetch(apiRoute.group, {
       method: method.post,
       headers,
-      body: JSON.stringify({ groupName }),
+      body: JSON.stringify(formData),
     })
 
     return res
@@ -60,7 +60,7 @@ export const createGroup = async (
 }
 
 export const queryGroups = async (
-  query: string,
+  { query }: FieldValues,
   apiRoute: apiRouteType,
   method: methodType
 ) => {
@@ -69,7 +69,7 @@ export const queryGroups = async (
     const res = await fetch(`${apiRoute.group}/query`, {
       method: method.post,
       headers,
-      body: JSON.stringify({ query }),
+      body: JSON.stringify({ query: query.toLowerCase() }),
     })
     return res
   } catch (error) {

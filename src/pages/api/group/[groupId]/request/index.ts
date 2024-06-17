@@ -18,6 +18,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       if (maxUserGroups)
         return res.status(400).json({ error: "max group count reached" })
       const groupId = parseInt(req.query.groupId as string)
+
+      console.log(userId, groupId)
       try {
         const groupRequests = await prisma.groupRequests.create({
           data: {

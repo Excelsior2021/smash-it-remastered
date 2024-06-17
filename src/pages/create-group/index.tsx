@@ -26,7 +26,12 @@ import { authOptions } from "../api/auth/[...nextauth]"
 import { getServerSession } from "next-auth"
 
 //types
-import type { clientRouteType, apiRouteType, methodType } from "@/types"
+import type {
+  clientRouteType,
+  apiRouteType,
+  methodType,
+  changeAccountDetailType,
+} from "@/types"
 import type { NextRouter } from "next/router"
 import type { FieldValues, UseFormSetError } from "react-hook-form"
 import type { GetServerSidePropsContext } from "next"
@@ -51,7 +56,8 @@ const CreateGroup = ({ emailUnverified }: props) => {
   const clearBackRoute = headerStore(state => state.clearBackRoute)
 
   const handleCreateGroup = async (
-    { groupName }: FieldValues,
+    createGroup: changeAccountDetailType,
+    formData: FieldValues,
     setError: UseFormSetError<FieldValues>,
     router: NextRouter,
     clientRoute: clientRouteType,
@@ -66,7 +72,7 @@ const CreateGroup = ({ emailUnverified }: props) => {
       return
     }
 
-    const res = (await createGroup({ groupName }, apiRoute, method)) as Response
+    const res = (await createGroup(formData, apiRoute, method)) as Response
 
     if (!res.ok) {
       const data = await res.json()
@@ -98,6 +104,7 @@ const CreateGroup = ({ emailUnverified }: props) => {
         className="flex flex-col gap-8 max-w-96 m-auto"
         onSubmit={handleSubmit(formData =>
           handleCreateGroup(
+            createGroup,
             formData,
             setError,
             router,

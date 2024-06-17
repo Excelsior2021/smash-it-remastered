@@ -22,7 +22,7 @@ import { getServerSession } from "next-auth"
 
 //types
 import type { FieldValues } from "react-hook-form"
-import type { apiRouteType, methodType } from "@/types"
+import type { apiRouteType, methodType, noBodyApiType } from "@/types"
 import { GetServerSidePropsContext } from "next"
 
 const DeleteAccount = () => {
@@ -43,6 +43,7 @@ const DeleteAccount = () => {
   }, [setBackRoute, clearBackRoute])
 
   const handleDeleteAccount = async (
+    deleteAccount: noBodyApiType,
     { deleteInput }: FieldValues,
     apiRoute: apiRouteType,
     method: methodType
@@ -83,7 +84,7 @@ const DeleteAccount = () => {
       <form
         className="flex flex-col items-center gap-6 w-full max-w-60 m-auto"
         onSubmit={handleSubmit(async formData =>
-          handleDeleteAccount(formData, apiRoute, method)
+          handleDeleteAccount(deleteAccount, formData, apiRoute, method)
         )}>
         <label className="hidden" htmlFor="deleteAccount">
           delete account

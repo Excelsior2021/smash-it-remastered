@@ -36,8 +36,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         if (!validateScores(player1Score, player2Score))
           return res.status(422).json({ error: "invalid scores" })
 
-        console.log(player1Id)
-
         const match = await prisma.$transaction(async tx => {
           const match = await tx.match.create({
             data: {

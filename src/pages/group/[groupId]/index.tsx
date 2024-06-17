@@ -30,7 +30,13 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "../../api/auth/[...nextauth]"
 
 //type
-import type { apiRouteType, group, member, methodType } from "@/types"
+import type {
+  apiRouteType,
+  group,
+  member,
+  methodType,
+  userGroupApiType,
+} from "@/types"
 import type { GetServerSidePropsContext } from "next"
 
 type props = {
@@ -65,6 +71,7 @@ const GroupPage = ({
   if (groupJSON) group = JSON.parse(groupJSON)
 
   const handleLeaveGroup = async (
+    removeUserFromGroup: userGroupApiType,
     userId: number,
     groupId: number,
     apiRoute: apiRouteType,
@@ -142,7 +149,13 @@ const GroupPage = ({
           action="confirm"
           loading={submitting}
           onClick={async () => {
-            await handleLeaveGroup(userId, group.id, apiRoute, method)
+            await handleLeaveGroup(
+              removeUserFromGroup,
+              userId,
+              group.id,
+              apiRoute,
+              method
+            )
           }}
         />
       )}

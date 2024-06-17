@@ -30,6 +30,7 @@ import { authOptions } from "../../api/auth/[...nextauth]"
 import { getServerSession } from "next-auth"
 
 //types
+import type { Dispatch, SetStateAction } from "react"
 import type { apiRouteType, member, methodType, player } from "@/types"
 import type { FieldValues } from "react-hook-form"
 import type { GetServerSidePropsContext } from "next"
@@ -41,6 +42,8 @@ type props = {
   emailUnverified: true | undefined
   session: any
 }
+
+type opponentData = { groupId: number; member: member }
 
 enum scoresSubmissionStatus {
   pending,
@@ -94,7 +97,10 @@ const RecordMatch = ({
   }, [router, activeGroup, setBackRoute, clearBackRoute])
 
   const handleChosenOpponent = useCallback(
-    (opponentData: { groupId: number; member: member }) => {
+    (
+      setChosenOpponent: Dispatch<SetStateAction<member | null>>,
+      opponentData: opponentData
+    ) => {
       if (groupId === opponentData.groupId) {
         setChosenOpponent(opponentData.member)
       }
@@ -203,7 +209,9 @@ const RecordMatch = ({
                 heading="choose an opponent"
                 members={opponents}
                 groupId={groupId}
-                itemOnClick={handleChosenOpponent}
+                itemOnClick={(opponentData: opponentData) =>
+                  handleChosenOpponent(setChosenOpponent, opponentData)
+                }
               />
             )}
 

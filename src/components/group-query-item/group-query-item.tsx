@@ -13,6 +13,7 @@ import type {
   groupRequest as groupRequestType,
   methodType,
   userGroup,
+  userGroupApiType,
 } from "@/types"
 
 type props = {
@@ -40,11 +41,7 @@ const GroupQueryItem = ({
 }: props) => {
   const [request, setRequest] = useState("")
   const [submitting, setSubmmiting] = useState(false)
-  const [disableButton] = useState(
-    request === requestState.joined ||
-      request === requestState.requested ||
-      userGroups.length === 3
-  )
+  const [disableButton, setDisableButton] = useState(false)
 
   useEffect(() => {
     userGroups.forEach(group => {
@@ -53,12 +50,19 @@ const GroupQueryItem = ({
         return
       }
     })
+    if (
+      request === requestState.joined ||
+      request === requestState.requested ||
+      userGroups.length === 3
+    )
+      setDisableButton(true)
     for (const request of groupRequests) {
       if (request.groupId === groupId) setRequest(requestState.requested)
     }
-  }, [groupId, groupRequests, userGroups])
+  }, [groupId, groupRequests, userGroups, request, setDisableButton])
 
   const handleGroupRequest = async (
+    groupRequest: userGroupApiType,
     userId: number,
     groupId: number,
     setRequest: Dispatch<SetStateAction<string>>,
@@ -75,6 +79,7 @@ const GroupQueryItem = ({
       )) as Response
 
       if (res.ok) setRequest(requestState.requested)
+      return
     } catch (error) {
       console.log(error)
     } finally {
@@ -92,7 +97,14 @@ const GroupQueryItem = ({
         <button
           className={`btn w-24 ${disableButton ? "opacity-50" : ""}`}
           onClick={() =>
-            handleGroupRequest(userId, groupId, setRequest, apiRoute, method)
+            handleGroupRequest(
+              groupRequest,
+              userId,
+              groupId,
+              setRequest,
+              apiRoute,
+              method
+            )
           }
           disabled={disableButton}>
           {submitting ? (

@@ -26,7 +26,7 @@ import { authOptions } from "../api/auth/[...nextauth]"
 
 //types
 import type { FieldValues } from "react-hook-form"
-import type { apiRouteType, methodType } from "@/types"
+import type { apiRouteType, methodType, resetPasswordType } from "@/types"
 import type { GetServerSidePropsContext } from "next"
 
 type props = {
@@ -49,6 +49,7 @@ const ResetPassword = ({ token, invalid }: props) => {
   let newPassword: string
 
   const handleResetPassword = async (
+    resetPassword: resetPasswordType,
     formData: FieldValues,
     token: string,
     apiRoute: apiRouteType,
@@ -80,7 +81,13 @@ const ResetPassword = ({ token, invalid }: props) => {
         <form
           className="flex flex-col gap-10 max-w-[500px] m-auto"
           onSubmit={handleSubmit(async formData =>
-            handleResetPassword(formData, token, apiRoute, method)
+            handleResetPassword(
+              resetPassword,
+              formData,
+              token,
+              apiRoute,
+              method
+            )
           )}>
           {changePasswordFormFields.map(field => {
             if (field.name === "currentPassword") return

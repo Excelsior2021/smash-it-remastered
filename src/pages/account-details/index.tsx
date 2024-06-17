@@ -27,7 +27,7 @@ import { authOptions } from "../api/auth/[...nextauth]"
 import { useSession } from "next-auth/react"
 
 //types
-import type { apiRouteType, methodType } from "@/types"
+import type { apiRouteType, changeAccountDetailType, methodType } from "@/types"
 import type { FieldValues } from "react-hook-form"
 import type { GetServerSidePropsContext } from "next"
 
@@ -81,6 +81,7 @@ const AccountDetails = ({ fields }: props) => {
   }, [setBackRoute, clearBackRoute])
 
   const handleChangeAccountDetail = async (
+    changeAccountDetail: changeAccountDetailType,
     formData: FieldValues,
     apiRoute: apiRouteType,
     method: methodType
@@ -152,6 +153,7 @@ const AccountDetails = ({ fields }: props) => {
                         onSubmit={handleSubmit(async formData => {
                           setSubmmiting(true)
                           await handleChangeAccountDetail(
+                            changeAccountDetail,
                             formData,
                             apiRoute,
                             method

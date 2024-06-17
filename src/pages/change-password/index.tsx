@@ -27,7 +27,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "../api/auth/[...nextauth]"
 
 //types
-import type { apiRouteType, methodType } from "@/types"
+import type { apiRouteType, changeAccountDetailType, methodType } from "@/types"
 import type { FieldValues } from "react-hook-form"
 import type { GetServerSidePropsContext } from "next"
 
@@ -60,6 +60,7 @@ const ChangePassword = ({ hasPassword, emailUnverified }: props) => {
   }, [setBackRoute, clearBackRoute])
 
   const handleChangePassword = async (
+    changePassword: changeAccountDetailType,
     formData: FieldValues,
     apiRoute: apiRouteType,
     method: methodType
@@ -96,7 +97,7 @@ const ChangePassword = ({ hasPassword, emailUnverified }: props) => {
       <form
         className="flex flex-col gap-10 max-w-[500px] m-auto"
         onSubmit={handleSubmit(async formData =>
-          handleChangePassword(formData, apiRoute, method)
+          handleChangePassword(changePassword, formData, apiRoute, method)
         )}>
         {changePasswordFormFields.map(field => {
           if (!hasPassword && field.name === "currentPassword") return
