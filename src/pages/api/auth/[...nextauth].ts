@@ -34,19 +34,23 @@ export const authOptions = {
               OR: [{ username: userId }, { email: userId }],
             },
           })
+
           if (user) {
             const passwordVerified = await verifyPassword(
               password,
               user.password!,
               compare
             )
+
             if (passwordVerified) return user
             else return null
           }
           return null
         } catch (error) {
           console.log(error)
-          return null
+          throw new Error(
+            "a server error occured. please check your connection and try again."
+          )
         }
       },
     }),

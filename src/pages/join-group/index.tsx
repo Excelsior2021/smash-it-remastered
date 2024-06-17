@@ -43,7 +43,7 @@ const JoinGroup = ({ groupRequests, emailUnverified, userId }: props) => {
   const handleQueryGroups = async (
     query: string,
     setGroups: Dispatch<SetStateAction<userGroup[] | null>>,
-    queryGroups: (...args: any) => Response | undefined,
+    queryGroups: (...args: any) => Promise<Response | undefined>,
     apiRoute: apiRouteType,
     method: methodType
   ) => {
@@ -53,6 +53,7 @@ const JoinGroup = ({ groupRequests, emailUnverified, userId }: props) => {
       method
     )) as Response
     if (res && res.ok) setGroups(await res.json())
+    else setGroups(null)
   }
 
   useEffect(() => {

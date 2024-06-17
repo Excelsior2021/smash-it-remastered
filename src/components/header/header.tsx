@@ -27,11 +27,14 @@ const Header = () => {
           <BackButton className="w-8 h-8 min-[380px]:w-10 min-[380px]:h-10" />
         </div>
       )}
-      <div className="relative w-48 h-12">
+      <div className="relative flex justify-between items-end w-48 h-12">
         <Link href={clientRoute.root}>
           <Image src="/logo.png" alt="logo" fill />
         </Link>
+
+        <span className="text-xl ml-48">BETA</span>
       </div>
+
       {activeGroup && (
         <div className="text-3xl text-center capitalize">
           {activeGroup.name}

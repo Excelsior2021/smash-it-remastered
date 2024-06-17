@@ -39,6 +39,12 @@ const GroupQueryItem = ({
   userId,
 }: props) => {
   const [request, setRequest] = useState("")
+  const [submitting, setSubmmiting] = useState(false)
+  const [disableButton] = useState(
+    request === requestState.joined ||
+      request === requestState.requested ||
+      userGroups.length === 3
+  )
 
   useEffect(() => {
     userGroups.forEach(group => {
@@ -59,14 +65,21 @@ const GroupQueryItem = ({
     apiRoute: apiRouteType,
     method: methodType
   ) => {
-    const res = (await groupRequest(
-      userId,
-      groupId,
-      apiRoute,
-      method
-    )) as Response
+    try {
+      setSubmmiting(true)
+      const res = (await groupRequest(
+        userId,
+        groupId,
+        apiRoute,
+        method
+      )) as Response
 
-    if (res.ok) setRequest(requestState.requested)
+      if (res.ok) setRequest(requestState.requested)
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setSubmmiting(false)
+    }
   }
 
   return (
@@ -77,24 +90,20 @@ const GroupQueryItem = ({
           members: <span>{memberCount}/20</span>
         </p>
         <button
-          className={`btn w-24 ${
-            request === requestState.joined ||
-            request === requestState.requested
-              ? "opacity-50"
-              : ""
-          }`}
+          className={`btn w-24 ${disableButton ? "opacity-50" : ""}`}
           onClick={() =>
             handleGroupRequest(userId, groupId, setRequest, apiRoute, method)
           }
-          disabled={
-            request === requestState.joined ||
-            request === requestState.requested
-          }>
-          {request === requestState.joined
-            ? "joined"
-            : request === requestState.requested
-            ? "requested"
-            : "join"}
+          disabled={disableButton}>
+          {submitting ? (
+            <span className="loading loading-spinner loading-md"></span>
+          ) : request === requestState.joined ? (
+            "joined"
+          ) : request === requestState.requested ? (
+            "requested"
+          ) : (
+            "join"
+          )}
         </button>
       </div>
     </li>

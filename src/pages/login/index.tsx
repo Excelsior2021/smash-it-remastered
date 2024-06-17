@@ -23,7 +23,7 @@ import { authOptions } from "../api/auth/[...nextauth]"
 import { getServerSession } from "next-auth"
 
 //types
-import type { clientRouteType, providers } from "@/types"
+import type { clientRouteType, providers, signInNextAuth } from "@/types"
 import type { FieldValues } from "react-hook-form"
 import type { GetServerSidePropsContext } from "next"
 
@@ -44,19 +44,21 @@ const Login = ({ providers }: props) => {
   const [showPassword, setShowPassword] = useState(false)
 
   const handleLogin = async (
-    signIn,
+    signIn: signInNextAuth,
     formData: FieldValues,
     clientRoute: clientRouteType
   ) => {
     setSubmmiting(true)
     try {
       const res = await login(signIn, formData, clientRoute)
-      if (!res.ok)
+      if (!res.ok) {
         setError("server", {
           message:
-            "invalid credentials. please check your username/email and password",
+            res.error === "CredentialsSignin"
+              ? "invalid credentials. please check your username/email and password"
+              : res.error,
         })
-      else router.replace(clientRoute.root)
+      } else router.replace(clientRoute.root)
     } catch (error) {
     } finally {
       setSubmmiting(false)

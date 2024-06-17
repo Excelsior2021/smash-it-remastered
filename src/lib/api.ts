@@ -14,13 +14,15 @@ export const login = async (
   signIn: signInNextAuth,
   { userId, password }: FieldValues,
   clientRoute: clientRouteType
-) =>
-  await signIn("credentials", {
+) => {
+  const res = await signIn("credentials", {
     userId,
     password,
     redirect: false,
     callbackUrl: clientRoute.root,
   })
+  return res
+}
 
 export const createAccount = async (
   createAccountFormData: FieldValues,

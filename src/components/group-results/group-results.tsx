@@ -20,7 +20,8 @@ type props = {
 
 const GroupResults = ({ groups, userGroups, groupRequests, userId }: props) => {
   if (!groups) return
-  if (groups.length === 0) return <p>no groups found</p>
+  if (groups.length === 0)
+    return <p className="text-center text-xl">no groups found</p>
 
   return (
     <div>

@@ -29,6 +29,20 @@
   },
   {
     "schemaName": "public",
+    "tableName": "reset_password",
+    "predictions": [
+      {
+        "input": "public reset_password token",
+        "column": "token",
+        "shape": "TOKEN",
+        "confidence": 0.9771842360496521,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "public",
     "tableName": "user",
     "predictions": [
       {

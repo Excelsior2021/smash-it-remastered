@@ -24,7 +24,6 @@ import obscenity from "@/src/lib/obscenity-matcher"
 import type { NextApiRequest, NextApiResponse } from "next"
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  console.log(req.body)
   switch (req.method) {
     case method.post: {
       const {
@@ -162,6 +161,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           })
       } catch (error) {
         console.log(error)
+        return res.status(500).json({
+          error:
+            "a server error occured. please check your connection and try again.",
+        })
       }
     }
 

@@ -15,6 +15,12 @@ const links = [
   },
 ]
 
+const features = [
+  "Join groups and track performance.",
+  "Keep track of scores and matches.",
+  "Compare your stats with other group members.",
+]
+
 const LandingPage = () => (
   <div>
     <div>
@@ -25,9 +31,11 @@ const LandingPage = () => (
           </h1>
 
           <ul className="flex flex-col gap-4 text-center">
-            <li>Join groups and measure performance against members.</li>
-            <li>Keep track of scores.</li>
-            <li>Compare your stats with other users.</li>
+            {features.map(feature => (
+              <li key={feature} className="text-xl">
+                {feature}
+              </li>
+            ))}
           </ul>
         </div>
       </div>
@@ -37,6 +45,11 @@ const LandingPage = () => (
           <LinkButton key={name} href={route} text={name} />
         ))}
       </div>
+      <p className="text-center m-12">
+        Please Note: This app is in beta. There maybe unexpected changes and
+        data integrity is not guaranteed. Please keep this in mind while using
+        the app.
+      </p>
     </div>
   </div>
 )

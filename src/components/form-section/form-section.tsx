@@ -79,6 +79,7 @@ const FormSection = ({
       {Object.keys(errors).length > 0 && (
         <p className="text-error">please check all sections for errors.</p>
       )}
+      {errors.server && <p className="text-error">{errors.server.message}</p>}
     </div>
   )
 }

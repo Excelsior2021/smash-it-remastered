@@ -1,6 +1,7 @@
 //components
 import FormSection from "@/src/components/form-section/form-section"
 import OauthProviders from "@/src/components/oauth-providers/oauth-providers"
+import Modal from "@/src/components/modal/modal"
 
 //react
 import { useState } from "react"
@@ -24,7 +25,6 @@ import { getServerSession } from "next-auth"
 import { getProviders, signIn } from "next-auth/react"
 
 //types
-import type { NextRouter } from "next/router"
 import type { apiRouteType, methodType, providers } from "@/types"
 import type { GetServerSidePropsContext } from "next"
 
@@ -47,7 +47,6 @@ const CreateAccount = ({ providers }: props) => {
 
   const handleCreateAccount = async (
     formData: FieldValues,
-    router: NextRouter,
     apiRoute: apiRouteType,
     method: methodType
   ) => {
@@ -56,10 +55,17 @@ const CreateAccount = ({ providers }: props) => {
       const res = (await createAccount(formData, apiRoute, method)) as Response
 
       if (res.ok) {
-        router.replace("/")
-        return
+        document.getElementById("modal").showModal()
       } else {
         const serverErrors = await res.json()
+
+        if (res.status === 500) {
+          setError("server", {
+            type: "server",
+            message: serverErrors.error,
+          })
+          return
+        }
 
         for (const error in serverErrors.errors) {
           serverErrors.errors[error] = serverErrors.errors[error].filter(
@@ -89,7 +95,7 @@ const CreateAccount = ({ providers }: props) => {
         <form
           className="flex flex-col gap-6 mb-6"
           onSubmit={handleSubmit(async formData =>
-            handleCreateAccount(formData, router, apiRoute, method)
+            handleCreateAccount(formData, apiRoute, method)
           )}>
           <div className={`${accountSection ? "hidden" : null}`}>
             <FormSection
@@ -152,6 +158,11 @@ const CreateAccount = ({ providers }: props) => {
           </Link>
         </p>
       </div>
+      <Modal
+        heading="account created"
+        text="A verification email has been sent to your email address. Please verify your email."
+        onClickClose={() => router.replace(clientRoute.login)}
+      />
     </div>
   )
 }
