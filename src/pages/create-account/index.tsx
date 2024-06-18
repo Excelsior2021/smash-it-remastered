@@ -92,7 +92,7 @@ const CreateAccount = ({ providers }: props) => {
   }
 
   return (
-    <div className="p-4 sm:flex justify-center">
+    <div className="sm:flex justify-center">
       <div className="sm:w-[500px]">
         <h1 className="text-3xl mb-6">Create an account</h1>
 
