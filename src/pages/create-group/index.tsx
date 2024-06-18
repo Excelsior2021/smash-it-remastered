@@ -3,7 +3,7 @@ import Input from "@/src/components/input/input"
 import EmailUnverifiedMessage from "@/src/components/email-unverified-message/email-unverified-message"
 
 //react
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 
 //next
@@ -31,6 +31,7 @@ import type {
   apiRouteType,
   methodType,
   changeAccountDetailType,
+  userGroup,
 } from "@/types"
 import type { NextRouter } from "next/router"
 import type { FieldValues, UseFormSetError } from "react-hook-form"
@@ -51,9 +52,11 @@ const CreateGroup = ({ emailUnverified }: props) => {
 
   const router = useRouter()
   const userGroups = userStore(state => state.groups)
+  const setGroups = userStore(state => state.setGroups)
   const setActiveGroup = userStore(state => state.setActiveGroup)
   const setBackRoute = headerStore(state => state.setBackRoute)
   const clearBackRoute = headerStore(state => state.clearBackRoute)
+  const [submitting, setSubmitting] = useState(false)
 
   const handleCreateGroup = async (
     createGroup: changeAccountDetailType,
@@ -64,29 +67,38 @@ const CreateGroup = ({ emailUnverified }: props) => {
     apiRoute: apiRouteType,
     method: methodType
   ) => {
-    if (userGroups.length >= 3) {
-      setError("maxGroupCount", {
-        message:
-          "max group count reached. (you can only be a member of a max. of 3 groups.)",
-      })
-      return
-    }
+    setSubmitting(true)
+    try {
+      if (userGroups.length >= 3) {
+        setError("maxGroupCount", {
+          message:
+            "max group count reached. (you can only be a member of a max. of 3 groups.)",
+        })
+        return
+      }
 
-    const res = (await createGroup(formData, apiRoute, method)) as Response
+      const res = (await createGroup(formData, apiRoute, method)) as Response
 
-    if (!res.ok) {
-      const data = await res.json()
-      const errors = data.errors.filter(
-        (error: string | boolean) => error && error
-      )
-      setError("server", {
-        type: "server",
-        message: errors,
-      })
-    } else {
-      const { group } = await res.json()
-      setActiveGroup({ id: group.id, name: group.name })
-      router.push(`${clientRoute.group}/${group.id}`)
+      if (!res.ok) {
+        const data = await res.json()
+        const errors = data.errors.filter(
+          (error: string | boolean) => error && error
+        )
+        setError("server", {
+          type: "server",
+          message: errors,
+        })
+      } else {
+        const { group } = await res.json()
+        let newGroup = { id: group.id, name: group.name }
+        setGroups([...userGroups, { ...newGroup }])
+        setActiveGroup(newGroup)
+        router.push(`${clientRoute.group}/${group.id}`)
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -144,7 +156,13 @@ const CreateGroup = ({ emailUnverified }: props) => {
             </p>
           )}
         </div>
-        <button className="btn btn-secondary">create group</button>
+        <button className="btn btn-secondary">
+          {submitting ? (
+            <span className="loading loading-bars loading-sm"></span>
+          ) : (
+            "create group"
+          )}
+        </button>
       </form>
       <p className="text-center m-6">
         When you create a group you will be an admin for the group.

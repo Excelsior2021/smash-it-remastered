@@ -57,8 +57,9 @@ const GroupPage = ({
   isAdmin,
   userId,
 }: props) => {
-  const { activeGroup, setGroups } = userStore(state => ({
+  const { activeGroup, setActiveGroup, setGroups } = userStore(state => ({
     activeGroup: state.activeGroup,
+    setActiveGroup: state.setActiveGroup,
     setGroups: state.setGroups,
   }))
   const setActiveNavItem = navStore(state => state.setActiveNavItem)
@@ -169,9 +170,15 @@ const GroupPage = ({
         <Modal
           heading="confirmation"
           text={`You have left ${activeGroup.name}.`}
-          onClickClose={async () =>
-            await handleGetUserGroups(getUserGroups, setGroups, apiRoute)
-          }
+          onClickClose={async () => {
+            await handleGetUserGroups(
+              getUserGroups,
+              setGroups,
+              setActiveGroup,
+              apiRoute
+            )
+            router.replace(clientRoute.root)
+          }}
         />
       )}
     </div>

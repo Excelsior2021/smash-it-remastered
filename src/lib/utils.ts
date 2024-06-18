@@ -24,9 +24,15 @@ export const generateDisplayName = (
 export const handleGetUserGroups = async (
   getUserGroups: getUserGroupsType,
   setGroups: any,
+  setActiveGroups: any,
   apiRoute: apiRouteType
 ) => {
   const res = (await getUserGroups(apiRoute)) as Response
 
-  if (res.ok) setGroups(await res.json())
+  const data = await res.json()
+
+  if (res.ok) {
+    setGroups(data)
+    setActiveGroups(data[0])
+  }
 }

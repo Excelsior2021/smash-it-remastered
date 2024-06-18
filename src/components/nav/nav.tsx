@@ -1,11 +1,22 @@
-import navItems from "@/src/lib/nav-items"
-import userStore from "@/src/store/user"
-import { useSession } from "next-auth/react"
-import Link from "next/link"
-import { useEffect, useState } from "react"
+//components
 import GroupSwitcher from "../group-switcher/group-switcher"
-import navStore from "@/src/store/nav"
 import FingerPrint from "../svg/finger-print"
+
+//react
+import { useEffect, useState } from "react"
+
+//next
+import Link from "next/link"
+
+//lib
+import navItems from "@/src/lib/nav-items"
+
+//store
+import userStore from "@/src/store/user"
+import navStore from "@/src/store/nav"
+
+//next-auth
+import { useSession } from "next-auth/react"
 
 const Nav = () => {
   const session = useSession()
