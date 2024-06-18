@@ -1,6 +1,10 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "../../../auth/[...nextauth]"
-import { isAdmin, isMaxGroupMembers } from "@/src/lib/server-validation"
+import {
+  isAdmin,
+  isMaxGroupMembers,
+  isMaxUserGroups,
+} from "@/src/lib/server-validation"
 import prisma from "@/src/lib/prisma"
 import method from "@/src/lib/http-method"
 
@@ -24,6 +28,25 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           return res.status(400).json({ error: "max member count reached" })
 
         const { userId } = req.body
+
+        const maxUserGroups = await isMaxUserGroups(userId, prisma)
+
+        if (maxUserGroups) {
+          const groupRequest = await prisma.groupRequests.delete({
+            where: {
+              userId_groupId: {
+                userId,
+                groupId,
+              },
+            },
+          })
+          if (groupRequest)
+            return res
+              .status(409)
+              .json({ error: "max user group count reached" })
+          return res.status(500).json("an error occured.")
+        }
+
         try {
           const [user, userRequest] = await prisma.$transaction([
             prisma.stat.create({

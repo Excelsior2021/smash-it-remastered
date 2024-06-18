@@ -72,7 +72,10 @@ const MemberListItem = ({
         )) as Response
 
         if (res.ok) setActionSuccess(true)
+        if (res.status === 409)
+          setTimeout(() => document.getElementById("modal").showModal(), 100)
       } catch (error) {
+        console.log(error)
       } finally {
         setLoading(false)
       }
@@ -149,6 +152,12 @@ const MemberListItem = ({
             )}
             {type === memberListItemType.groupRequest && (
               <>
+                <Modal
+                  heading="not allowed"
+                  text={`${member.username} is already a member of 3 other groups. A user can be a member of a max. of 3 groups. The group request will be removed.`}
+                  onClickClose={() => setActionSuccess(true)}
+                />
+
                 <AddUserImage
                   className="add-member w-6 h-6 lg:w-8 lg:h-8"
                   onClick={async (e: MouseEvent) => {

@@ -15,6 +15,7 @@ import type {
   userGroup,
   userGroupApiType,
 } from "@/types"
+import { useRouter } from "next/router"
 
 type props = {
   name: string
@@ -42,6 +43,7 @@ const GroupQueryItem = ({
   const [request, setRequest] = useState("")
   const [submitting, setSubmmiting] = useState(false)
   const [disableButton, setDisableButton] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     userGroups.forEach(group => {
@@ -78,8 +80,10 @@ const GroupQueryItem = ({
         method
       )) as Response
 
-      if (res.ok) setRequest(requestState.requested)
-      return
+      if (res.ok) {
+        setRequest(requestState.requested)
+        router.replace(router.asPath)
+      }
     } catch (error) {
       console.log(error)
     } finally {

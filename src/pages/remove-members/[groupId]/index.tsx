@@ -1,3 +1,4 @@
+//component
 import MemberList from "@/src/components/member-list/member-list"
 
 //react
@@ -21,16 +22,17 @@ import userStore from "@/src/store/user"
 import { authOptions } from "../../api/auth/[...nextauth]"
 import { getServerSession } from "next-auth"
 
+//types
 import type { member } from "@/types"
 import type { GetServerSidePropsContext } from "next"
 
 type props = {
   users: member[]
   groupId: number
-  notInGroup: string
+  noMembers: string
 }
 
-const RemoveMembers = ({ users, groupId, notInGroup }: props) => {
+const RemoveMembers = ({ users, groupId, noMembers }: props) => {
   const activeGroup = userStore(state => state.activeGroup)
   const setBackRoute = headerStore(state => state.setBackRoute)
   const clearBackRoute = headerStore(state => state.clearBackRoute)
@@ -49,18 +51,19 @@ const RemoveMembers = ({ users, groupId, notInGroup }: props) => {
     return () => clearBackRoute()
   }, [activeGroup, router, setBackRoute, clearBackRoute])
 
-  if (notInGroup) return <p>{notInGroup}</p>
-
   return (
     <div>
       <h1 className="text-3xl text-center capitalize mb-6">remove members</h1>
-      <div className="flex justify-center w-full">
-        <MemberList
-          members={users}
-          groupId={groupId}
-          type={memberListItemType.removeMember}
-        />
-      </div>
+      {noMembers && <p className="text-center text-xl">{noMembers}</p>}
+      {!noMembers && (
+        <div className="flex justify-center w-full">
+          <MemberList
+            members={users}
+            groupId={groupId}
+            type={memberListItemType.removeMember}
+          />
+        </div>
+      )}
     </div>
   )
 }
@@ -112,7 +115,12 @@ export const getServerSideProps = async (
       return {
         props: { users, groupId: groupId, isAdmin: admin },
       }
-    }
+    } else
+      return {
+        props: {
+          noMembers: "There are only admins in this group",
+        },
+      }
   } catch (error) {
     console.log(error)
   }

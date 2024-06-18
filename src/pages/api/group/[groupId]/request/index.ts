@@ -19,18 +19,21 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(400).json({ error: "max group count reached" })
       const groupId = parseInt(req.query.groupId as string)
 
-      console.log(userId, groupId)
       try {
-        const groupRequests = await prisma.groupRequests.create({
+        const groupRequest = await prisma.groupRequests.create({
           data: {
             userId,
             groupId,
           },
         })
-        if (groupRequests)
-          return res.status(201).json({ message: "request submitted" })
+        console.log(groupRequest)
+        if (groupRequest)
+          return res
+            .status(201)
+            .json({ message: "request submitted", groupRequest })
       } catch (error) {
         console.log(error)
+        return res.status(500).json({ error: "an error occured" })
       }
     }
   }

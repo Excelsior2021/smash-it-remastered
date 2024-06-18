@@ -10,7 +10,7 @@ import type { AppProps } from "next/app"
 const App = ({ Component, pageProps }: AppProps) => (
   <>
     <Head>
-      <title>Smash It!</title>
+      <title>Smash It! Performance tracking for table tennis</title>
     </Head>
     <Providers>
       <div className="relative flex">
