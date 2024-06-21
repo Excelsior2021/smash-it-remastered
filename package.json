@@ -9,7 +9,8 @@
     "lint": "next lint",
     "migrate": "npx prisma migrate dev",
     "db-reset": "npx prisma migrate reset",
-    "postmigrate": "npx @snaplet/seed --config prisma/seed/seed.config.ts sync"
+    "postmigrate": "npx @snaplet/seed --config prisma/seed/seed.config.ts sync",
+    "test": "vitest"
   },
   "prisma": {
     "seed": "tsx prisma/seed/seed.ts"
@@ -43,6 +44,8 @@
     "prisma": "^5.14.0",
     "tailwindcss": "^3.4.1",
     "tsx": "^4.9.3",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "^1.6.0"
   }
 }
