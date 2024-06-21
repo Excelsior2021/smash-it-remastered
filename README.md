@@ -12,7 +12,7 @@
 
 <br />
 
-<img src="./smash-it-remastered" alt="smash it remastered image" />
+<img src="./smash-it-remastered.png" alt="smash it remastered image" />
 
 <!-- About the Project -->
 
