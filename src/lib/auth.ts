@@ -42,7 +42,7 @@ export const protectedRoute = async (
 
 export const adminRoute = async (
   context: GetServerSidePropsContext,
-  session,
+  session: any,
   prisma: PrismaClient
 ) => {
   try {
@@ -58,7 +58,7 @@ export const adminRoute = async (
       },
     })
 
-    return stat?.isAdmin
+    if (stat) return stat?.isAdmin
   } catch (error) {
     console.log(error)
   }

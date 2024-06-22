@@ -32,18 +32,11 @@ import type { GetServerSidePropsContext } from "next"
 type props = {
   profile: profile
   stats: stats
-  notGroupMember: string
   noGroup?: boolean
   sessionUserId: number
 }
 
-const Profile = ({
-  profile,
-  stats,
-  notGroupMember,
-  noGroup,
-  sessionUserId,
-}: props) => {
+const Profile = ({ profile, stats, noGroup, sessionUserId }: props) => {
   const router = useRouter()
   const activeGroup = userStore(state => state.activeGroup)
   const setActiveNavItem = navStore(state => state.setActiveNavItem)
@@ -59,7 +52,7 @@ const Profile = ({
   useEffect(() => {
     if (noGroup) setActiveNavItem("profile")
 
-    if (!noGroup && !notGroupMember) {
+    if (!noGroup) {
       if (profile) if (profile.id === sessionUserId) setActiveNavItem("profile")
       if (activeGroup)
         updateGroupDataForPage(
@@ -77,13 +70,10 @@ const Profile = ({
     noGroup,
     profile,
     setActiveNavItem,
-    notGroupMember,
     groupId,
   ])
 
   if (noGroup) return <NoGroup />
-
-  if (notGroupMember) return <p className="text-center">{notGroupMember}</p>
 
   return (
     <div className="flex justify-center">
@@ -168,7 +158,7 @@ export const getServerSideProps = async (
 
     if (!inGroup)
       return {
-        notFound: true,
+        redirect: { destination: clientRoute.root, permanent: false },
       }
 
     const profile = await prisma.user.findUnique({
@@ -187,13 +177,6 @@ export const getServerSideProps = async (
     })
 
     if (profile) {
-      if (profile.stats.length === 0) {
-        return {
-          props: {
-            notGroupMember: `${profile.username} is not a member of the current group`,
-          },
-        }
-      }
       const stats = profile.stats[0]
       return {
         props: {

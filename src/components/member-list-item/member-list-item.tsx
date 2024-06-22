@@ -78,6 +78,7 @@ const MemberListItem = ({
         console.log(error)
       } finally {
         setLoading(false)
+        setShowMemberModal(false)
       }
     },
     []

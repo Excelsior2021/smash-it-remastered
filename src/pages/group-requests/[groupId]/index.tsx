@@ -1,5 +1,6 @@
 //components
 import MemberList from "@/src/components/member-list/member-list"
+import ServerMessage from "@/src/components/server-message/server-message"
 
 //react
 import { useEffect } from "react"
@@ -54,11 +55,9 @@ const GroupRequests = ({ users, groupId, serverMessage }: props) => {
 
   return (
     <div className="relative flex flex-col justify-center items-center">
-      <h1 className="justify-self-center text-3xl capitalize mb-6">
-        group requests
-      </h1>
+      <h1 className="text-3xl text-center capitalize mb-6">group requests</h1>
 
-      {serverMessage && <p className="text-center m-6">{serverMessage}</p>}
+      {serverMessage && <ServerMessage message={serverMessage} />}
       {users && (
         <div className="w-full max-w-[500px]">
           <MemberList
@@ -93,29 +92,10 @@ export const getServerSideProps = async (
 
   try {
     const groupId = parseInt(context.query.groupId as string)
-    const userId = session.user.id
+
     if (groupId === -1)
       return {
         props: { noGroup: true },
-      }
-    const inGroup = await prisma.stat.findUnique({
-      where: {
-        userId_groupId: {
-          userId,
-          groupId,
-        },
-      },
-      select: {
-        isAdmin: true,
-      },
-    })
-
-    if (!inGroup)
-      return {
-        props: {
-          serverMessage:
-            "This group does not exist or your are not part of the group.",
-        },
       }
 
     const groupRequests = await prisma.groupRequests.findMany({
@@ -141,7 +121,7 @@ export const getServerSideProps = async (
       }
     } else {
       return {
-        props: { serverMessage: "there are currently no requests :(" },
+        props: { serverMessage: "There are currently no requests." },
       }
     }
   } catch (error) {

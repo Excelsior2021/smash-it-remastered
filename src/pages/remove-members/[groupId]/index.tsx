@@ -1,5 +1,6 @@
 //component
 import MemberList from "@/src/components/member-list/member-list"
+import ServerMessage from "@/src/components/server-message/server-message"
 
 //react
 import { useEffect } from "react"
@@ -54,7 +55,7 @@ const RemoveMembers = ({ users, groupId, noMembers }: props) => {
   return (
     <div>
       <h1 className="text-3xl text-center capitalize mb-6">remove members</h1>
-      {noMembers && <p className="text-center text-xl">{noMembers}</p>}
+      {noMembers && <ServerMessage message={noMembers} />}
       {!noMembers && (
         <div className="flex justify-center w-full">
           <MemberList
@@ -118,7 +119,7 @@ export const getServerSideProps = async (
     } else
       return {
         props: {
-          noMembers: "There are only admins in this group",
+          noMembers: "There are only admins in this group.",
         },
       }
   } catch (error) {

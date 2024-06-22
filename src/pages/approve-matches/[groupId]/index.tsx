@@ -1,5 +1,6 @@
 //components
 import ApproveMatchList from "@/src/components/approve-match-list/approve-match-list"
+import ServerMessage from "@/src/components/server-message/server-message"
 
 //react
 import { useEffect } from "react"
@@ -56,8 +57,8 @@ const ApproveMatches = ({
   return (
     <div className="flex flex-col justify-center items-center">
       <h1 className="text-3xl capitalize mb-6">approve matches</h1>
-      {noMatches && <p>{noMatches}</p>}
-      {matchSubmissions && (
+      {noMatches && <ServerMessage message={noMatches} />}
+      {matchSubmissions && adminUserId && (
         <div className="w-full">
           <ApproveMatchList
             matchSubmissions={JSON.parse(matchSubmissions)}
@@ -116,7 +117,7 @@ export const getServerSideProps = async (
     else
       return {
         props: {
-          noMatches: "no matches to approve",
+          noMatches: "No matches to approve",
         },
       }
   } catch (error) {

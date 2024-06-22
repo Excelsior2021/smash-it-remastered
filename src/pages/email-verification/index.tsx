@@ -20,7 +20,7 @@ import { authOptions } from "../api/auth/[...nextauth]"
 
 //types
 import type { GetServerSidePropsContext } from "next"
-import { noBodyApiType } from "@/types"
+import type { noBodyApiType } from "@/types"
 
 const EmailVerification = () => {
   const [error, setError] = useState(null)
@@ -76,7 +76,7 @@ export const getServerSideProps = async (
   if (session.user.emailVerified)
     return {
       redirect: {
-        destination: "/",
+        destination: clientRoute.root,
         permanent: false,
       },
     }

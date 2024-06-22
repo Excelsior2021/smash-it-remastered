@@ -1,5 +1,6 @@
 //components
 import MemberList from "@/src/components/member-list/member-list"
+import ServerMessage from "@/src/components/server-message/server-message"
 
 //react
 import { useEffect } from "react"
@@ -55,7 +56,7 @@ const AddAdmin = ({ groupId, members, noMoreMembers }: props) => {
   return (
     <div>
       <h1 className="text-3xl text-center capitalize mb-6">add to admins</h1>
-      {noMoreMembers && <p className="text-xl text-center">{noMoreMembers}</p>}
+      {noMoreMembers && <ServerMessage message={noMoreMembers} />}
       {members && (
         <MemberList
           groupId={groupId}
@@ -82,34 +83,14 @@ export const getServerSideProps = async (
   if (!authenticated) return props
 
   const admin = await adminRoute(context, session, prisma)
+
   if (!admin) return notAdmin(context, clientRoute)
 
   const groupId = parseInt(context.query.groupId as string)
-  const userId = session.user.id
 
   if (groupId === -1)
     return {
       props: { noGroup: true },
-    }
-
-  const inGroup = await prisma.stat.findUnique({
-    where: {
-      userId_groupId: {
-        userId,
-        groupId,
-      },
-    },
-    select: {
-      isAdmin: true,
-    },
-  })
-
-  if (!inGroup)
-    return {
-      props: {
-        serverMessage:
-          "This group does not exist or your are not part of the group.",
-      },
     }
 
   const stats = await prisma.stat.findMany({
@@ -138,7 +119,7 @@ export const getServerSideProps = async (
   if (members.length === 0)
     return {
       props: {
-        noMoreMembers: "Seems like everyone is an admin.",
+        noMoreMembers: "Seems like everyone is an admin in this group.",
       },
     }
 

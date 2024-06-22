@@ -3,6 +3,7 @@ import MemberList from "@/src/components/member-list/member-list"
 import MemberMatch from "@/src/components/member-match/member-match"
 import EmailUnverifiedMessage from "@/src/components/email-unverified-message/email-unverified-message"
 import Modal from "@/src/components/modal/modal"
+import ServerMessage from "@/src/components/server-message/server-message"
 
 //react
 import { useCallback, useEffect, useState } from "react"
@@ -314,7 +315,7 @@ const RecordMatch = ({
           </div>
         </>
       ) : (
-        <p className="text-center text-xl">Not enough members in the group</p>
+        <ServerMessage message="Not enough members in the group" />
       )}
     </div>
   )

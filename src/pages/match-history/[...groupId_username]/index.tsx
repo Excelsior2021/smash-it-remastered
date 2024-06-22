@@ -1,5 +1,6 @@
 //components
 import MatchHistoryItem from "@/src/components/match-history-item/match-history-item"
+import ServerMessage from "@/src/components/server-message/server-message"
 
 //react
 import { useEffect } from "react"
@@ -11,7 +12,6 @@ import { useRouter } from "next/router"
 import { protectedRoute } from "@/src/lib/auth"
 import clientRoute from "@/src/lib/client-route"
 import prisma from "@/src/lib/prisma"
-import { userInGroup } from "@/src/lib/server-validation"
 import { updateGroupDataForPage } from "@/src/lib/utils"
 
 //store
@@ -82,11 +82,11 @@ const MatchHistory = ({
         </h1>
       )}
       {noMatches && (
-        <p className="text-center">
-          {profileUser.username} currently has no matches in this group.
-        </p>
+        <ServerMessage
+          message={`${profileUser.username} currently has no matches in this group.`}
+        />
       )}
-      {matchesObj && (
+      {matchesObj && !noMatches && (
         <div>
           <div className="text-center mb-6 text-xl">
             {matchesObj.length} matches
@@ -129,13 +129,6 @@ export const getServerSideProps = async (
   const username = context.query.groupId_username[1]
 
   if (!username || !groupId)
-    return {
-      notFound: true,
-    }
-
-  const inGroup = await userInGroup(session.user.id, groupId, prisma)
-
-  if (!inGroup)
     return {
       notFound: true,
     }
