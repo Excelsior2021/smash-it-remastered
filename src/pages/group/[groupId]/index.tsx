@@ -80,12 +80,12 @@ const GroupPage = ({
   ) => {
     setSubmitting(true)
     try {
-      const res = (await removeUserFromGroup(
+      const res: Awaited<Response> = await removeUserFromGroup(
         userId,
         groupId,
         apiRoute,
         method
-      )) as Response
+      )
 
       if (res && res.status === 409) {
         setNeedAdmin(true)

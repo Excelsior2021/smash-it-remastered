@@ -30,6 +30,7 @@ import type {
   apiRouteType,
   member,
   methodType,
+  opponentData,
   userGroupApiType,
 } from "@/types"
 import type { MouseEvent } from "react"
@@ -37,7 +38,7 @@ import type { MouseEvent } from "react"
 type props = {
   member: member
   groupId: number
-  onClick?: Function
+  onClick?: (() => void) | ((opponentData: opponentData) => void) | null
   type?: memberListItemType
   className?: string
 }
@@ -64,12 +65,12 @@ const MemberListItem = ({
     ) => {
       try {
         setLoading(true)
-        const res = (await action(
+        const res: Awaited<Response> = await action(
           userId,
           groupId,
           apiRoute,
           method
-        )) as Response
+        )
 
         if (res.ok) setActionSuccess(true)
         if (res.status === 409)

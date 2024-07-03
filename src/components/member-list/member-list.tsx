@@ -1,12 +1,15 @@
-import { member } from "@/types"
+//components
 import MemberListItem from "../member-list-item/member-list-item"
-import memberListItemType from "@/src/lib/member-list-item-types"
+
+//types
+import type { member, opponentData } from "@/types"
+import type memberListItemType from "@/src/lib/member-list-item-types"
 
 type props = {
   heading?: string
   members: member[]
   groupId: number
-  itemOnClick?: (() => void) | ((opponentData) => void) | null
+  itemOnClick?: (() => void) | ((opponentData: opponentData) => void) | null
   type?: memberListItemType
   className?: string
 }

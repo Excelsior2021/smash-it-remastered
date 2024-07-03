@@ -1,5 +1,6 @@
 //react
 import { useEffect, useState } from "react"
+import { useRouter } from "next/router"
 
 //lib
 import { groupRequest } from "@/src/lib/api"
@@ -15,7 +16,6 @@ import type {
   userGroup,
   userGroupApiType,
 } from "@/types"
-import { useRouter } from "next/router"
 
 type props = {
   name: string
@@ -24,12 +24,6 @@ type props = {
   userGroups: userGroup[]
   groupRequests: groupRequestType[]
   userId: number
-}
-
-enum requestState {
-  join = "join",
-  requested = "requested",
-  joined = "joined",
 }
 
 const GroupQueryItem = ({
@@ -44,6 +38,12 @@ const GroupQueryItem = ({
   const [submitting, setSubmmiting] = useState(false)
   const [disableButton, setDisableButton] = useState(false)
   const router = useRouter()
+
+  enum requestState {
+    join = "join",
+    requested = "requested",
+    joined = "joined",
+  }
 
   useEffect(() => {
     userGroups.forEach(group => {
@@ -61,7 +61,14 @@ const GroupQueryItem = ({
     for (const request of groupRequests) {
       if (request.groupId === groupId) setRequest(requestState.requested)
     }
-  }, [groupId, groupRequests, userGroups, request, setDisableButton])
+  }, [
+    groupId,
+    groupRequests,
+    userGroups,
+    request,
+    setDisableButton,
+    requestState,
+  ])
 
   const handleGroupRequest = async (
     groupRequest: userGroupApiType,
@@ -73,12 +80,12 @@ const GroupQueryItem = ({
   ) => {
     try {
       setSubmmiting(true)
-      const res = (await groupRequest(
+      const res: Awaited<Response> = await groupRequest(
         userId,
         groupId,
         apiRoute,
         method
-      )) as Response
+      )
 
       if (res.ok) {
         setRequest(requestState.requested)

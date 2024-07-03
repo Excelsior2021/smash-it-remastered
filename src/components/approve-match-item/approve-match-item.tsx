@@ -42,9 +42,9 @@ const ApproveMatchItem = ({ matchSubmission, adminUserId }: props) => {
       groupId,
       userId,
       opponentId,
-      id,
+      id, //matchId
     } = matchSubmission
-    const res = (await recordMatch(
+    const res: Awaited<Response> = await recordMatch(
       userScore,
       opponentScore,
       matchDate,
@@ -55,7 +55,7 @@ const ApproveMatchItem = ({ matchSubmission, adminUserId }: props) => {
       apiRoute,
       method,
       id //matchId
-    )) as Response
+    )
 
     if (res.ok) setSubmitted(true)
   }
@@ -67,12 +67,12 @@ const ApproveMatchItem = ({ matchSubmission, adminUserId }: props) => {
     apiRoute: apiRouteType,
     method: methodType
   ) => {
-    const res = (await removeMatchSubmission(
+    const res: Awaited<Response> = await removeMatchSubmission(
       matchId,
       groupId,
       apiRoute,
       method
-    )) as Response
+    )
 
     if (res.ok) setSubmitted(true)
   }

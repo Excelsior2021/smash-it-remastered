@@ -19,19 +19,19 @@ import { getServerSession } from "next-auth"
 //types
 import type { GetServerSidePropsContext } from "next"
 
-const accountLinks = [
-  { key: 1, href: clientRoute.accountDetails, text: "account details" },
-  { key: 2, href: clientRoute.changePassword, text: "change password" },
-  { key: 3, href: clientRoute.emailVerification, text: "verify email" },
-  { key: 4, href: clientRoute.deleteAccount, text: "delete account" },
-]
-
 type props = {
   emailVerified: boolean
 }
 
 const AccountPage = ({ emailVerified }: props) => {
   const setActiveNavItem = navStore(state => state.setActiveNavItem)
+
+  const accountLinks = [
+    { key: 1, href: clientRoute.accountDetails, text: "account details" },
+    { key: 2, href: clientRoute.changePassword, text: "change password" },
+    { key: 3, href: clientRoute.emailVerification, text: "verify email" },
+    { key: 4, href: clientRoute.deleteAccount, text: "delete account" },
+  ]
 
   useEffect(() => {
     setActiveNavItem("account")

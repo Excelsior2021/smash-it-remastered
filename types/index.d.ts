@@ -3,6 +3,19 @@ import type clientRoute from "@/src/lib/client-route"
 import type method from "@/src/lib/http-method"
 import type { v4 } from "uuid"
 
+export type navItems = {
+  activeRoute: string
+  name: string
+  route: ({
+    username,
+    groupId,
+  }: {
+    username: string
+    groupId: number
+  }) => string
+  icon: JSX.Element
+}[]
+
 const apiResponse = Response | undefined
 
 export type group = {
@@ -19,6 +32,14 @@ export type group = {
 export type userGroup = {
   id: number
   name: string
+}
+
+export type groupResult = {
+  id: number
+  name: string
+  _count: {
+    stats: number
+  }
 }
 
 export type member = {
@@ -53,6 +74,8 @@ export type profileUser = {
   username: string
   id: number
 }
+
+export type opponentData = { groupId: number; member: member }
 
 export type match = {
   approvedAt: string

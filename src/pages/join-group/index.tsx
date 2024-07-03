@@ -13,6 +13,7 @@ import { protectedRoute } from "@/src/lib/auth"
 import clientRoute from "@/src/lib/client-route"
 import apiRoute from "@/src/lib/api-route"
 import method from "@/src/lib/http-method"
+import { debounce } from "@/src/lib/utils"
 
 //store
 import headerStore from "@/src/store/header"
@@ -28,6 +29,7 @@ import type {
   apiRouteType,
   changeAccountDetailType,
   groupRequest,
+  groupResult,
   methodType,
   userGroup,
 } from "@/types"
@@ -41,22 +43,29 @@ type props = {
 
 const JoinGroup = ({ groupRequests, emailUnverified, userId }: props) => {
   const { register, handleSubmit } = useForm()
-  const [groups, setGroups] = useState<userGroup[] | null>(null)
+  const [groups, setGroups] = useState<groupResult[] | null>(null)
   const userGroups = userStore(state => state.groups)
   const setBackRoute = headerStore(state => state.setBackRoute)
   const clearBackRoute = headerStore(state => state.clearBackRoute)
 
-  const handleQueryGroups = async (
-    queryGroups: changeAccountDetailType,
-    formData: FieldValues,
-    setGroups: Dispatch<SetStateAction<userGroup[] | null>>,
-    apiRoute: apiRouteType,
-    method: methodType
-  ) => {
-    const res = (await queryGroups(formData, apiRoute, method)) as Response
-    if (res && res.ok) setGroups(await res.json())
-    else setGroups(null)
-  }
+  const handleQueryGroups = debounce(
+    async (
+      queryGroups: changeAccountDetailType,
+      formData: FieldValues,
+      setGroups: Dispatch<SetStateAction<userGroup[] | null>>,
+      apiRoute: apiRouteType,
+      method: methodType
+    ) => {
+      const res: Awaited<Response> = await queryGroups(
+        formData,
+        apiRoute,
+        method
+      )
+      if (res && res.ok) setGroups(await res.json())
+      else setGroups(null)
+    },
+    250
+  )
 
   useEffect(() => {
     setBackRoute(clientRoute.joinCreateGroup)
@@ -97,14 +106,16 @@ const JoinGroup = ({ groupRequests, emailUnverified, userId }: props) => {
             />
           </form>
         </search>
-        <div className="w-full max-w-[500px]">
-          <GroupResults
-            groups={groups}
-            userGroups={userGroups}
-            groupRequests={groupRequests}
-            userId={userId}
-          />
-        </div>
+        {groups && (
+          <div className="w-full max-w-[500px]">
+            <GroupResults
+              groups={groups}
+              userGroups={userGroups}
+              groupRequests={groupRequests}
+              userId={userId}
+            />
+          </div>
+        )}
       </div>
     </div>
   )

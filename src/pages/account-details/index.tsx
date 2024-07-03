@@ -30,12 +30,7 @@ import { useSession } from "next-auth/react"
 import type { apiRouteType, changeAccountDetailType, methodType } from "@/types"
 import type { FieldValues } from "react-hook-form"
 import type { GetServerSidePropsContext } from "next"
-
-enum submissionStatus {
-  pending,
-  success,
-  failed,
-}
+import type { MouseEventHandler } from "react"
 
 type props = {
   fields: {
@@ -51,11 +46,16 @@ type accountFieldsModalDataType = {
   heading: string
   text: string
   input: ReactNode
-  onClick: (e: Event) => void
-  onClickClose: () => void
+  onClick: MouseEventHandler<HTMLButtonElement> | undefined
+  onClickClose: MouseEventHandler<HTMLButtonElement> | undefined
 }
 
 const AccountDetails = ({ fields }: props) => {
+  enum submissionStatus {
+    pending,
+    success,
+    failed,
+  }
   const { update } = useSession()
   const {
     register,

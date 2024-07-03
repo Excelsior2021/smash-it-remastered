@@ -31,7 +31,6 @@ import type {
   apiRouteType,
   methodType,
   changeAccountDetailType,
-  userGroup,
 } from "@/types"
 import type { NextRouter } from "next/router"
 import type { FieldValues, UseFormSetError } from "react-hook-form"
@@ -77,7 +76,11 @@ const CreateGroup = ({ emailUnverified }: props) => {
         return
       }
 
-      const res = (await createGroup(formData, apiRoute, method)) as Response
+      const res: Awaited<Response> = await createGroup(
+        formData,
+        apiRoute,
+        method
+      )
 
       if (!res.ok) {
         const data = await res.json()

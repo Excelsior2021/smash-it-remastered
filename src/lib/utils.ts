@@ -27,12 +27,20 @@ export const handleGetUserGroups = async (
   setActiveGroups: any,
   apiRoute: apiRouteType
 ) => {
-  const res = (await getUserGroups(apiRoute)) as Response
+  const res: Awaited<Response> = await getUserGroups(apiRoute)
 
   const data = await res.json()
 
   if (res.ok) {
     setGroups(data)
     setActiveGroups(data[0])
+  }
+}
+
+export const debounce = (cb: Function, delay = 1000) => {
+  let timeout: ReturnType<typeof setTimeout>
+  return (...args: any) => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => cb(...args), delay)
   }
 }

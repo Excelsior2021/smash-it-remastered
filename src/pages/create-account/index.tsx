@@ -58,7 +58,11 @@ const CreateAccount = ({ providers }: props) => {
   ) => {
     setSubmmiting(true)
     try {
-      const res = (await createAccount(formData, apiRoute, method)) as Response
+      const res: Awaited<Response> = await createAccount(
+        formData,
+        apiRoute,
+        method
+      )
 
       if (res.ok) {
         document.getElementById("modal").showModal()

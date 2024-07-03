@@ -4,19 +4,20 @@ import ModalGroupList from "../modal-group-list/modal-group-list"
 
 //types
 import type { matchData } from "@/types"
-import type { ReactNode } from "react"
+import type { MouseEventHandler, ReactNode } from "react"
+import type { FieldErrors, FieldValues } from "react-hook-form"
 
 type props = {
   heading: string
   headingCapitalize?: boolean
   text?: string | null
-  onClick?: () => void
-  onClickClose?: (() => void) | null
+  onClick?: MouseEventHandler<HTMLButtonElement> | undefined
+  onClickClose?: MouseEventHandler<HTMLButtonElement> | undefined
   action?: string | null
   matchData?: matchData | null
   accountFieldInput?: ReactNode
   loading?: boolean
-  errors?: string[] | null
+  errors?: string[] | FieldErrors<FieldValues> | null
   groups?: string[] | null
 }
 

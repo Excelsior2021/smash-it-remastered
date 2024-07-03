@@ -1,24 +1,19 @@
-//store
-import userStore from "@/src/store/user"
-
 //types
 import type { userGroup } from "@/types"
 import type { ChangeEvent } from "react"
 
-const GroupSwitcher = () => {
-  const { groups, activeGroup, setActiveGroup } = userStore(state => ({
-    groups: state.groups,
-    activeGroup: state.activeGroup,
-    setActiveGroup: state.setActiveGroup,
-  }))
+type props = {
+  groups: userGroup[]
+  activeGroup: userGroup
+  setActiveGroup: (group: userGroup) => void
+}
 
-  if (!groups || !activeGroup || groups.length < 2) return
-
+const GroupSwitcher = ({ groups, activeGroup, setActiveGroup }: props) => {
   const changeGroup = (e: ChangeEvent) => {
     const group = groups.find(
       (group: userGroup) => group.name === e.target.value
     )
-    setActiveGroup(group)
+    if (group) setActiveGroup(group)
   }
 
   return (
@@ -50,7 +45,7 @@ const GroupSwitcher = () => {
           name="group"
           className="select text-lg bg-secondary outline-none rounded-xl w-24 min-[380px]:w-44 p-2 cursor-pointer lg:bg-accent lg:w-28"
           onChange={changeGroup}>
-          {groups.map(({ id, name }: userGroup) => (
+          {groups.map(({ id, name }) => (
             <option key={id}>{name}</option>
           ))}
         </select>
