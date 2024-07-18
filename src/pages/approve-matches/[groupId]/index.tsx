@@ -40,6 +40,7 @@ const ApproveMatches = ({
   const setBackRoute = headerStore(state => state.setBackRoute)
   const clearBackRoute = headerStore(state => state.clearBackRoute)
   const router = useRouter()
+
   useEffect(() => {
     if (activeGroup) {
       updateGroupDataForPage(

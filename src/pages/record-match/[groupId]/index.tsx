@@ -195,7 +195,7 @@ const RecordMatch = ({
           onClickClose={
             scoresSubmitted === scoresSubmissionStatus.success
               ? () => router.push(clientRoute.root)
-              : null
+              : undefined
           }
         />
       )}

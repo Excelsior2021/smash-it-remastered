@@ -45,7 +45,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           return emailSent
         })
 
-        if (!emailSent.id)
+        if (!emailSent)
           return res
             .status(500)
             .json({ error: "an error occured. please try again." })
@@ -90,7 +90,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           return emailSent
         })
 
-        if (!emailSent.id)
+        if (!emailSent)
           return res
             .status(500)
             .json({ error: "an error occured. please try again." })

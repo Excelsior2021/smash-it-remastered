@@ -11,8 +11,8 @@ type props = {
   heading: string
   headingCapitalize?: boolean
   text?: string | null
-  onClick?: MouseEventHandler<HTMLButtonElement> | undefined
-  onClickClose?: MouseEventHandler<HTMLButtonElement> | undefined
+  onClick?: MouseEventHandler<HTMLButtonElement>
+  onClickClose?: MouseEventHandler<HTMLButtonElement>
   action?: string | null
   matchData?: matchData | null
   accountFieldInput?: ReactNode

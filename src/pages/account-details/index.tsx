@@ -72,9 +72,9 @@ const AccountDetails = ({ fields }: props) => {
   const [serverError, setServerError] = useState(false)
   const formRef = useRef(null)
   const router = useRouter()
-
   const setBackRoute = headerStore(state => state.setBackRoute)
   const clearBackRoute = headerStore(state => state.clearBackRoute)
+
   useEffect(() => {
     setBackRoute(clientRoute.account)
     return () => clearBackRoute()
@@ -119,7 +119,7 @@ const AccountDetails = ({ fields }: props) => {
           text={
             submission === submissionStatus.pending
               ? accountFieldsModalData.text
-              : submissionStatus.success
+              : submission === submissionStatus.success
               ? "updated successfully"
               : null
           }
@@ -173,9 +173,9 @@ const AccountDetails = ({ fields }: props) => {
                         />
                       </form>
                     ),
-                    onClick: (e: Event) => {
+                    onClick: e => {
                       e.preventDefault()
-                      formRef.current.requestSubmit()
+                      if (formRef.current) formRef.current.requestSubmit()
                     },
                     onClickClose: () => {
                       setServerError(false)
@@ -184,7 +184,7 @@ const AccountDetails = ({ fields }: props) => {
                       setSubmission(submissionStatus.pending)
                     },
                   })
-                  document.getElementById("modal").showModal()
+                  setTimeout(() => document.getElementById("modal").showModal())
                 }}>
                 <Edit className="size-8" />
               </div>

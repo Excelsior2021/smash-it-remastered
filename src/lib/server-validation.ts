@@ -22,9 +22,11 @@ export const validateUsername = async (
       username: true,
     },
   })
+
+  //usernamePattern is true to avoid invalid error on client
   if (usernameAlreadyExists)
-    //usernamePattern is true to avoid invalid error on client
     return { usernameAlreadyExists, usernamePattern: true }
+
   const usernameObscene = obscenity.hasMatch(username)
   const usernamePattern = pattern.username.test(username)
   return { usernameObscene, usernamePattern }

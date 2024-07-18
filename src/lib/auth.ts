@@ -7,7 +7,7 @@ import type {
 } from "@/types"
 import type { PrismaClient } from "@prisma/client"
 import type { GetServerSidePropsContext } from "next"
-import type { Resend } from "resend"
+import type { ErrorResponse, Resend } from "resend"
 
 export const hashPassword = async (password: string, hash: hashBcrypt) =>
   await hash(password, 12)
@@ -153,11 +153,11 @@ export const sendEmailVerificationToken = async (
     </div>`,
     })
 
-    if (error) throw new Error(error)
+    if (error) throw new Error(error.message)
 
     return data
   } catch (error) {
-    return error
+    return error as ErrorResponse
   }
 }
 

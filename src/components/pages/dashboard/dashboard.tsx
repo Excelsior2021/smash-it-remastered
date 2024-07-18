@@ -8,22 +8,38 @@ import { useEffect } from "react"
 import clientRoute from "@/src/lib/client-route"
 
 //store
-import userStore from "@/src/store/user"
 import navStore from "@/src/store/nav"
+
+//types
+import type { userGroup } from "@/types"
 
 type props = {
   session: {
     user: { username: string; firstName?: string }
   }
+  userGroups: userGroup[]
 }
 
 const DashboardPage = ({
   session: {
     user: { username, firstName },
   },
+  userGroups,
 }: props) => {
-  const activeGroup = userStore(state => state.activeGroup)
   const setActiveNavItem = navStore(state => state.setActiveNavItem)
+
+  const navLinks = [
+    {
+      id: 1,
+      href: clientRoute.joinCreateGroup,
+      text: "join or create a new group",
+    },
+    {
+      id: 2,
+      href: `${clientRoute.recordMatch}/${userGroups[0].id}`,
+      text: "record match",
+    },
+  ]
 
   useEffect(() => {
     setActiveNavItem("home")
@@ -39,20 +55,9 @@ const DashboardPage = ({
         </span>{" "}
       </h1>
       <ul className="flex flex-col gap-10 max-w-96 m-auto">
-        <li className="w-full text-center">
-          <LinkButton
-            href={clientRoute.joinCreateGroup}
-            text="join or create a new group"
-          />
-        </li>
-        {activeGroup && (
-          <li className="w-full text-center">
-            <LinkButton
-              href={`${clientRoute.recordMatch}/${activeGroup.id}`}
-              text="record match"
-            />
-          </li>
-        )}
+        {navLinks.map(link => (
+          <LinkButton key={link.id} href={link.href} text={link.text} />
+        ))}
       </ul>
     </div>
   )
