@@ -11,10 +11,10 @@ import { useRouter } from "next/router"
 
 //lib
 import { protectedRoute } from "@/src/lib/auth"
-import clientRoute from "@/src/lib/client-route"
+import clientRoute from "@/src/enums/client-route"
 import { generateDisplayName, updateGroupDataForPage } from "@/src/lib/utils"
 import prisma from "@/src/lib/prisma"
-import statKeys from "@/src/lib/stat-keys"
+import statKeys from "@/src/enums/stat-keys"
 import { userInGroup } from "@/src/lib/server-validation"
 
 //store

@@ -9,8 +9,8 @@ import { useState } from "react"
 
 //lib
 import { recordMatch, removeMatchSubmission } from "@/src/lib/api"
-import apiRoute from "@/src/lib/api-route"
-import method from "@/src/lib/http-method"
+import apiRoute from "@/src/enums/api-route"
+import method from "@/src/enums/http-method"
 
 //types
 import type {

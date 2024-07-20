@@ -12,11 +12,11 @@ import { useRouter } from "next/router"
 
 //lib
 import { authRedirect } from "@/src/lib/auth"
-import clientRoute from "@/src/lib/client-route"
+import clientRoute from "@/src/enums/client-route"
 import pattern from "@/src/lib/field-validation"
 import { forgottenPassword } from "@/src/lib/api"
-import apiRoute from "@/src/lib/api-route"
-import method from "@/src/lib/http-method"
+import apiRoute from "@/src/enums/api-route"
+import method from "@/src/enums/http-method"
 
 //store
 import headerStore from "@/src/store/header"

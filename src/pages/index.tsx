@@ -4,7 +4,7 @@ import DashboardPage from "../components/pages/dashboard/dashboard"
 
 //lib
 import { protectedRoute } from "../lib/auth"
-import clientRoute from "../lib/client-route"
+import clientRoute from "../enums/client-route"
 import prisma from "../lib/prisma"
 
 //next-auth

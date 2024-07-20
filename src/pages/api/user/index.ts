@@ -7,7 +7,7 @@ import {
   hashPassword,
   sendEmailVerificationToken,
 } from "@/src/lib/auth"
-import method from "@/src/lib/http-method"
+import method from "@/src/enums/http-method"
 import { compare, hash } from "bcryptjs"
 import { v4 as uuid } from "uuid"
 import {

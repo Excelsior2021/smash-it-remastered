@@ -1,7 +1,7 @@
 //lib
 import { isAdmin } from "@/src/lib/server-validation"
 import prisma from "@/src/lib/prisma"
-import method from "@/src/lib/http-method"
+import method from "@/src/enums/http-method"
 
 //next-auth
 import { getServerSession } from "next-auth"

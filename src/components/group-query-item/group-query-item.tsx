@@ -4,8 +4,8 @@ import { useRouter } from "next/router"
 
 //lib
 import { groupRequest } from "@/src/lib/api"
-import apiRoute from "@/src/lib/api-route"
-import method from "@/src/lib/http-method"
+import apiRoute from "@/src/enums/api-route"
+import method from "@/src/enums/http-method"
 
 //types
 import type { Dispatch, SetStateAction } from "react"
@@ -89,7 +89,7 @@ const GroupQueryItem = ({
 
       if (res.ok) {
         setRequest(requestState.requested)
-        router.replace(router.asPath)
+        // router.replace(router.asPath)
       }
     } catch (error) {
       console.log(error)

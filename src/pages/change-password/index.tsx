@@ -16,9 +16,9 @@ import prisma from "@/src/lib/prisma"
 import { changePasswordFormFields } from "@/src/lib/form-fields"
 import { changePassword, setPassword } from "@/src/lib/api"
 import { protectedRoute } from "@/src/lib/auth"
-import clientRoute from "@/src/lib/client-route"
-import apiRoute from "@/src/lib/api-route"
-import method from "@/src/lib/http-method"
+import clientRoute from "@/src/enums/client-route"
+import apiRoute from "@/src/enums/api-route"
+import method from "@/src/enums/http-method"
 
 //store
 import headerStore from "@/src/store/header"

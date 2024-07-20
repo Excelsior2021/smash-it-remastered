@@ -11,7 +11,7 @@ import { useRouter } from "next/router"
 //lib
 import prisma from "@/src/lib/prisma"
 import { adminRoute, notAdmin, protectedRoute } from "@/src/lib/auth"
-import clientRoute from "@/src/lib/client-route"
+import clientRoute from "@/src/enums/client-route"
 import { updateGroupDataForPage } from "@/src/lib/utils"
 
 //store

@@ -1,6 +1,6 @@
-import type apiRoute from "@/src/lib/api-route"
-import type clientRoute from "@/src/lib/client-route"
-import type method from "@/src/lib/http-method"
+import type apiRoute from "@/src/enums/api-route"
+import type clientRoute from "@/src/enums/client-route"
+import type method from "@/src/enums/http-method"
 import type { v4 } from "uuid"
 
 export type navItems = {

@@ -15,7 +15,7 @@ import { useRouter } from "next/router"
 import { login } from "@/src/lib/api"
 import { authRedirect } from "@/src/lib/auth"
 import { loginFormFields } from "@/src/lib/form-fields"
-import clientRoute from "@/src/lib/client-route"
+import clientRoute from "@/src/enums/client-route"
 
 //next-auth
 import { getProviders, signIn } from "next-auth/react"

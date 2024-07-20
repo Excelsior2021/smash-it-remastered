@@ -9,8 +9,11 @@ import type { PrismaClient } from "@prisma/client"
 import type { GetServerSidePropsContext } from "next"
 import type { ErrorResponse, Resend } from "resend"
 
-export const hashPassword = async (password: string, hash: hashBcrypt) =>
-  await hash(password, 12)
+export const hashPassword = async (
+  password: string,
+  hash: hashBcrypt,
+  salt = 12
+) => await hash(password, salt)
 
 export const protectedRoute = async (
   context: GetServerSidePropsContext,
@@ -45,23 +48,19 @@ export const adminRoute = async (
   session: any,
   prisma: PrismaClient
 ) => {
-  try {
-    const stat = await prisma.stat.findUnique({
-      where: {
-        userId_groupId: {
-          userId: session.user.id,
-          groupId: parseInt(context.query.groupId as string),
-        },
+  const stat = await prisma.stat.findUnique({
+    where: {
+      userId_groupId: {
+        userId: session.user.id,
+        groupId: parseInt(context.query.groupId as string),
       },
-      select: {
-        isAdmin: true,
-      },
-    })
+    },
+    select: {
+      isAdmin: true,
+    },
+  })
 
-    if (stat) return stat?.isAdmin
-  } catch (error) {
-    console.log(error)
-  }
+  return stat?.isAdmin === true
 }
 
 export const notAdmin = (

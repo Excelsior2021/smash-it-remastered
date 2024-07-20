@@ -14,12 +14,12 @@ import { useRouter } from "next/router"
 //lib
 import { protectedRoute } from "@/src/lib/auth"
 import prisma from "@/src/lib/prisma"
-import clientRoute from "@/src/lib/client-route"
+import clientRoute from "@/src/enums/client-route"
 import { handleGetUserGroups, updateGroupDataForPage } from "@/src/lib/utils"
 import { userInGroup } from "@/src/lib/server-validation"
 import { getUserGroups, removeUserFromGroup } from "@/src/lib/api"
-import apiRoute from "@/src/lib/api-route"
-import method from "@/src/lib/http-method"
+import apiRoute from "@/src/enums/api-route"
+import method from "@/src/enums/http-method"
 
 //store
 import navStore from "@/src/store/nav"

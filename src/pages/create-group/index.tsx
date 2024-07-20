@@ -11,10 +11,10 @@ import { useRouter } from "next/router"
 
 //lib
 import { createGroup } from "@/src/lib/api"
-import clientRoute from "@/src/lib/client-route"
+import clientRoute from "@/src/enums/client-route"
 import { protectedRoute } from "@/src/lib/auth"
-import apiRoute from "@/src/lib/api-route"
-import method from "@/src/lib/http-method"
+import apiRoute from "@/src/enums/api-route"
+import method from "@/src/enums/http-method"
 import pattern from "@/src/lib/field-validation"
 
 //store

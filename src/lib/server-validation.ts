@@ -29,7 +29,29 @@ export const validateUsername = async (
 
   const usernameObscene = obscenity.hasMatch(username)
   const usernamePattern = pattern.username.test(username)
+
   return { usernameObscene, usernamePattern }
+}
+
+export const validateGroupName = async (
+  groupName: string,
+  pattern: fieldPattern,
+  obscenity: RegExpMatcher,
+  prisma: PrismaClient
+) => {
+  const groupNameAlreadyExists = await prisma.group.findUnique({
+    where: {
+      name: groupName,
+    },
+  })
+
+  if (groupNameAlreadyExists)
+    return { groupNameAlreadyExists, groupNamePattern: true }
+
+  const groupNameObscene = obscenity.hasMatch(groupName)
+  const groupNamePattern = pattern.groupName.test(groupName)
+
+  return { groupNameObscene, groupNamePattern }
 }
 
 export const validateEmail = async (
@@ -91,8 +113,8 @@ export const userInGroup = async (
   userId: number,
   groupId: number,
   prisma: PrismaClient
-) => {
-  const stat = await prisma.stat.findUnique({
+) =>
+  await prisma.stat.findUnique({
     where: {
       userId_groupId: {
         userId,
@@ -100,8 +122,6 @@ export const userInGroup = async (
       },
     },
   })
-  return stat
-}
 
 export const isAdmin = async (
   prisma: PrismaClient,
@@ -119,7 +139,8 @@ export const isAdmin = async (
       isAdmin: true,
     },
   })
-  if (stat) return stat.isAdmin
+
+  if (stat?.isAdmin) return true
   else return false
 }
 
@@ -139,7 +160,7 @@ export const isMaxGroupMembers = async (
       },
     },
   })
-  if (group) if (group?._count.stats >= 20) return true
+  if (group) if (group._count.stats >= 20) return true
   return false
 }
 
@@ -161,38 +182,23 @@ export const isMaxUserGroups = async (userId: number, prisma: PrismaClient) => {
   return false
 }
 
-export const validateGroupName = async (
-  groupName: string,
-  pattern: fieldPattern,
-  obscenity: RegExpMatcher,
-  prisma: PrismaClient
-) => {
-  const groupNameAlreadyExists = await prisma.group.findUnique({
+export const getAdminCount = async (id: number, prisma: PrismaClient) => {
+  const adminCount = await prisma.group.findUnique({
     where: {
-      name: groupName,
-    },
-  })
-
-  if (groupNameAlreadyExists)
-    return { groupNameAlreadyExists, groupNamePattern: true }
-
-  const groupNameObscene = obscenity.hasMatch(groupName)
-  const groupNamePattern = pattern.groupName.test(groupName)
-
-  return { groupNameObscene, groupNamePattern }
-}
-
-export const getAdminCount = async (groupId: number, prisma: PrismaClient) => {
-  const members = await prisma.stat.findMany({
-    where: {
-      groupId,
+      id,
     },
     select: {
-      isAdmin: true,
+      _count: {
+        select: {
+          stats: {
+            where: {
+              isAdmin: true,
+            },
+          },
+        },
+      },
     },
   })
 
-  const admins = members.filter(member => member.isAdmin)
-
-  return admins.length
+  return adminCount?._count.stats
 }

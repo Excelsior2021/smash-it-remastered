@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "../../../auth/[...nextauth]"
 import { isAdmin } from "@/src/lib/server-validation"
 import prisma from "@/src/lib/prisma"
-import method from "@/src/lib/http-method"
+import method from "@/src/enums/http-method"
 
 import type { NextApiRequest, NextApiResponse } from "next"
 

@@ -10,7 +10,7 @@ import { useRouter } from "next/router"
 
 //lib
 import { protectedRoute } from "@/src/lib/auth"
-import clientRoute from "@/src/lib/client-route"
+import clientRoute from "@/src/enums/client-route"
 import prisma from "@/src/lib/prisma"
 import { updateGroupDataForPage } from "@/src/lib/utils"
 

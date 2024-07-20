@@ -15,9 +15,9 @@ import { useRouter } from "next/router"
 import { createAccount } from "@/src/lib/api"
 import { authRedirect } from "@/src/lib/auth"
 import { accountFormFields, personalFormFields } from "@/src/lib/form-fields"
-import clientRoute from "@/src/lib/client-route"
-import apiRoute from "@/src/lib/api-route"
-import method from "../../lib/http-method"
+import clientRoute from "@/src/enums/client-route"
+import apiRoute from "@/src/enums/api-route"
+import method from "@/src/enums/http-method"
 
 //next-auth
 import { authOptions } from "../api/auth/[...nextauth]"

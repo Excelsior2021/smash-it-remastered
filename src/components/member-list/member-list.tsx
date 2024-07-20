@@ -3,7 +3,7 @@ import MemberListItem from "../member-list-item/member-list-item"
 
 //types
 import type { member, opponentData } from "@/types"
-import type memberListItemType from "@/src/lib/member-list-item-types"
+import type memberListItemType from "@/src/enums/member-list-item-types"
 
 type props = {
   heading?: string

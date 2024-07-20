@@ -12,9 +12,9 @@ import { useRouter } from "next/router"
 import prisma from "@/src/lib/prisma"
 
 import { adminRoute, notAdmin, protectedRoute } from "@/src/lib/auth"
-import memberListItemType from "@/src/lib/member-list-item-types"
+import memberListItemType from "@/src/enums/member-list-item-types"
 import { updateGroupDataForPage } from "@/src/lib/utils"
-import clientRoute from "@/src/lib/client-route"
+import clientRoute from "@/src/enums/client-route"
 
 //store
 import userStore from "@/src/store/user"

@@ -7,9 +7,9 @@ import { useForm } from "react-hook-form"
 
 //lib
 import { deleteAccount } from "@/src/lib/api"
-import clientRoute from "@/src/lib/client-route"
-import apiRoute from "@/src/lib/api-route"
-import method from "@/src/lib/http-method"
+import clientRoute from "@/src/enums/client-route"
+import apiRoute from "@/src/enums/api-route"
+import method from "@/src/enums/http-method"
 import { protectedRoute } from "@/src/lib/auth"
 
 //store

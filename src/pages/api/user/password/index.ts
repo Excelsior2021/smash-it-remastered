@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "../../auth/[...nextauth]"
 import prisma from "@/src/lib/prisma"
-import method from "@/src/lib/http-method"
+import method from "@/src/enums/http-method"
 import { validatePassword } from "@/src/lib/server-validation"
 import pattern from "@/src/lib/field-validation"
 import { hashPassword } from "@/src/lib/auth"

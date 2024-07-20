@@ -6,7 +6,7 @@ import { useEffect } from "react"
 
 //lib
 import { protectedRoute } from "@/src/lib/auth"
-import clientRoute from "@/src/lib/client-route"
+import clientRoute from "@/src/enums/client-route"
 
 //store
 import headerStore from "@/src/store/header"

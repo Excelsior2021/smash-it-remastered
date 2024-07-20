@@ -17,10 +17,10 @@ import prisma from "@/src/lib/prisma"
 import { protectedRoute } from "@/src/lib/auth"
 import { updateGroupDataForPage } from "@/src/lib/utils"
 import { recordMatch, submitMatch } from "@/src/lib/api"
-import clientRoute from "@/src/lib/client-route"
+import clientRoute from "@/src/enums/client-route"
 import { validateScores } from "@/src/lib/server-validation"
-import apiRoute from "@/src/lib/api-route"
-import method from "@/src/lib/http-method"
+import apiRoute from "@/src/enums/api-route"
+import method from "@/src/enums/http-method"
 
 //store
 import userStore from "@/src/store/user"

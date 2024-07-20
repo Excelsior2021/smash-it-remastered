@@ -10,9 +10,9 @@ import { FieldValues, useForm } from "react-hook-form"
 import prisma from "@/src/lib/prisma"
 import { queryGroups } from "@/src/lib/api"
 import { protectedRoute } from "@/src/lib/auth"
-import clientRoute from "@/src/lib/client-route"
-import apiRoute from "@/src/lib/api-route"
-import method from "@/src/lib/http-method"
+import clientRoute from "@/src/enums/client-route"
+import apiRoute from "@/src/enums/api-route"
+import method from "@/src/enums/http-method"
 import { debounce } from "@/src/lib/utils"
 
 //store
@@ -70,7 +70,7 @@ const JoinGroup = ({ groupRequests, emailUnverified, userId }: props) => {
   useEffect(() => {
     setBackRoute(clientRoute.joinCreateGroup)
     return () => clearBackRoute()
-  }, [setBackRoute, clearBackRoute])
+  }, [setBackRoute, clearBackRoute, groups])
 
   if (emailUnverified) return <EmailUnverifiedMessage />
 

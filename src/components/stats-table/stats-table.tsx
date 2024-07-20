@@ -5,7 +5,7 @@ import { useEffect } from "react"
 import Image from "next/image"
 
 //lib
-import statKeys from "@/src/lib/stat-keys"
+import statKeys from "@/src/enums/stat-keys"
 
 //store
 import statsTableStore from "@/src/store/stats-table"
