@@ -93,7 +93,6 @@ export const validatePassword = (
 ) => {
   const passwordMatch = password === confirmPassword
   const passwordPattern = pattern.password.test(password)
-
   return { passwordMatch, passwordPattern }
 }
 

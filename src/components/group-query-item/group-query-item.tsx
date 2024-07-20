@@ -37,7 +37,6 @@ const GroupQueryItem = ({
   const [request, setRequest] = useState("")
   const [submitting, setSubmmiting] = useState(false)
   const [disableButton, setDisableButton] = useState(false)
-  const router = useRouter()
 
   enum requestState {
     join = "join",
@@ -87,10 +86,7 @@ const GroupQueryItem = ({
         method
       )
 
-      if (res.ok) {
-        setRequest(requestState.requested)
-        // router.replace(router.asPath)
-      }
+      if (res.ok) setRequest(requestState.requested)
     } catch (error) {
       console.log(error)
     } finally {

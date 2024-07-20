@@ -9,6 +9,7 @@ import {
   validateEmail,
   validateGroupName,
   validateName,
+  validatePassword,
   validateScores,
   validateUsername,
   verifyPassword,
@@ -205,6 +206,26 @@ describe("lib/server-validation", () => {
         nameObscene: false,
         namePattern: false,
       })
+    })
+  })
+
+  describe("validatePassword()", () => {
+    pattern.password.test = mockFn()
+    const password = "password"
+    const confirmPassword = "password"
+
+    test("passwords match", () => {
+      pattern.password.test.mockReturnValueOnce(true)
+      expect(
+        validatePassword(password, confirmPassword, pattern)
+      ).toStrictEqual({ passwordMatch: true, passwordPattern: true })
+    })
+
+    test("password invalid", () => {
+      pattern.password.test.mockReturnValueOnce(false)
+      expect(
+        validatePassword(password, confirmPassword, pattern)
+      ).toStrictEqual({ passwordMatch: true, passwordPattern: false })
     })
   })
 

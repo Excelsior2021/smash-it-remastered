@@ -97,6 +97,15 @@ export const groupRequest = async (
   }
 }
 
+export const getGroupRequests = async (apiRoute: apiRouteType) => {
+  try {
+    const res = await fetch(`${apiRoute.user}/group-request`)
+    return res
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 export const getUserGroups = async (apiRoute: apiRouteType) => {
   try {
     const res = await fetch(`${apiRoute.user}/group`)

@@ -88,16 +88,12 @@ export const authRedirect = async (
 }
 
 export const getToken = async (email: string, tx: txPrisma, type: string) => {
-  try {
-    const token = await tx[type].findUnique({
-      where: {
-        email,
-      },
-    })
-    return token
-  } catch (error) {
-    console.log(error)
-  }
+  const token = await tx[type].findUnique({
+    where: {
+      email,
+    },
+  })
+  return token
 }
 
 export const generateToken = async (
@@ -183,7 +179,7 @@ export const sendResetPasswordToken = async (
     </div>`,
     })
 
-    if (error) throw new Error(error)
+    if (error) throw new Error(error.message)
 
     return data
   } catch (error) {

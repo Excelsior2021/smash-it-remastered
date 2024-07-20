@@ -8,7 +8,7 @@ import { FieldValues, useForm } from "react-hook-form"
 
 //lib
 import prisma from "@/src/lib/prisma"
-import { queryGroups } from "@/src/lib/api"
+import { getGroupRequests, queryGroups } from "@/src/lib/api"
 import { protectedRoute } from "@/src/lib/auth"
 import clientRoute from "@/src/enums/client-route"
 import apiRoute from "@/src/enums/api-route"
@@ -44,6 +44,8 @@ type props = {
 const JoinGroup = ({ groupRequests, emailUnverified, userId }: props) => {
   const { register, handleSubmit } = useForm()
   const [groups, setGroups] = useState<groupResult[] | null>(null)
+  const [groupRequestsState, setGroupRequestsState] =
+    useState<groupRequest[]>(groupRequests)
   const userGroups = userStore(state => state.groups)
   const setBackRoute = headerStore(state => state.setBackRoute)
   const clearBackRoute = headerStore(state => state.clearBackRoute)
@@ -61,8 +63,13 @@ const JoinGroup = ({ groupRequests, emailUnverified, userId }: props) => {
         apiRoute,
         method
       )
-      if (res && res.ok) setGroups(await res.json())
-      else setGroups(null)
+
+      const res2: Awaited<Response> = await getGroupRequests(apiRoute)
+
+      if (res && res.ok && res2 && res2.ok) {
+        setGroups(await res.json())
+        setGroupRequestsState(await res2.json())
+      } else setGroups(null)
     },
     250
   )
@@ -111,7 +118,7 @@ const JoinGroup = ({ groupRequests, emailUnverified, userId }: props) => {
             <GroupResults
               groups={groups}
               userGroups={userGroups}
-              groupRequests={groupRequests}
+              groupRequests={groupRequestsState}
               userId={userId}
             />
           </div>
