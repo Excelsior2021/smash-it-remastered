@@ -51,12 +51,13 @@ The previous version of the app was more of a proof of concept. I decided to bui
 ### Dev
 
 - [Vitest](https://vitest.dev)
+- [Snaplet Seed](https://www.snaplet.dev)
 
 ## Approach
 
 The current approach for this project was to use Next.js, a React framework for building full-stack web applications, which enabled the use of server side rendering. Therefore having the benefit of an single page application with server side rendering. This app uses the pages router as I wanted to learn this approach. To speed up the development process to achieve a minimum viable product, I decided to use Tailwind CSS and daisyUI for utility css classes and a component library respectively. NextAuth.js was used for user authentication and session management. Zustand was used for global state management client side. Obscenity was used to prevent the use of profanity. Resend is an email service, used for email verification and password resets.
 
-Primsa ORM was used to generate the database schema and interact with the database on an application level. A PostgreSQL database was used.
+Primsa ORM was used to generate the database schema and interact with the database on an application level. A PostgreSQL database was used. Snaplet seed was used for database seeding.
 
 ## Deployment
 
