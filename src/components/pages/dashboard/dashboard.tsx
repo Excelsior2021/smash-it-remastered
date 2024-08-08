@@ -36,7 +36,9 @@ const DashboardPage = ({
     },
     {
       id: 2,
-      href: `${clientRoute.recordMatch}/${userGroups[0].id}`,
+      href: `${clientRoute.recordMatch}/${
+        userGroups.length !== 0 ? userGroups[0].id : "-1"
+      }`,
       text: "record match",
     },
   ]
@@ -55,9 +57,10 @@ const DashboardPage = ({
         </span>{" "}
       </h1>
       <ul className="flex flex-col gap-10 max-w-96 m-auto">
-        {navLinks.map(link => (
-          <LinkButton key={link.id} href={link.href} text={link.text} />
-        ))}
+        {navLinks.map(link => {
+          if (link.id === 2 && userGroups.length === 0) return
+          return <LinkButton key={link.id} href={link.href} text={link.text} />
+        })}
       </ul>
     </div>
   )

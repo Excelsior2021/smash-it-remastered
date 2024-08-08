@@ -4,6 +4,7 @@ import MemberMatch from "@/src/components/member-match/member-match"
 import EmailUnverifiedMessage from "@/src/components/email-unverified-message/email-unverified-message"
 import Modal from "@/src/components/modal/modal"
 import ServerMessage from "@/src/components/server-message/server-message"
+import NoGroup from "@/src/components/no-group/no-group"
 
 //react
 import { useCallback, useEffect, useState } from "react"
@@ -40,8 +41,9 @@ type props = {
   opponents: member[]
   groupId: number
   isAdmin: boolean
-  emailUnverified: true | undefined
+  emailUnverified?: true
   session: any
+  noGroup?: boolean
 }
 
 type opponentData = { groupId: number; member: member }
@@ -58,6 +60,7 @@ const RecordMatch = ({
   isAdmin,
   emailUnverified,
   session,
+  noGroup,
 }: props) => {
   const {
     register,
@@ -159,6 +162,8 @@ const RecordMatch = ({
   }
 
   if (emailUnverified) return <EmailUnverifiedMessage />
+
+  if (noGroup) return <NoGroup />
 
   return (
     <div>
@@ -344,6 +349,11 @@ export const getServerSideProps = async (
 
   try {
     const groupId = parseInt(context.query.groupId as string)
+    if (groupId === -1)
+      return {
+        props: { noGroup: true },
+      }
+
     const stat = await prisma.stat.findUnique({
       where: {
         userId_groupId: {

@@ -12,7 +12,6 @@ import { protectedRoute } from "@/src/lib/auth"
 import clientRoute from "@/src/enums/client-route"
 import { verifyEmail } from "@/src/lib/api"
 import apiRoute from "@/src/enums/api-route"
-import method from "@/src/enums/http-method"
 
 //next-auth
 import { getServerSession } from "next-auth"
@@ -27,7 +26,7 @@ const EmailVerification = () => {
   const router = useRouter()
 
   const handleVerifyEmail = async (verifyEmail: noBodyApiType) => {
-    const res = await verifyEmail(apiRoute, method)
+    const res = await verifyEmail(apiRoute)
 
     if (res && !res.ok) {
       const data = await res.json()

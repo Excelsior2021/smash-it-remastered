@@ -10,9 +10,12 @@ const headers = {
   "Content-Type": "application/json",
 }
 
-const makeRequest = async (apiRoute, method, body) => {
+const makeRequest = async (
+  apiRoute: string,
+  method: methodType | string = "GET",
+  body: any = null
+) => {
   let options
-
   if (method !== "GET")
     options = {
       method,
@@ -28,15 +31,13 @@ export const login = async (
   signIn: signInNextAuth,
   { userId, password }: FieldValues,
   clientRoute: clientRouteType
-) => {
-  const res = await signIn("credentials", {
+) =>
+  await signIn("credentials", {
     userId,
     password,
     redirect: false,
     callbackUrl: clientRoute.root,
   })
-  return res
-}
 
 export const createAccount = async (
   createAccountFormData: FieldValues,
@@ -44,12 +45,7 @@ export const createAccount = async (
   method: methodType
 ) => {
   try {
-    const res = await fetch(apiRoute.user, {
-      method: method.post,
-      headers,
-      body: JSON.stringify(createAccountFormData),
-    })
-    return res
+    return await makeRequest(apiRoute.user, method.post, createAccountFormData)
   } catch (error) {
     console.log(error)
   }
@@ -61,13 +57,7 @@ export const createGroup = async (
   method: methodType
 ) => {
   try {
-    const res = await fetch(apiRoute.group, {
-      method: method.post,
-      headers,
-      body: JSON.stringify(formData),
-    })
-
-    return res
+    return await makeRequest(apiRoute.group, method.post, formData)
   } catch (error) {
     console.log(error)
   }
@@ -80,12 +70,9 @@ export const queryGroups = async (
 ) => {
   if (query.trim() === "") return
   try {
-    const res = await fetch(`${apiRoute.group}/query`, {
-      method: method.post,
-      headers,
-      body: JSON.stringify({ query: query.toLowerCase() }),
+    return await makeRequest(`${apiRoute.group}/query`, method.post, {
+      query: query.toLowerCase(),
     })
-    return res
   } catch (error) {
     console.log(error)
   }
@@ -98,14 +85,13 @@ export const groupRequest = async (
   method: methodType
 ) => {
   try {
-    const res = await fetch(`${apiRoute.group}/${groupId}/request`, {
-      method: method.post,
-      headers,
-      body: JSON.stringify({
+    return await makeRequest(
+      `${apiRoute.group}/${groupId}/request`,
+      method.post,
+      {
         userId,
-      }),
-    })
-    return res
+      }
+    )
   } catch (error) {
     console.log(error)
   }
@@ -113,8 +99,7 @@ export const groupRequest = async (
 
 export const getGroupRequests = async (apiRoute: apiRouteType) => {
   try {
-    const res = await fetch(`${apiRoute.user}/group-request`)
-    return res
+    return await makeRequest(`${apiRoute.user}/group-request`)
   } catch (error) {
     console.log(error)
   }
@@ -391,14 +376,9 @@ export const deleteAccount = async (
   }
 }
 
-export const verifyEmail = async (
-  apiRoute: apiRouteType,
-  method: methodType
-) => {
+export const verifyEmail = async (apiRoute: apiRouteType) => {
   try {
-    const res = await fetch(apiRoute.email, {
-      method: method.get,
-    })
+    const res = await fetch(apiRoute.email)
     return res
   } catch (error) {
     console.log(error)
