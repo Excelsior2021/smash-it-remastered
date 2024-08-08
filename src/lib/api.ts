@@ -10,6 +10,20 @@ const headers = {
   "Content-Type": "application/json",
 }
 
+const makeRequest = async (apiRoute, method, body) => {
+  let options
+
+  if (method !== "GET")
+    options = {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }
+
+  const res = await fetch(apiRoute, options)
+  return res
+}
+
 export const login = async (
   signIn: signInNextAuth,
   { userId, password }: FieldValues,

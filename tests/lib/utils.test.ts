@@ -1,5 +1,6 @@
-import { describe, expect, it, vi, beforeEach } from "vitest"
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest"
 import {
+  debounce,
   generateDisplayName,
   handleGetUserGroups,
   updateGroupDataForPage,
@@ -30,13 +31,14 @@ describe("lib/utils", () => {
     it("replaces url", () => {
       const routerGroupId = "2"
       updateGroupDataForPage(activeGroup, router, routerGroupId, url)
-      expect(router.replace).toHaveBeenCalled()
+      expect(router.replace).toHaveBeenCalledOnce()
+      expect(router.replace).toHaveBeenCalledWith(url)
     })
 
     it("does not replace the url", () => {
       const routerGroupId = "1"
       updateGroupDataForPage(activeGroup, router, routerGroupId, url)
-      expect(router.replace).toHaveBeenCalledTimes(0)
+      expect(router.replace).not.toHaveBeenCalled()
     })
   })
 
@@ -66,7 +68,7 @@ describe("lib/utils", () => {
 
     getUserGroups.mockResolvedValue({
       ok: true,
-      json: () => [{}],
+      json: () => [{ mock: "data" }],
     })
 
     handleGetUserGroups(getUserGroups, setGroups, setActiveGroup, apiRoute)
@@ -75,13 +77,33 @@ describe("lib/utils", () => {
       expect(getUserGroups).toHaveBeenCalledOnce()
       expect(getUserGroups).toHaveBeenCalledWith(apiRoute)
       expect(setGroups).toHaveBeenCalledOnce()
+      expect(setGroups).toHaveBeenCalledWith([{ mock: "data" }])
       expect(setActiveGroup).toHaveBeenCalledOnce()
+      expect(setActiveGroup).toHaveBeenCalledWith({ mock: "data" })
     })
   })
 
   describe("debounce()", () => {
-    it("", () => {
-      expect(1).toBe(1)
+    beforeEach(() => {
+      vi.useFakeTimers()
+      debounce(cb)(1, 2, 3) //debounce returns a function
+    })
+
+    afterEach(() => {
+      vi.resetAllMocks()
+    })
+
+    const cb = vi.fn()
+
+    it("calls the callback after 1s has passed", () => {
+      vi.runAllTimers()
+      expect(cb).toHaveBeenCalledOnce()
+      expect(cb).toHaveBeenCalledWith(1, 2, 3)
+    })
+
+    it("does not call the callback before 1s has passed", () => {
+      vi.advanceTimersByTime(900)
+      expect(cb).not.toHaveBeenCalled()
     })
   })
 })

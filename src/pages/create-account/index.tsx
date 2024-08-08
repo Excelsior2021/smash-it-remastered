@@ -107,28 +107,30 @@ const CreateAccount = ({ providers }: props) => {
           onSubmit={handleSubmit(async formData =>
             handleCreateAccount(createAccount, formData, apiRoute, method)
           )}>
-          <div className={`${accountSection ? "hidden" : null}`}>
+          <fieldset
+            className={`${accountSection ? "hidden" : null}`}
+            disabled={submitting}>
             <FormSection
               heading="personal details"
               fields={personalFormFields}
               register={register}
               errors={errors}
               clearErrors={clearErrors}
-              disabled={submitting}
             />
-          </div>
+          </fieldset>
 
-          <div className={`${accountSection ? null : "hidden"}`}>
+          <fieldset
+            className={`${accountSection ? null : "hidden"}`}
+            disabled={submitting}>
             <FormSection
               heading="account details"
               fields={accountFormFields}
               register={register}
               errors={errors}
               clearErrors={clearErrors}
-              disabled={submitting}
               toggle={true}
             />
-          </div>
+          </fieldset>
 
           {!accountSection && (
             <button

@@ -20,7 +20,6 @@ type props = {
   register: UseFormRegister<FieldValues>
   errors: FieldErrors<FieldValues>
   clearErrors: UseFormClearErrors<FieldValues>
-  disabled: boolean
   toggle?: boolean
 }
 
@@ -30,7 +29,6 @@ const FormSection = ({
   register,
   errors,
   clearErrors,
-  disabled,
   toggle,
 }: props) => {
   const [showPasswords, setShowPasswords] = useState(false)
@@ -52,7 +50,6 @@ const FormSection = ({
               validate={field.validate}
               info={field.info}
               onChange={() => clearErrors(field.name)}
-              disabled={disabled}
             />
             {errors[field.name] && (
               <>
