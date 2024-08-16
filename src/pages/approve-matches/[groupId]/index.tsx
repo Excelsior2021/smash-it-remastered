@@ -1,6 +1,6 @@
 //components
-import ApproveMatchList from "@/src/components/approve-match-list/approve-match-list"
-import ServerMessage from "@/src/components/server-message/server-message"
+import ApproveMatchList from "@/components/approve-match-list/approve-match-list"
+import ServerMessage from "@/components/server-message/server-message"
 
 //react
 import { useEffect } from "react"
@@ -9,14 +9,14 @@ import { useEffect } from "react"
 import { useRouter } from "next/router"
 
 //lib
-import prisma from "@/src/lib/prisma"
-import { adminRoute, notAdmin, protectedRoute } from "@/src/lib/auth"
-import clientRoute from "@/src/enums/client-route"
-import { updateGroupDataForPage } from "@/src/lib/utils"
+import prisma from "@/lib/prisma"
+import { adminRoute, notAdmin, protectedRoute } from "@/lib/auth"
+import clientRoute from "@/enums/client-route"
+import { updateGroupDataForPage } from "@/lib/utils"
 
 //store
-import headerStore from "@/src/store/header"
-import userStore from "@/src/store/user"
+import headerStore from "@/store/header"
+import userStore from "@/store/user"
 
 //next-auth
 import { authOptions } from "../../api/auth/[...nextauth]"

@@ -5,10 +5,10 @@ import { useEffect } from "react"
 import Image from "next/image"
 
 //lib
-import statKeys from "@/src/enums/stat-keys"
+import statKeys from "@/enums/stat-keys"
 
 //store
-import statsTableStore from "@/src/store/stats-table"
+import statsTableStore from "@/store/stats-table"
 
 //types
 import type { stats } from "@/types"

@@ -1,6 +1,6 @@
 //components
-import LinkButton from "@/src/components/link-button/link-button"
-import Modal from "@/src/components/modal/modal"
+import LinkButton from "@/components/link-button/link-button"
+import Modal from "@/components/modal/modal"
 
 //react
 import { useEffect } from "react"
@@ -9,14 +9,16 @@ import { useEffect } from "react"
 import { useRouter } from "next/router"
 
 //lib
-import clientRoute from "@/src/enums/client-route"
-import prisma from "@/src/lib/prisma"
+import clientRoute from "@/enums/client-route"
+import prisma from "@/lib/prisma"
+import { showModal } from "@/lib/utils"
 
 //next-auth
 import { getServerSession } from "next-auth"
 import { authOptions } from "../api/auth/[...nextauth]"
 import { useSession } from "next-auth/react"
 
+//types
 import type { GetServerSidePropsContext } from "next"
 
 type props = {
@@ -30,7 +32,7 @@ const VerifyEmail = ({ message, loggedIn, emailVerified }: props) => {
   const router = useRouter()
 
   useEffect(() => {
-    document.getElementById("modal").showModal()
+    showModal()
   }, [])
 
   return (

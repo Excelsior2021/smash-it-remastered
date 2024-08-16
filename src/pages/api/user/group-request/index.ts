@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "../../auth/[...nextauth]"
-import prisma from "@/src/lib/prisma"
-import method from "@/src/enums/http-method"
+import prisma from "@/lib/prisma"
+import method from "@/enums/http-method"
 
 import type { NextApiRequest, NextApiResponse } from "next"
 

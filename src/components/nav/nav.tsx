@@ -9,8 +9,8 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 
 //store
-import userStore from "@/src/store/user"
-import navStore from "@/src/store/nav"
+import userStore from "@/store/user"
+import navStore from "@/store/nav"
 
 //types
 import type { navItems } from "@/types"

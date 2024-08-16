@@ -1,33 +1,32 @@
 //components
-import GroupResults from "@/src/components/group-results/group-results"
-import EmailUnverifiedMessage from "@/src/components/email-unverified-message/email-unverified-message"
+import GroupResults from "@/components/group-results/group-results"
+import EmailUnverifiedMessage from "@/components/email-unverified-message/email-unverified-message"
 
 //react
-import { useEffect, useState } from "react"
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react"
 import { FieldValues, useForm } from "react-hook-form"
 
 //lib
-import prisma from "@/src/lib/prisma"
-import { getGroupRequests, queryGroups } from "@/src/lib/api"
-import { protectedRoute } from "@/src/lib/auth"
-import clientRoute from "@/src/enums/client-route"
-import apiRoute from "@/src/enums/api-route"
-import method from "@/src/enums/http-method"
-import { debounce } from "@/src/lib/utils"
+import prisma from "@/lib/prisma"
+import { getGroupRequests, queryGroups } from "@/lib/api"
+import { protectedRoute } from "@/lib/auth"
+import clientRoute from "@/enums/client-route"
+import apiRoute from "@/enums/api-route"
+import method from "@/enums/http-method"
+import { debounce, makeRequest } from "@/lib/utils"
 
 //store
-import headerStore from "@/src/store/header"
-import userStore from "@/src/store/user"
+import headerStore from "@/store/header"
+import userStore from "@/store/user"
 
 //next-auth
 import { authOptions } from "../api/auth/[...nextauth]"
 import { getServerSession } from "next-auth"
 
 //types
-import type { Dispatch, SetStateAction } from "react"
 import type {
   apiRouteType,
-  changeAccountDetailType,
+  apiRequestType,
   groupRequest,
   groupResult,
   methodType,
@@ -52,19 +51,23 @@ const JoinGroup = ({ groupRequests, emailUnverified, userId }: props) => {
 
   const handleQueryGroups = debounce(
     async (
-      queryGroups: changeAccountDetailType,
+      queryGroups: apiRequestType,
       formData: FieldValues,
       setGroups: Dispatch<SetStateAction<userGroup[] | null>>,
       apiRoute: apiRouteType,
       method: methodType
     ) => {
       const res: Awaited<Response> = await queryGroups(
+        makeRequest,
         formData,
         apiRoute,
         method
       )
 
-      const res2: Awaited<Response> = await getGroupRequests(apiRoute)
+      const res2: Awaited<Response> = await getGroupRequests(
+        makeRequest,
+        apiRoute
+      )
 
       if (res && res.ok && res2 && res2.ok) {
         setGroups(await res.json())

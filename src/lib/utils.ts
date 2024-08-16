@@ -1,4 +1,9 @@
-import type { apiRouteType, getUserGroupsType, userGroup } from "@/types"
+import type {
+  apiRouteType,
+  getUserGroupsType,
+  makeRequestType,
+  userGroup,
+} from "@/types"
 import type { NextRouter } from "next/router"
 
 export const updateGroupDataForPage = (
@@ -22,12 +27,13 @@ export const generateDisplayName = (
 }
 
 export const handleGetUserGroups = async (
+  makeRequest: makeRequestType,
   getUserGroups: getUserGroupsType,
   setGroups: any,
   setActiveGroup: any,
   apiRoute: apiRouteType
 ) => {
-  const res: Awaited<Response> = await getUserGroups(apiRoute)
+  const res: Awaited<Response> = await getUserGroups(makeRequest, apiRoute)
 
   const data = await res.json()
 
@@ -43,4 +49,25 @@ export const debounce = (cb: Function, delay = 1000) => {
     clearTimeout(timeout)
     timeout = setTimeout(() => cb(...args), delay)
   }
+}
+
+export const makeRequest = async (
+  apiRoute: string,
+  method: string = "GET",
+  body: any = null
+) => {
+  let options: RequestInit | undefined = undefined
+  if (method !== "GET")
+    options = {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }
+
+  return options ? await fetch(apiRoute, options) : fetch(apiRoute)
+}
+
+export const showModal = () => {
+  const modal = document.getElementById("modal") as HTMLDialogElement
+  return modal.showModal()
 }

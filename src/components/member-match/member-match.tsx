@@ -3,7 +3,7 @@ import Avatar from "../avatar/avatar"
 import Input from "../input/input"
 
 //lib
-import { generateDisplayName } from "@/src/lib/utils"
+import { generateDisplayName } from "@/lib/utils"
 
 //types
 import type { member } from "@/types"

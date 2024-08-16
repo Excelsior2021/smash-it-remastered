@@ -1,10 +1,10 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "../auth/[...nextauth]"
-import prisma from "@/src/lib/prisma"
-import { isMaxUserGroups, validateGroupName } from "@/src/lib/server-validation"
-import method from "@/src/enums/http-method"
-import obscenity from "@/src/lib/obscenity-matcher"
-import pattern from "@/src/lib/field-validation"
+import prisma from "@/lib/prisma"
+import { isMaxUserGroups, validateGroupName } from "@/lib/server-validation"
+import method from "@/enums/http-method"
+import obscenity from "@/lib/obscenity-matcher"
+import pattern from "@/lib/field-validation"
 
 import type { NextApiRequest, NextApiResponse } from "next"
 

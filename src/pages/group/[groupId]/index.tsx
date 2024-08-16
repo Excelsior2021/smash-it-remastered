@@ -1,9 +1,9 @@
 //components
-import LinkButton from "@/src/components/link-button/link-button"
-import MemberList from "@/src/components/member-list/member-list"
-import NoGroup from "@/src/components/no-group/no-group"
-import StatsTable from "@/src/components/stats-table/stats-table"
-import Modal from "@/src/components/modal/modal"
+import LinkButton from "@/components/link-button/link-button"
+import MemberList from "@/components/member-list/member-list"
+import NoGroup from "@/components/no-group/no-group"
+import StatsTable from "@/components/stats-table/stats-table"
+import Modal from "@/components/modal/modal"
 
 //react
 import { useEffect, useState } from "react"
@@ -12,18 +12,23 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 
 //lib
-import { protectedRoute } from "@/src/lib/auth"
-import prisma from "@/src/lib/prisma"
-import clientRoute from "@/src/enums/client-route"
-import { handleGetUserGroups, updateGroupDataForPage } from "@/src/lib/utils"
-import { userInGroup } from "@/src/lib/server-validation"
-import { getUserGroups, removeUserFromGroup } from "@/src/lib/api"
-import apiRoute from "@/src/enums/api-route"
-import method from "@/src/enums/http-method"
+import { protectedRoute } from "@/lib/auth"
+import prisma from "@/lib/prisma"
+import clientRoute from "@/enums/client-route"
+import {
+  handleGetUserGroups,
+  makeRequest,
+  showModal,
+  updateGroupDataForPage,
+} from "@/lib/utils"
+import { userInGroup } from "@/lib/server-validation"
+import { getUserGroups, removeUserFromGroup } from "@/lib/api"
+import apiRoute from "@/enums/api-route"
+import method from "@/enums/http-method"
 
 //store
-import navStore from "@/src/store/nav"
-import userStore from "@/src/store/user"
+import navStore from "@/store/nav"
+import userStore from "@/store/user"
 
 //next-auth
 import { getServerSession } from "next-auth"
@@ -33,8 +38,10 @@ import { authOptions } from "../../api/auth/[...nextauth]"
 import type {
   apiRouteType,
   group,
+  makeRequestType,
   member,
   methodType,
+  showModalType,
   userGroupApiType,
 } from "@/types"
 import type { GetServerSidePropsContext } from "next"
@@ -68,11 +75,13 @@ const GroupPage = ({
   const [needAdmin, setNeedAdmin] = useState(false)
   const [leftGroup, setLeftGroup] = useState(false)
 
-  let group: group
+  let group: group | null = null
   if (groupJSON) group = JSON.parse(groupJSON)
 
   const handleLeaveGroup = async (
+    makeRequest: makeRequestType,
     removeUserFromGroup: userGroupApiType,
+    showModal: showModalType,
     userId: number,
     groupId: number,
     apiRoute: apiRouteType,
@@ -81,6 +90,7 @@ const GroupPage = ({
     setSubmitting(true)
     try {
       const res: Awaited<Response> = await removeUserFromGroup(
+        makeRequest,
         userId,
         groupId,
         apiRoute,
@@ -89,13 +99,13 @@ const GroupPage = ({
 
       if (res && res.status === 409) {
         setNeedAdmin(true)
-        setTimeout(() => document.getElementById("modal").showModal())
+        setTimeout(() => showModal())
       }
 
       if (res && res.ok) {
         setNeedAdmin(false)
         setLeftGroup(true)
-        setTimeout(() => document.getElementById("modal").showModal())
+        setTimeout(() => showModal())
       }
     } catch (error) {
       console.log(error)
@@ -121,7 +131,7 @@ const GroupPage = ({
   return (
     <div>
       {notInGroup && <p className="text-center">{notInGroup}</p>}
-      {group && (
+      {group !== null && (
         <>
           {isAdmin && activeGroup && (
             <div className="mb-6 md:max-w-96">
@@ -137,13 +147,13 @@ const GroupPage = ({
           <div className="mt-16">
             <button
               className="btn bg-red-950 block border-0 hover:bg-red-900 w-full md:w-96 ml-auto"
-              onClick={() => document.getElementById("modal").showModal()}>
+              onClick={() => showModal()}>
               leave group
             </button>
           </div>
         </>
       )}
-      {activeGroup && !needAdmin && !leftGroup && (
+      {activeGroup && !needAdmin && !leftGroup && group !== null && (
         <Modal
           heading="leave group"
           text={`Are you sure you want to leave ${activeGroup.name}? Data will be lost!`}
@@ -151,7 +161,9 @@ const GroupPage = ({
           loading={submitting}
           onClick={async () => {
             await handleLeaveGroup(
+              makeRequest,
               removeUserFromGroup,
+              showModal,
               userId,
               group.id,
               apiRoute,
@@ -172,6 +184,7 @@ const GroupPage = ({
           text={`You have left ${activeGroup.name}.`}
           onClickClose={async () => {
             await handleGetUserGroups(
+              makeRequest,
               getUserGroups,
               setGroups,
               setActiveGroup,

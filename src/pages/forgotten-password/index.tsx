@@ -1,6 +1,6 @@
 //components
-import Input from "@/src/components/input/input"
-import Modal from "@/src/components/modal/modal"
+import Input from "@/components/input/input"
+import Modal from "@/components/modal/modal"
 
 //react
 import { useEffect, useState } from "react"
@@ -11,15 +11,16 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 
 //lib
-import { authRedirect } from "@/src/lib/auth"
-import clientRoute from "@/src/enums/client-route"
-import pattern from "@/src/lib/field-validation"
-import { forgottenPassword } from "@/src/lib/api"
-import apiRoute from "@/src/enums/api-route"
-import method from "@/src/enums/http-method"
+import { authRedirect } from "@/lib/auth"
+import clientRoute from "@/enums/client-route"
+import pattern from "@/lib/field-validation"
+import { forgottenPassword } from "@/lib/api"
+import apiRoute from "@/enums/api-route"
+import method from "@/enums/http-method"
+import { makeRequest, showModal } from "@/lib/utils"
 
 //store
-import headerStore from "@/src/store/header"
+import headerStore from "@/store/header"
 
 //next-auth
 import { getServerSession } from "next-auth"
@@ -27,7 +28,13 @@ import { authOptions } from "../api/auth/[...nextauth]"
 
 //type
 import type { FieldValues } from "react-hook-form"
-import type { apiRouteType, changeAccountDetailType, methodType } from "@/types"
+import type {
+  apiRouteType,
+  apiRequestType,
+  methodType,
+  makeRequestType,
+  showModalType,
+} from "@/types"
 import type { GetServerSidePropsContext } from "next"
 
 const ForgottenPassword = () => {
@@ -36,9 +43,8 @@ const ForgottenPassword = () => {
     handleSubmit,
     setError,
     clearErrors,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm()
-  const [submitting, setSubmmiting] = useState(false)
   const setBackRoute = headerStore(state => state.setBackRoute)
   const clearBackRoute = headerStore(state => state.clearBackRoute)
   const router = useRouter()
@@ -49,14 +55,15 @@ const ForgottenPassword = () => {
   }, [setBackRoute, clearBackRoute])
 
   const handleForgottenPassword = async (
-    forgottenPassword: changeAccountDetailType,
+    makeRequest: makeRequestType,
+    forgottenPassword: apiRequestType,
+    showModal: showModalType,
     { email }: FieldValues,
     apiRoute: apiRouteType,
     method: methodType
   ) => {
-    setSubmmiting(true)
     try {
-      const res = await forgottenPassword(email, apiRoute, method)
+      const res = await forgottenPassword(makeRequest, email, apiRoute, method)
 
       if (res && !res.ok) {
         const { error } = await res.json()
@@ -67,11 +74,9 @@ const ForgottenPassword = () => {
         return
       }
 
-      if (res && res.ok) document.getElementById("modal").showModal()
+      if (res && res.ok) showModal()
     } catch (error) {
       console.log(error)
-    } finally {
-      setSubmmiting(false)
     }
   }
 
@@ -89,7 +94,9 @@ const ForgottenPassword = () => {
         onSubmit={handleSubmit(
           async formData =>
             await handleForgottenPassword(
+              makeRequest,
               forgottenPassword,
+              showModal,
               formData,
               apiRoute,
               method
@@ -107,7 +114,7 @@ const ForgottenPassword = () => {
             className="input text-black w-full mb-2"
             register={register}
             onChange={() => clearErrors()}
-            disabled={submitting}
+            disabled={isSubmitting}
           />
           {errors.email && <p>{errors.email.message as string}</p>}
           {errors.server && (
@@ -115,9 +122,9 @@ const ForgottenPassword = () => {
           )}
         </div>
 
-        <button className="btn btn-secondary" disabled={submitting}>
+        <button className="btn btn-secondary" disabled={isSubmitting}>
           {" "}
-          {submitting ? (
+          {isSubmitting ? (
             <span className="loading loading-bars loading-sm"></span>
           ) : (
             "submit"

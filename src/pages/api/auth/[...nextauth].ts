@@ -1,10 +1,10 @@
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { env } from "process"
-import prisma from "@/src/lib/prisma"
+import prisma from "@/lib/prisma"
 import { compare } from "bcryptjs"
 import GoogleProvider from "next-auth/providers/google"
-import { verifyPassword } from "@/src/lib/server-validation"
+import { verifyPassword } from "@/lib/server-validation"
 
 export const authOptions = {
   secret: env.NEXTAUTH_SECRET,

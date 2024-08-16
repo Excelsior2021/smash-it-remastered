@@ -3,29 +3,9 @@ import type {
   apiRouteType,
   methodType,
   signInNextAuth,
+  makeRequestType,
 } from "@/types"
 import type { FieldValues } from "react-hook-form"
-
-const headers = {
-  "Content-Type": "application/json",
-}
-
-const makeRequest = async (
-  apiRoute: string,
-  method: methodType | string = "GET",
-  body: any = null
-) => {
-  let options
-  if (method !== "GET")
-    options = {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    }
-
-  const res = await fetch(apiRoute, options)
-  return res
-}
 
 export const login = async (
   signIn: signInNextAuth,
@@ -40,157 +20,99 @@ export const login = async (
   })
 
 export const createAccount = async (
+  makeRequest: makeRequestType,
   createAccountFormData: FieldValues,
   apiRoute: apiRouteType,
   method: methodType
-) => {
-  try {
-    return await makeRequest(apiRoute.user, method.post, createAccountFormData)
-  } catch (error) {
-    console.log(error)
-  }
-}
+) => await makeRequest(apiRoute.user, method.post, createAccountFormData)
 
 export const createGroup = async (
+  makeRequest: makeRequestType,
   formData: FieldValues,
   apiRoute: apiRouteType,
   method: methodType
-) => {
-  try {
-    return await makeRequest(apiRoute.group, method.post, formData)
-  } catch (error) {
-    console.log(error)
-  }
-}
+) => await makeRequest(apiRoute.group, method.post, formData)
 
 export const queryGroups = async (
+  makeRequest: makeRequestType,
   { query }: FieldValues,
   apiRoute: apiRouteType,
   method: methodType
 ) => {
   if (query.trim() === "") return
-  try {
-    return await makeRequest(`${apiRoute.group}/query`, method.post, {
-      query: query.toLowerCase(),
-    })
-  } catch (error) {
-    console.log(error)
-  }
+
+  return await makeRequest(`${apiRoute.group}/query`, method.post, {
+    query: query.toLowerCase(),
+  })
 }
 
 export const groupRequest = async (
+  makeRequest: makeRequestType,
   userId: number,
   groupId: number,
   apiRoute: apiRouteType,
   method: methodType
-) => {
-  try {
-    return await makeRequest(
-      `${apiRoute.group}/${groupId}/request`,
-      method.post,
-      {
-        userId,
-      }
-    )
-  } catch (error) {
-    console.log(error)
-  }
-}
+) =>
+  await makeRequest(`${apiRoute.group}/${groupId}/request`, method.post, {
+    userId,
+  })
 
-export const getGroupRequests = async (apiRoute: apiRouteType) => {
-  try {
-    return await makeRequest(`${apiRoute.user}/group-request`)
-  } catch (error) {
-    console.log(error)
-  }
-}
+export const getGroupRequests = async (
+  makeRequest: makeRequestType,
+  apiRoute: apiRouteType
+) => await makeRequest(`${apiRoute.user}/group-request`)
 
-export const getUserGroups = async (apiRoute: apiRouteType) => {
-  try {
-    const res = await fetch(`${apiRoute.user}/group`)
-    return res
-  } catch (error) {
-    console.log(error)
-  }
-}
+export const getUserGroups = async (
+  makeRequest: makeRequestType,
+  apiRoute: apiRouteType
+) => await makeRequest(`${apiRoute.user}/group`)
 
 export const removeUserFromGroup = async (
+  makeRequest: makeRequestType,
   userId: number,
   groupId: number,
   apiRoute: apiRouteType,
   method: methodType
-) => {
-  try {
-    const res = await fetch(`${apiRoute.group}/${groupId}/member`, {
-      method: method.delete,
-      headers,
-      body: JSON.stringify({
-        userId,
-      }),
-    })
-
-    return res
-  } catch (error) {
-    console.log(error)
-    return error
-  }
-}
+) =>
+  await makeRequest(`${apiRoute.group}/${groupId}/member`, method.delete, {
+    userId,
+  })
 
 export const approveUserToGroup = async (
+  makeRequest: makeRequestType,
   userId: number,
   groupId: number,
   apiRoute: apiRouteType,
   method: methodType
-) => {
-  try {
-    const res = await fetch(`${apiRoute.group}/${groupId}/approve`, {
-      method: method.post,
-      headers,
-      body: JSON.stringify({ userId }),
-    })
-    return res
-  } catch (error) {
-    console.log(error)
-  }
-}
+) =>
+  await makeRequest(`${apiRoute.group}/${groupId}/approve`, method.post, {
+    userId,
+  })
 
 export const declineUserToGroup = async (
+  makeRequest: makeRequestType,
   userId: number,
   groupId: number,
   apiRoute: apiRouteType,
   method: methodType
-) => {
-  try {
-    const res = await fetch(`${apiRoute.group}/${groupId}/decline`, {
-      method: method.post,
-      headers,
-      body: JSON.stringify({ userId }),
-    })
-    return res
-  } catch (error) {
-    console.log(error)
-  }
-}
+) =>
+  await makeRequest(`${apiRoute.group}/${groupId}/decline`, method.post, {
+    userId,
+  })
 
 export const makeUserAdminOfGroup = async (
+  makeRequest: makeRequestType,
   userId: number,
   groupId: number,
   apiRoute: apiRouteType,
   method: methodType
-) => {
-  try {
-    const res = await fetch(`${apiRoute.group}/${groupId}/admin`, {
-      method: method.patch,
-      headers,
-      body: JSON.stringify({ userId }),
-    })
-    return res
-  } catch (error) {
-    console.log(error)
-  }
-}
+) =>
+  await makeRequest(`${apiRoute.group}/${groupId}/admin`, method.patch, {
+    userId,
+  })
 
 export const recordMatch = async (
+  makeRequest: makeRequestType,
   userScore: number,
   opponentScore: number,
   matchDate: string,
@@ -201,28 +123,19 @@ export const recordMatch = async (
   apiRoute: apiRouteType,
   method: methodType,
   matchId: number | null = null
-) => {
-  try {
-    const res = await fetch(`${apiRoute.group}/${groupId}/match`, {
-      method: method.post,
-      headers,
-      body: JSON.stringify({
-        userScore,
-        opponentScore,
-        matchDate: new Date(matchDate),
-        player1Id: userId,
-        player2Id: opponentId,
-        approvedBy,
-        matchId,
-      }),
-    })
-    return res
-  } catch (error) {
-    console.log(error)
-  }
-}
+) =>
+  await makeRequest(`${apiRoute.group}/${groupId}/match`, method.post, {
+    userScore,
+    opponentScore,
+    matchDate: new Date(matchDate),
+    player1Id: userId,
+    player2Id: opponentId,
+    approvedBy,
+    matchId,
+  })
 
 export const submitMatch = async (
+  makeRequest: makeRequestType,
   userScore: number,
   opponentScore: number,
   matchDate: string,
@@ -231,156 +144,83 @@ export const submitMatch = async (
   opponentId: number,
   apiRoute: apiRouteType,
   method: methodType
-) => {
-  try {
-    const res = await fetch(`${apiRoute.group}/${groupId}/match-submission`, {
-      method: method.post,
-      headers,
-      body: JSON.stringify({
-        userScore,
-        opponentScore,
-        matchDate: new Date(matchDate),
-        userId,
-        opponentId,
-      }),
-    })
-    return res
-  } catch (error) {
-    console.log(error)
-  }
-}
+) =>
+  await makeRequest(
+    `${apiRoute.group}/${groupId}/match-submission`,
+    method.post,
+    {
+      userScore,
+      opponentScore,
+      matchDate: new Date(matchDate),
+      userId,
+      opponentId,
+    }
+  )
 
 export const removeMatchSubmission = async (
+  makeRequest: makeRequestType,
   matchId: number,
   groupId: number,
   apiRoute: apiRouteType,
   method: methodType
-) => {
-  try {
-    const res = await fetch(`${apiRoute.group}/${groupId}/match-submission`, {
-      method: method.delete,
-      headers,
-      body: JSON.stringify({ matchId }),
-    })
-    return res
-  } catch (error) {
-    console.log(error)
-  }
-}
+) =>
+  await makeRequest(
+    `${apiRoute.group}/${groupId}/match-submission`,
+    method.delete,
+    { matchId }
+  )
 
 export const changeAccountDetail = async (
+  makeRequest: makeRequestType,
   field: FieldValues,
   apiRoute: apiRouteType,
   method: methodType
-) => {
-  try {
-    const res = await fetch(`${apiRoute.user}`, {
-      method: method.patch,
-      headers,
-      body: JSON.stringify(field),
-    })
-
-    return res
-  } catch (error) {
-    console.log(error)
-  }
-}
+) => await makeRequest(`${apiRoute.user}`, method.patch, field)
 
 //if password already exists
 export const changePassword = async (
+  makeRequest: makeRequestType,
   passwordData: FieldValues,
   apiRoute: apiRouteType,
   method: methodType
-) => {
-  try {
-    const res = await fetch(`${apiRoute.user}`, {
-      method: method.patch,
-      headers,
-      body: JSON.stringify(passwordData),
-    })
-
-    return res
-  } catch (error) {}
-}
+) => await makeRequest(`${apiRoute.user}`, method.patch, passwordData)
 
 //if password was not set initially. e.g. oauth sign up
 export const setPassword = async (
+  makeRequest: makeRequestType,
   passwordData: FieldValues,
   apiRoute: apiRouteType,
   method: methodType
-) => {
-  try {
-    const res = await fetch(`${apiRoute.user}/password`, {
-      method: method.post,
-      headers,
-      body: JSON.stringify(passwordData),
-    })
-
-    return res
-  } catch (error) {
-    console.log(error)
-  }
-}
+) => await makeRequest(`${apiRoute.user}/password`, method.post, passwordData)
 
 //forgotten password
 export const forgottenPassword = async (
+  makeRequest: makeRequestType,
   email: string,
   apiRoute: apiRouteType,
   method: methodType
-) => {
-  try {
-    const res = await fetch(`${apiRoute.email}`, {
-      method: method.post,
-      headers,
-      body: JSON.stringify({ email }),
-    })
-
-    return res
-  } catch (error) {
-    console.log(error)
-  }
-}
+) => await makeRequest(`${apiRoute.email}`, method.post, { email })
 
 //reset password if user has forgotten
 export const resetPassword = async (
+  makeRequest: makeRequestType,
   passwordData: FieldValues,
   token: string,
   apiRoute: apiRouteType,
   method: methodType
-) => {
-  try {
-    const res = await fetch(`${apiRoute.user}/password`, {
-      method: method.patch,
-      headers,
-      body: JSON.stringify({ ...passwordData, token }),
-    })
-
-    return res
-  } catch (error) {
-    console.log(error)
-  }
-}
+) =>
+  await makeRequest(`${apiRoute.user}/password`, method.patch, {
+    ...passwordData,
+    token,
+  })
 
 export const deleteAccount = async (
+  makeRequest: makeRequestType,
   apiRoute: apiRouteType,
   method: methodType
-) => {
-  try {
-    const res = await fetch(apiRoute.user, {
-      method: method.delete,
-      headers,
-    })
-    return res
-  } catch (error) {
-    console.log(error)
-  }
-}
+) => await makeRequest(apiRoute.user, method.delete)
 
-export const verifyEmail = async (apiRoute: apiRouteType) => {
-  try {
-    const res = await fetch(apiRoute.email)
-    return res
-  } catch (error) {
-    console.log(error)
-  }
-}
+export const verifyEmail = async (
+  makeRequest: makeRequestType,
+  apiRoute: apiRouteType
+) => await makeRequest(apiRoute.email)

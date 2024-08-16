@@ -2,12 +2,12 @@
 import { useEffect } from "react"
 
 //lib
-import { getUserGroups } from "@/src/lib/api"
-import apiRoute from "@/src/enums/api-route"
-import { handleGetUserGroups } from "@/src/lib/utils"
+import { getUserGroups } from "@/lib/api"
+import apiRoute from "@/enums/api-route"
+import { handleGetUserGroups, makeRequest } from "@/lib/utils"
 
 //store
-import userStore from "@/src/store/user"
+import userStore from "@/store/user"
 
 //next-auth
 import { useSession } from "next-auth/react"
@@ -21,7 +21,13 @@ const AppStateProvider = () => {
 
   useEffect(() => {
     if (data)
-      handleGetUserGroups(getUserGroups, setGroups, setActiveGroup, apiRoute)
+      handleGetUserGroups(
+        makeRequest,
+        getUserGroups,
+        setGroups,
+        setActiveGroup,
+        apiRoute
+      )
   }, [data, setGroups, setActiveGroup])
 
   return <></>

@@ -1,11 +1,12 @@
 import { describe, expect, it, test, vi } from "vitest"
 import {
   adminRoute,
+  authRedirect,
   hashPassword,
   notAdmin,
   protectedRoute,
-} from "@/src/lib/auth"
-import clientRoute from "@/src/enums/client-route"
+} from "@/lib/auth"
+import clientRoute from "@/enums/client-route"
 import prisma from "./__mocks__/prisma"
 
 describe("lib/auth", () => {
@@ -119,6 +120,46 @@ describe("lib/auth", () => {
           permanent: false,
         },
       })
+    })
+  })
+
+  describe("authRedirect()", () => {
+    const contextMock = {
+      req: {},
+      res: {},
+    } as any
+    const authOptionsMock = {}
+
+    it("returns redirect object", async () => {
+      const getServerSessionMock = vi.fn(() => true) as any
+
+      const redirect = await authRedirect(
+        contextMock,
+        getServerSessionMock,
+        clientRoute,
+        authOptionsMock
+      )
+
+      expect(getServerSessionMock).toHaveBeenCalledOnce()
+      expect(getServerSessionMock).toHaveBeenCalledWith(
+        contextMock.req,
+        contextMock.res,
+        authOptionsMock
+      )
+      expect(redirect).toStrictEqual({
+        redirect: { destination: clientRoute.root, permanent: false },
+      })
+    })
+
+    it("returns undefined", async () => {
+      const getServerSessionMock = vi.fn(() => false) as any
+      const redirect = await authRedirect(
+        contextMock,
+        getServerSessionMock,
+        clientRoute,
+        authOptionsMock
+      )
+      expect(redirect).toBe(undefined)
     })
   })
 })

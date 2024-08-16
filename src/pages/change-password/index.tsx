@@ -1,34 +1,40 @@
 //components
-import Input from "@/src/components/input/input"
-import Modal from "@/src/components/modal/modal"
-import EmailUnverifiedMessage from "@/src/components/email-unverified-message/email-unverified-message"
-import Toggle from "@/src/components/toggle/toggle"
+import Input from "@/components/input/input"
+import Modal from "@/components/modal/modal"
+import EmailUnverifiedMessage from "@/components/email-unverified-message/email-unverified-message"
+import Toggle from "@/components/toggle/toggle"
 
 //react
 import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, type FieldValues } from "react-hook-form"
 
 //next
 import { useRouter } from "next/router"
 
 //lib
-import prisma from "@/src/lib/prisma"
-import { changePasswordFormFields } from "@/src/lib/form-fields"
-import { changePassword, setPassword } from "@/src/lib/api"
-import { protectedRoute } from "@/src/lib/auth"
-import clientRoute from "@/src/enums/client-route"
-import apiRoute from "@/src/enums/api-route"
-import method from "@/src/enums/http-method"
+import prisma from "@/lib/prisma"
+import { changePasswordFormFields } from "@/lib/form-fields"
+import { changePassword, setPassword } from "@/lib/api"
+import { protectedRoute } from "@/lib/auth"
+import clientRoute from "@/enums/client-route"
+import apiRoute from "@/enums/api-route"
+import method from "@/enums/http-method"
+import { makeRequest, showModal } from "@/lib/utils"
 
 //store
-import headerStore from "@/src/store/header"
+import headerStore from "@/store/header"
 
 import { getServerSession } from "next-auth"
 import { authOptions } from "../api/auth/[...nextauth]"
 
 //types
-import type { apiRouteType, changeAccountDetailType, methodType } from "@/types"
-import type { FieldValues } from "react-hook-form"
+import type {
+  apiRouteType,
+  apiRequestType,
+  methodType,
+  makeRequestType,
+  showModalType,
+} from "@/types"
 import type { GetServerSidePropsContext } from "next"
 
 type props = {
@@ -44,9 +50,8 @@ const ChangePassword = ({ hasPassword, emailUnverified }: props) => {
     setError,
     watch,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm()
-  const [submitting, setSubmitting] = useState(false)
   const [showPasswords, setShowPasswords] = useState(false)
   const router = useRouter()
   const setBackRoute = headerStore(state => state.setBackRoute)
@@ -60,19 +65,21 @@ const ChangePassword = ({ hasPassword, emailUnverified }: props) => {
   }, [setBackRoute, clearBackRoute])
 
   const handleChangePassword = async (
-    changePassword: changeAccountDetailType,
+    makeRequest: makeRequestType,
+    changePassword: apiRequestType,
+    showModal: showModalType,
     formData: FieldValues,
     apiRoute: apiRouteType,
     method: methodType
   ) => {
     try {
-      setSubmitting(true)
       let res
-      if (hasPassword) res = await changePassword(formData, apiRoute, method)
-      else res = await setPassword(formData, apiRoute, method)
+      if (hasPassword)
+        res = await changePassword(makeRequest, formData, apiRoute, method)
+      else res = await setPassword(makeRequest, formData, apiRoute, method)
 
       if (res && res.ok) {
-        document.getElementById("modal").showModal()
+        showModal()
         reset()
       } else if (res) {
         const { field, error } = await res.json()
@@ -82,8 +89,6 @@ const ChangePassword = ({ hasPassword, emailUnverified }: props) => {
       }
     } catch (error) {
       console.log(error)
-    } finally {
-      setSubmitting(false)
     }
   }
 
@@ -97,7 +102,14 @@ const ChangePassword = ({ hasPassword, emailUnverified }: props) => {
       <form
         className="flex flex-col gap-10 max-w-[500px] m-auto"
         onSubmit={handleSubmit(async formData =>
-          handleChangePassword(changePassword, formData, apiRoute, method)
+          handleChangePassword(
+            makeRequest,
+            changePassword,
+            showModal,
+            formData,
+            apiRoute,
+            method
+          )
         )}>
         {changePasswordFormFields.map(field => {
           if (!hasPassword && field.name === "currentPassword") return
@@ -120,7 +132,7 @@ const ChangePassword = ({ hasPassword, emailUnverified }: props) => {
                 className="input text-black w-full"
                 info={field.info}
                 onChange={() => clearErrors(field.name)}
-                disabled={submitting}
+                disabled={isSubmitting}
               />
               {errors[field.name] && (
                 <p className="text-error">{errors[field.name].message}</p>
@@ -132,8 +144,8 @@ const ChangePassword = ({ hasPassword, emailUnverified }: props) => {
           text="show passwords"
           onChange={() => setShowPasswords(prev => !prev)}
         />
-        <button className="btn btn-secondary" disabled={submitting}>
-          {submitting ? (
+        <button className="btn btn-secondary" disabled={isSubmitting}>
+          {isSubmitting ? (
             <span className="loading loading-bars loading-sm"></span>
           ) : hasPassword ? (
             " change password"

@@ -7,33 +7,34 @@ import Key from "../svg/key"
 import Unlock from "../svg/unlock"
 
 //react
-import { useCallback, useState } from "react"
+import { useCallback, useState, type MouseEvent } from "react"
 
 //next
 import { useRouter } from "next/router"
 
 //lib
-import memberListItemType from "@/src/enums/member-list-item-types"
-import { generateDisplayName } from "@/src/lib/utils"
+import memberListItemType from "@/enums/member-list-item-types"
+import { generateDisplayName, makeRequest, showModal } from "@/lib/utils"
 import {
   approveUserToGroup,
   declineUserToGroup,
   makeUserAdminOfGroup,
   removeUserFromGroup,
-} from "@/src/lib/api"
-import clientRoute from "@/src/enums/client-route"
-import apiRoute from "@/src/enums/api-route"
-import method from "@/src/enums/http-method"
+} from "@/lib/api"
+import clientRoute from "@/enums/client-route"
+import apiRoute from "@/enums/api-route"
+import method from "@/enums/http-method"
 
 //types
 import type {
   apiRouteType,
+  makeRequestType,
   member,
   methodType,
   opponentData,
+  showModalType,
   userGroupApiType,
 } from "@/types"
-import type { MouseEvent } from "react"
 
 type props = {
   member: member
@@ -57,7 +58,9 @@ const MemberListItem = ({
 
   const handleAction = useCallback(
     async (
+      makeRequest: makeRequestType,
       action: userGroupApiType,
+      showModal: showModalType,
       userId: number,
       groupId: number,
       apiRoute: apiRouteType,
@@ -66,6 +69,7 @@ const MemberListItem = ({
       try {
         setLoading(true)
         const res: Awaited<Response> = await action(
+          makeRequest,
           userId,
           groupId,
           apiRoute,
@@ -73,8 +77,7 @@ const MemberListItem = ({
         )
 
         if (res.ok) setActionSuccess(true)
-        if (res.status === 409)
-          setTimeout(() => document.getElementById("modal").showModal(), 100)
+        if (res.status === 409) setTimeout(() => showModal(), 100)
       } catch (error) {
         console.log(error)
       } finally {
@@ -130,7 +133,9 @@ const MemberListItem = ({
                     text={`Are you sure you want to remove ${member.username} from the group? All their personal data for this group will be lost.`}
                     onClick={async () =>
                       await handleAction(
+                        makeRequest,
                         removeUserFromGroup,
+                        showModal,
                         member.id,
                         groupId,
                         apiRoute,
@@ -145,9 +150,7 @@ const MemberListItem = ({
                   onClick={(e: MouseEvent) => {
                     e.stopPropagation()
                     setShowMemberModal(true)
-                    setTimeout(() =>
-                      document.getElementById("modal").showModal()
-                    )
+                    setTimeout(() => showModal())
                   }}
                 />
               </>
@@ -165,7 +168,9 @@ const MemberListItem = ({
                   onClick={async (e: MouseEvent) => {
                     e.stopPropagation()
                     await handleAction(
+                      makeRequest,
                       approveUserToGroup,
+                      showModal,
                       member.id,
                       groupId,
                       apiRoute,
@@ -178,7 +183,9 @@ const MemberListItem = ({
                   onClick={async (e: MouseEvent) => {
                     e.stopPropagation()
                     await handleAction(
+                      makeRequest,
                       declineUserToGroup,
+                      showModal,
                       member.id,
                       groupId,
                       apiRoute,
@@ -197,7 +204,9 @@ const MemberListItem = ({
                     text={`Are you sure you want to make ${member.username} an admin of the group?`}
                     onClick={async () =>
                       await handleAction(
+                        makeRequest,
                         makeUserAdminOfGroup,
+                        showModal,
                         member.id,
                         groupId,
                         apiRoute,
@@ -212,9 +221,7 @@ const MemberListItem = ({
                   onClick={async (e: Event) => {
                     e.stopPropagation()
                     setShowMemberModal(true)
-                    setTimeout(() =>
-                      document.getElementById("modal").showModal()
-                    )
+                    setTimeout(() => showModal())
                   }}
                 />
               </>

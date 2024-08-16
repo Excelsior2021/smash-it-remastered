@@ -1,40 +1,45 @@
 //components
-import MemberList from "@/src/components/member-list/member-list"
-import MemberMatch from "@/src/components/member-match/member-match"
-import EmailUnverifiedMessage from "@/src/components/email-unverified-message/email-unverified-message"
-import Modal from "@/src/components/modal/modal"
-import ServerMessage from "@/src/components/server-message/server-message"
-import NoGroup from "@/src/components/no-group/no-group"
+import MemberList from "@/components/member-list/member-list"
+import MemberMatch from "@/components/member-match/member-match"
+import EmailUnverifiedMessage from "@/components/email-unverified-message/email-unverified-message"
+import Modal from "@/components/modal/modal"
+import ServerMessage from "@/components/server-message/server-message"
+import NoGroup from "@/components/no-group/no-group"
 
 //react
-import { useCallback, useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type Dispatch,
+  type ReactNode,
+  type SetStateAction,
+} from "react"
+import { useForm, type FieldValues } from "react-hook-form"
 
 //next
 import { useRouter } from "next/router"
 
 //lib
-import prisma from "@/src/lib/prisma"
-import { protectedRoute } from "@/src/lib/auth"
-import { updateGroupDataForPage } from "@/src/lib/utils"
-import { recordMatch, submitMatch } from "@/src/lib/api"
-import clientRoute from "@/src/enums/client-route"
-import { validateScores } from "@/src/lib/server-validation"
-import apiRoute from "@/src/enums/api-route"
-import method from "@/src/enums/http-method"
+import prisma from "@/lib/prisma"
+import { protectedRoute } from "@/lib/auth"
+import { makeRequest, showModal, updateGroupDataForPage } from "@/lib/utils"
+import { recordMatch, submitMatch } from "@/lib/api"
+import clientRoute from "@/enums/client-route"
+import { validateScores } from "@/lib/server-validation"
+import apiRoute from "@/enums/api-route"
+import method from "@/enums/http-method"
 
 //store
-import userStore from "@/src/store/user"
-import headerStore from "@/src/store/header"
+import userStore from "@/store/user"
+import headerStore from "@/store/header"
 
 //next-auth
 import { authOptions } from "../../api/auth/[...nextauth]"
 import { getServerSession } from "next-auth"
 
 //types
-import type { Dispatch, SetStateAction } from "react"
 import type { apiRouteType, member, methodType, player } from "@/types"
-import type { FieldValues } from "react-hook-form"
 import type { GetServerSidePropsContext } from "next"
 
 type props = {
@@ -68,14 +73,13 @@ const RecordMatch = ({
     getValues,
     clearErrors,
     setError,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm()
   const [chosenOpponent, setChosenOpponent] = useState<member | null>(null)
   const [matchData, setMatchData] = useState({
     players: [] as player[],
     matchDate: "",
   })
-  const [scoresSubmitting, setScoresSubmitting] = useState(false)
   const [scoresSubmitted, setScoresSubmitted] = useState(
     scoresSubmissionStatus.pending
   )
@@ -120,7 +124,6 @@ const RecordMatch = ({
     apiRoute: apiRouteType,
     method: methodType
   ) => {
-    setScoresSubmitting(true)
     const userScore = parseInt(formData.userScore)
     const opponentScore = parseInt(formData.opponentScore)
     const matchDate = formData.matchDate
@@ -129,6 +132,7 @@ const RecordMatch = ({
     try {
       if (isAdmin) {
         res = await recordMatch(
+          makeRequest,
           userScore,
           opponentScore,
           matchDate,
@@ -141,6 +145,7 @@ const RecordMatch = ({
         )
       } else {
         res = await submitMatch(
+          makeRequest,
           userScore,
           opponentScore,
           matchDate,
@@ -156,8 +161,6 @@ const RecordMatch = ({
       else setScoresSubmitted(scoresSubmissionStatus.failed)
     } catch (error) {
       console.log(error)
-    } finally {
-      setScoresSubmitting(false)
     }
   }
 
@@ -185,7 +188,7 @@ const RecordMatch = ({
               ? matchData
               : null
           }
-          loading={scoresSubmitting}
+          loading={isSubmitting}
           onClick={handleSubmit(
             async formData =>
               await handleSubmitScores(
@@ -247,7 +250,7 @@ const RecordMatch = ({
                     ],
                     matchDate: getValues().matchDate,
                   })
-                  document.getElementById("modal").showModal()
+                  showModal()
                 })}>
                 <div className="flex flex-col gap-2 items-center">
                   <label className="capitalize text-xl" htmlFor="date">
@@ -308,7 +311,7 @@ const RecordMatch = ({
 
                 {errors.invalidScores && (
                   <p className="text-error text-center">
-                    {errors.invalidScores.message}
+                    {errors.invalidScores.message as ReactNode}
                   </p>
                 )}
 

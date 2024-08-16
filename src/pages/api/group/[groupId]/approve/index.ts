@@ -4,9 +4,9 @@ import {
   isAdmin,
   isMaxGroupMembers,
   isMaxUserGroups,
-} from "@/src/lib/server-validation"
-import prisma from "@/src/lib/prisma"
-import method from "@/src/enums/http-method"
+} from "@/lib/server-validation"
+import prisma from "@/lib/prisma"
+import method from "@/enums/http-method"
 
 //types
 import type { NextApiRequest, NextApiResponse } from "next"

@@ -1,11 +1,11 @@
 //react
 import { useEffect, useState } from "react"
-import { useRouter } from "next/router"
 
 //lib
-import { groupRequest } from "@/src/lib/api"
-import apiRoute from "@/src/enums/api-route"
-import method from "@/src/enums/http-method"
+import { groupRequest } from "@/lib/api"
+import apiRoute from "@/enums/api-route"
+import method from "@/enums/http-method"
+import { makeRequest } from "@/lib/utils"
 
 //types
 import type { Dispatch, SetStateAction } from "react"
@@ -80,6 +80,7 @@ const GroupQueryItem = ({
     try {
       setSubmmiting(true)
       const res: Awaited<Response> = await groupRequest(
+        makeRequest,
         userId,
         groupId,
         apiRoute,

@@ -1,13 +1,13 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "../auth/[...nextauth]"
-import prisma from "@/src/lib/prisma"
-import resend, { resendType } from "@/src/lib/resend"
+import prisma from "@/lib/prisma"
+import resend, { resendType } from "@/lib/resend"
 import {
   generateToken,
   hashPassword,
   sendEmailVerificationToken,
-} from "@/src/lib/auth"
-import method from "@/src/enums/http-method"
+} from "@/lib/auth"
+import method from "@/enums/http-method"
 import { compare, hash } from "bcryptjs"
 import { v4 as uuid } from "uuid"
 import {
@@ -17,9 +17,9 @@ import {
   validatePassword,
   validateUsername,
   verifyPassword,
-} from "@/src/lib/server-validation"
-import pattern from "@/src/lib/field-validation"
-import obscenity from "@/src/lib/obscenity-matcher"
+} from "@/lib/server-validation"
+import pattern from "@/lib/field-validation"
+import obscenity from "@/lib/obscenity-matcher"
 
 import type { NextApiRequest, NextApiResponse } from "next"
 

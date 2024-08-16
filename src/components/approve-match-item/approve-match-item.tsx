@@ -8,13 +8,15 @@ import { useState } from "react"
 //next
 
 //lib
-import { recordMatch, removeMatchSubmission } from "@/src/lib/api"
-import apiRoute from "@/src/enums/api-route"
-import method from "@/src/enums/http-method"
+import { recordMatch, removeMatchSubmission } from "@/lib/api"
+import apiRoute from "@/enums/api-route"
+import method from "@/enums/http-method"
+import { makeRequest } from "@/lib/utils"
 
 //types
 import type {
   apiRouteType,
+  makeRequestType,
   matchSubmission,
   methodType,
   recordMatchType,
@@ -30,6 +32,7 @@ const ApproveMatchItem = ({ matchSubmission, adminUserId }: props) => {
   const [submitted, setSubmitted] = useState(false)
 
   const handleApproveMatch = async (
+    makeRequest: makeRequestType,
     recordMatch: recordMatchType,
     matchSubmission: matchSubmission,
     apiRoute: apiRouteType,
@@ -45,6 +48,7 @@ const ApproveMatchItem = ({ matchSubmission, adminUserId }: props) => {
       id, //matchId
     } = matchSubmission
     const res: Awaited<Response> = await recordMatch(
+      makeRequest,
       userScore,
       opponentScore,
       matchDate,
@@ -61,6 +65,7 @@ const ApproveMatchItem = ({ matchSubmission, adminUserId }: props) => {
   }
 
   const handleDeclineMatch = async (
+    makeRequest: makeRequestType,
     removeMatchSubmission: removeMatchSubmissionType,
     matchId: number,
     groupId: number,
@@ -68,6 +73,7 @@ const ApproveMatchItem = ({ matchSubmission, adminUserId }: props) => {
     method: methodType
   ) => {
     const res: Awaited<Response> = await removeMatchSubmission(
+      makeRequest,
       matchId,
       groupId,
       apiRoute,
@@ -112,6 +118,7 @@ const ApproveMatchItem = ({ matchSubmission, adminUserId }: props) => {
           className="p-2 rounded-full bg-red-700/70 hover:bg-red-600/70 cursor-pointer"
           onClick={() =>
             handleDeclineMatch(
+              makeRequest,
               removeMatchSubmission,
               matchSubmission.id,
               matchSubmission.groupId,
@@ -124,7 +131,13 @@ const ApproveMatchItem = ({ matchSubmission, adminUserId }: props) => {
         <div
           className="p-2 rounded-full bg-green-700/70 hover:bg-green-600/70 cursor-pointer"
           onClick={() =>
-            handleApproveMatch(recordMatch, matchSubmission, apiRoute, method)
+            handleApproveMatch(
+              makeRequest,
+              recordMatch,
+              matchSubmission,
+              apiRoute,
+              method
+            )
           }>
           <Tick />
         </div>

@@ -1,6 +1,6 @@
 //components
-import MemberList from "@/src/components/member-list/member-list"
-import ServerMessage from "@/src/components/server-message/server-message"
+import MemberList from "@/components/member-list/member-list"
+import ServerMessage from "@/components/server-message/server-message"
 
 //react
 import { useEffect } from "react"
@@ -9,20 +9,20 @@ import { useEffect } from "react"
 import { useRouter } from "next/router"
 
 //lib
-import prisma from "@/src/lib/prisma"
-import { adminRoute, notAdmin, protectedRoute } from "@/src/lib/auth"
-import clientRoute from "@/src/enums/client-route"
-import memberListItemType from "@/src/enums/member-list-item-types"
+import prisma from "@/lib/prisma"
+import { adminRoute, notAdmin, protectedRoute } from "@/lib/auth"
+import clientRoute from "@/enums/client-route"
+import memberListItemType from "@/enums/member-list-item-types"
 
 //store
-import userStore from "@/src/store/user"
-import headerStore from "@/src/store/header"
+import userStore from "@/store/user"
+import headerStore from "@/store/header"
 
 //next-auth
 import { getServerSession } from "next-auth"
 import { authOptions } from "../../api/auth/[...nextauth]"
 
-import { updateGroupDataForPage } from "@/src/lib/utils"
+import { updateGroupDataForPage } from "@/lib/utils"
 
 //types
 import type { member } from "@/types"

@@ -13,7 +13,7 @@ import {
   validateScores,
   validateUsername,
   verifyPassword,
-} from "@/src/lib/server-validation"
+} from "@/lib/server-validation"
 import { compare } from "bcryptjs"
 import pattern from "./__mocks__/field-validation"
 import obscenity from "./__mocks__/obscenity-matcher"
@@ -321,7 +321,6 @@ describe("lib/server-validation", () => {
   describe("getAdminCount()", () => {
     it("returns admin count", async () => {
       prisma.group.findUnique.mockResolvedValueOnce({ _count: { stats: 3 } })
-
       expect(await getAdminCount(groupId, prisma)).toBe(3)
     })
   })

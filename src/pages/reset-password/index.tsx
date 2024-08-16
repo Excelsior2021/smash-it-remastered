@@ -1,32 +1,38 @@
 //components
-import Input from "@/src/components/input/input"
-import Toggle from "@/src/components/toggle/toggle"
-import Modal from "@/src/components/modal/modal"
-import LinkButton from "@/src/components/link-button/link-button"
+import Input from "@/components/input/input"
+import Toggle from "@/components/toggle/toggle"
+import Modal from "@/components/modal/modal"
+import LinkButton from "@/components/link-button/link-button"
 
 //react
-import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { useState, type ReactNode } from "react"
+import { useForm, type FieldValues } from "react-hook-form"
 
 //next
 import { useRouter } from "next/router"
 
 //lib
-import { authRedirect } from "@/src/lib/auth"
-import clientRoute from "@/src/enums/client-route"
-import { changePasswordFormFields } from "@/src/lib/form-fields"
-import prisma from "@/src/lib/prisma"
-import { resetPassword } from "@/src/lib/api"
-import apiRoute from "@/src/enums/api-route"
-import method from "@/src/enums/http-method"
+import { authRedirect } from "@/lib/auth"
+import clientRoute from "@/enums/client-route"
+import { changePasswordFormFields } from "@/lib/form-fields"
+import prisma from "@/lib/prisma"
+import { resetPassword } from "@/lib/api"
+import apiRoute from "@/enums/api-route"
+import method from "@/enums/http-method"
+import { makeRequest, showModal } from "@/lib/utils"
 
 //next-auth
 import { getServerSession } from "next-auth"
 import { authOptions } from "../api/auth/[...nextauth]"
 
 //types
-import type { FieldValues } from "react-hook-form"
-import type { apiRouteType, methodType, resetPasswordType } from "@/types"
+import type {
+  apiRouteType,
+  makeRequestType,
+  methodType,
+  resetPasswordType,
+  showModalType,
+} from "@/types"
 import type { GetServerSidePropsContext } from "next"
 
 type props = {
@@ -40,29 +46,33 @@ const ResetPassword = ({ token, invalid }: props) => {
     handleSubmit,
     watch,
     clearErrors,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm()
-  const [submitting, setSubmitting] = useState(false)
   const [showPasswords, setShowPasswords] = useState(false)
   const router = useRouter()
 
   let newPassword: string
 
   const handleResetPassword = async (
+    makeRequest: makeRequestType,
     resetPassword: resetPasswordType,
+    showModal: showModalType,
     formData: FieldValues,
     token: string,
     apiRoute: apiRouteType,
     method: methodType
   ) => {
-    setSubmitting(true)
     try {
-      const res = await resetPassword(formData, token, apiRoute, method)
-      if (res && res.ok) document.getElementById("modal").showModal()
+      const res = await resetPassword(
+        makeRequest,
+        formData,
+        token,
+        apiRoute,
+        method
+      )
+      if (res && res.ok) showModal()
     } catch (error) {
       console.log(error)
-    } finally {
-      setSubmitting(false)
     }
   }
 
@@ -82,7 +92,9 @@ const ResetPassword = ({ token, invalid }: props) => {
           className="flex flex-col gap-10 max-w-[500px] m-auto"
           onSubmit={handleSubmit(async formData =>
             handleResetPassword(
+              makeRequest,
               resetPassword,
+              showModal,
               formData,
               token,
               apiRoute,
@@ -109,10 +121,12 @@ const ResetPassword = ({ token, invalid }: props) => {
                   className="input text-black w-full"
                   info={field.info}
                   onChange={() => clearErrors(field.name)}
-                  disabled={submitting}
+                  disabled={isSubmitting}
                 />
                 {errors[field.name] && (
-                  <p className="text-error">{errors[field.name].message}</p>
+                  <p className="text-error">
+                    {errors[field.name]?.message as ReactNode}
+                  </p>
                 )}
               </div>
             )
@@ -123,8 +137,8 @@ const ResetPassword = ({ token, invalid }: props) => {
             onChange={() => setShowPasswords(prev => !prev)}
           />
 
-          <button className="btn btn-secondary" disabled={submitting}>
-            {submitting ? (
+          <button className="btn btn-secondary" disabled={isSubmitting}>
+            {isSubmitting ? (
               <span className="loading loading-bars loading-sm"></span>
             ) : (
               "submit"

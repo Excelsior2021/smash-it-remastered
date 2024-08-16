@@ -1,25 +1,26 @@
 //components
-import Modal from "@/src/components/modal/modal"
-import Input from "@/src/components/input/input"
-import Edit from "@/src/components/svg/edit"
+import Modal from "@/components/modal/modal"
+import Input from "@/components/input/input"
+import Edit from "@/components/svg/edit"
 
 //react
-import { ReactNode, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, type ReactNode } from "react"
 import { useForm } from "react-hook-form"
 
 //next
 import { useRouter } from "next/router"
 
 //lib
-import prisma from "@/src/lib/prisma"
-import clientRoute from "@/src/enums/client-route"
-import { protectedRoute } from "@/src/lib/auth"
-import apiRoute from "@/src/enums/api-route"
-import method from "@/src/enums/http-method"
-import { changeAccountDetail } from "@/src/lib/api"
+import prisma from "@/lib/prisma"
+import clientRoute from "@/enums/client-route"
+import { protectedRoute } from "@/lib/auth"
+import apiRoute from "@/enums/api-route"
+import method from "@/enums/http-method"
+import { changeAccountDetail } from "@/lib/api"
+import { makeRequest, showModal } from "@/lib/utils"
 
 //store
-import headerStore from "@/src/store/header"
+import headerStore from "@/store/header"
 
 //next-auth
 import { getServerSession } from "next-auth"
@@ -27,7 +28,12 @@ import { authOptions } from "../api/auth/[...nextauth]"
 import { useSession } from "next-auth/react"
 
 //types
-import type { apiRouteType, changeAccountDetailType, methodType } from "@/types"
+import type {
+  apiRouteType,
+  apiRequestType,
+  methodType,
+  makeRequestType,
+} from "@/types"
 import type { FieldValues } from "react-hook-form"
 import type { GetServerSidePropsContext } from "next"
 import type { MouseEventHandler } from "react"
@@ -63,11 +69,10 @@ const AccountDetails = ({ fields }: props) => {
     reset,
     setError,
     clearErrors,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm()
   const [accountFieldsModalData, setAccountFieldsModalData] =
     useState<accountFieldsModalDataType | null>(null)
-  const [submitting, setSubmmiting] = useState(false)
   const [submission, setSubmission] = useState(submissionStatus.pending)
   const [serverError, setServerError] = useState(false)
   const formRef = useRef(null)
@@ -81,13 +86,19 @@ const AccountDetails = ({ fields }: props) => {
   }, [setBackRoute, clearBackRoute])
 
   const handleChangeAccountDetail = async (
-    changeAccountDetail: changeAccountDetailType,
+    makeRequest: makeRequestType,
+    changeAccountDetail: apiRequestType,
     formData: FieldValues,
     apiRoute: apiRouteType,
     method: methodType
   ) => {
     try {
-      const res = await changeAccountDetail(formData, apiRoute, method)
+      const res = await changeAccountDetail(
+        makeRequest,
+        formData,
+        apiRoute,
+        method
+      )
 
       if (res && res.ok) {
         router.replace(router.asPath)
@@ -105,8 +116,6 @@ const AccountDetails = ({ fields }: props) => {
       }
     } catch (error) {
       console.log(error)
-    } finally {
-      setSubmmiting(false)
     }
   }
 
@@ -130,7 +139,7 @@ const AccountDetails = ({ fields }: props) => {
           }
           errors={serverError ? errors : null}
           action={submission === submissionStatus.pending ? "submit" : null}
-          loading={submitting}
+          loading={isSubmitting}
           onClick={accountFieldsModalData.onClick}
           onClickClose={accountFieldsModalData.onClickClose}
         />
@@ -151,8 +160,8 @@ const AccountDetails = ({ fields }: props) => {
                     input: (
                       <form
                         onSubmit={handleSubmit(async formData => {
-                          setSubmmiting(true)
                           await handleChangeAccountDetail(
+                            makeRequest,
                             changeAccountDetail,
                             formData,
                             apiRoute,
@@ -184,7 +193,7 @@ const AccountDetails = ({ fields }: props) => {
                       setSubmission(submissionStatus.pending)
                     },
                   })
-                  setTimeout(() => document.getElementById("modal").showModal())
+                  setTimeout(() => showModal())
                 }}>
                 <Edit className="size-8" />
               </div>

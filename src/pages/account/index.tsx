@@ -1,15 +1,15 @@
 //components
-import LinkButton from "@/src/components/link-button/link-button"
+import LinkButton from "@/components/link-button/link-button"
 
 //react
 import { useEffect } from "react"
 
 //lib
-import { protectedRoute } from "@/src/lib/auth"
-import clientRoute from "@/src/enums/client-route"
+import { protectedRoute } from "@/lib/auth"
+import clientRoute from "@/enums/client-route"
 
 //store
-import navStore from "@/src/store/nav"
+import navStore from "@/store/nav"
 
 //next-auth
 import { signOut } from "next-auth/react"

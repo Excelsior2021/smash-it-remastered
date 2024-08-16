@@ -1,5 +1,5 @@
 //components
-import LinkButton from "@/src/components/link-button/link-button"
+import LinkButton from "@/components/link-button/link-button"
 
 //react
 import { useEffect } from "react"
@@ -8,15 +8,15 @@ import { useEffect } from "react"
 import { useRouter } from "next/router"
 
 //lib
-import { adminRoute, notAdmin, protectedRoute } from "@/src/lib/auth"
-import prisma from "@/src/lib/prisma"
-import clientRoute from "@/src/enums/client-route"
-import { updateGroupDataForPage } from "@/src/lib/utils"
+import { adminRoute, notAdmin, protectedRoute } from "@/lib/auth"
+import prisma from "@/lib/prisma"
+import clientRoute from "@/enums/client-route"
+import { updateGroupDataForPage } from "@/lib/utils"
 
 //store
-import headerStore from "@/src/store/header"
-import navStore from "@/src/store/nav"
-import userStore from "@/src/store/user"
+import headerStore from "@/store/header"
+import navStore from "@/store/nav"
+import userStore from "@/store/user"
 
 //next-auth
 import { getServerSession } from "next-auth"

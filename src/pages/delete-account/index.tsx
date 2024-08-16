@@ -1,19 +1,19 @@
 //components
-import Modal from "@/src/components/modal/modal"
+import Modal from "@/components/modal/modal"
 
 //react
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 
 //lib
-import { deleteAccount } from "@/src/lib/api"
-import clientRoute from "@/src/enums/client-route"
-import apiRoute from "@/src/enums/api-route"
-import method from "@/src/enums/http-method"
-import { protectedRoute } from "@/src/lib/auth"
+import { deleteAccount } from "@/lib/api"
+import clientRoute from "@/enums/client-route"
+import apiRoute from "@/enums/api-route"
+import method from "@/enums/http-method"
+import { protectedRoute } from "@/lib/auth"
 
 //store
-import headerStore from "@/src/store/header"
+import headerStore from "@/store/header"
 
 //next-auth
 import { signOut } from "next-auth/react"
@@ -22,8 +22,15 @@ import { getServerSession } from "next-auth"
 
 //types
 import type { FieldValues } from "react-hook-form"
-import type { apiRouteType, methodType, noBodyApiType } from "@/types"
+import type {
+  apiRouteType,
+  deleteAccountType,
+  makeRequestType,
+  methodType,
+  showModalType,
+} from "@/types"
 import { GetServerSidePropsContext } from "next"
+import { makeRequest, showModal } from "@/lib/utils"
 
 const DeleteAccount = () => {
   const {
@@ -31,7 +38,7 @@ const DeleteAccount = () => {
     handleSubmit,
     setError,
     clearErrors,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm()
   const setBackRoute = headerStore(state => state.setBackRoute)
   const clearBackRoute = headerStore(state => state.clearBackRoute)
@@ -43,13 +50,15 @@ const DeleteAccount = () => {
   }, [setBackRoute, clearBackRoute])
 
   const handleDeleteAccount = async (
-    deleteAccount: noBodyApiType,
+    makeRequest: makeRequestType,
+    deleteAccount: deleteAccountType,
+    showModal: showModalType,
     { deleteInput }: FieldValues,
     apiRoute: apiRouteType,
     method: methodType
   ) => {
     if (deleteInput === "delete") {
-      const res = await deleteAccount(apiRoute, method)
+      const res = await deleteAccount(makeRequest, apiRoute, method)
 
       if (res && res.ok) {
         await signOut()
@@ -58,7 +67,7 @@ const DeleteAccount = () => {
       if (res && res.status === 409) {
         const data = await res.json()
         setGroups(data.needsAdmin)
-        document.getElementById("modal").showModal()
+        showModal()
       }
     } else {
       setError("delete", {
@@ -84,7 +93,14 @@ const DeleteAccount = () => {
       <form
         className="flex flex-col items-center gap-6 w-full max-w-60 m-auto"
         onSubmit={handleSubmit(async formData =>
-          handleDeleteAccount(deleteAccount, formData, apiRoute, method)
+          handleDeleteAccount(
+            makeRequest,
+            deleteAccount,
+            showModal,
+            formData,
+            apiRoute,
+            method
+          )
         )}>
         <label className="hidden" htmlFor="deleteAccount">
           delete account
@@ -100,7 +116,9 @@ const DeleteAccount = () => {
             <p className="text-error">{errors.delete.message}</p>
           )}
         </div>
-        <button className="btn w-full bg-[#a9353ff1] hover:bg-[#832931f1] border-0">
+        <button
+          disabled={isSubmitting}
+          className="btn w-full bg-[#a9353ff1] hover:bg-[#832931f1] border-0">
           delete account
         </button>
       </form>

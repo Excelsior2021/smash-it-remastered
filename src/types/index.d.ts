@@ -1,6 +1,6 @@
-import type apiRoute from "@/src/enums/api-route"
-import type clientRoute from "@/src/enums/client-route"
-import type method from "@/src/enums/http-method"
+import type apiRoute from "@/enums/api-route"
+import type clientRoute from "@/enums/client-route"
+import type method from "@/enums/http-method"
 import type { v4 } from "uuid"
 
 export type navItems = {
@@ -200,8 +200,11 @@ export type getServerSession = <
 
 export type uuidType = typeof v4
 
+export type showModalType = () => void
+
 //api handlers
 export type userGroupApiType = (
+  makeRequest: makeRequestType,
   userId: number,
   groupId: number,
   apiRoute: apiRouteType,
@@ -209,6 +212,7 @@ export type userGroupApiType = (
 ) => Promise<apiResponse>
 
 export type recordMatchType = (
+  makeRequest: makeRequestType,
   userScore: number,
   opponentScore: number,
   matchDate: string,
@@ -222,28 +226,46 @@ export type recordMatchType = (
 ) => Promise<apiResponse>
 
 export type removeMatchSubmissionType = (
+  makeRequest: makeRequestType,
   matchId: number,
   groupId: number,
   apiRoute: apiRouteType,
   method: methodType
 ) => Promise<apiResponse>
 
-export type getUserGroupsType = (apiRoute: apiRouteType) => Promise<apiResponse>
+export type getUserGroupsType = (
+  makeRequest: makeRequestType,
+  apiRoute: apiRouteType
+) => Promise<apiResponse>
 
-export type changeAccountDetailType = (
+export type apiRequestType = (
+  makeRequest: makeRequestType,
   field: FieldValues,
   apiRoute: apiRouteType,
   method: methodType
 ) => Promise<apiResponse>
 
-export type noBodyApiType = (
+export type deleteAccountType = (
+  makeRequest: makeRequestType,
   apiRoute: apiRouteType,
   method: methodType
 ) => Promise<apiResponse>
 
+export type verifyEmailType = (
+  makeRequest: makeRequestType,
+  apiRoute: apiRouteType
+) => Promise<apiResponse>
+
 export type resetPasswordType = (
+  makeRequest: makeRequestType,
   passwordData: FieldValues,
   token: string,
   apiRoute: apiRouteType,
   method: methodType
 ) => Promise<apiResponse>
+
+export type makeRequestType = (
+  apiRoute: string,
+  method?: string,
+  body?: any
+) => Promise<Response>

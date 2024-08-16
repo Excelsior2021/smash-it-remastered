@@ -1,7 +1,7 @@
 //components
-import Avatar from "@/src/components/avatar/avatar"
-import NoGroup from "@/src/components/no-group/no-group"
-import LinkButton from "@/src/components/link-button/link-button"
+import Avatar from "@/components/avatar/avatar"
+import NoGroup from "@/components/no-group/no-group"
+import LinkButton from "@/components/link-button/link-button"
 
 //react
 import { useEffect } from "react"
@@ -10,16 +10,16 @@ import { useEffect } from "react"
 import { useRouter } from "next/router"
 
 //lib
-import { protectedRoute } from "@/src/lib/auth"
-import clientRoute from "@/src/enums/client-route"
-import { generateDisplayName, updateGroupDataForPage } from "@/src/lib/utils"
-import prisma from "@/src/lib/prisma"
-import statKeys from "@/src/enums/stat-keys"
-import { userInGroup } from "@/src/lib/server-validation"
+import { protectedRoute } from "@/lib/auth"
+import clientRoute from "@/enums/client-route"
+import { generateDisplayName, updateGroupDataForPage } from "@/lib/utils"
+import prisma from "@/lib/prisma"
+import statKeys from "@/enums/stat-keys"
+import { userInGroup } from "@/lib/server-validation"
 
 //store
-import navStore from "@/src/store/nav"
-import userStore from "@/src/store/user"
+import navStore from "@/store/nav"
+import userStore from "@/store/user"
 
 //next-auth
 import { authOptions } from "../../api/auth/[...nextauth]"

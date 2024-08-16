@@ -1,5 +1,5 @@
 //components
-import Modal from "@/src/components/modal/modal"
+import Modal from "@/components/modal/modal"
 
 //react
 import { useState } from "react"
@@ -8,32 +8,37 @@ import { useState } from "react"
 import { useRouter } from "next/router"
 
 //lib
-import { protectedRoute } from "@/src/lib/auth"
-import clientRoute from "@/src/enums/client-route"
-import { verifyEmail } from "@/src/lib/api"
-import apiRoute from "@/src/enums/api-route"
+import { protectedRoute } from "@/lib/auth"
+import clientRoute from "@/enums/client-route"
+import { verifyEmail } from "@/lib/api"
+import apiRoute from "@/enums/api-route"
+import { makeRequest, showModal } from "@/lib/utils"
 
 //next-auth
 import { getServerSession } from "next-auth"
 import { authOptions } from "../api/auth/[...nextauth]"
 
 //types
+import type { makeRequestType, showModalType, verifyEmailType } from "@/types"
 import type { GetServerSidePropsContext } from "next"
-import type { noBodyApiType } from "@/types"
 
 const EmailVerification = () => {
   const [error, setError] = useState(null)
   const router = useRouter()
 
-  const handleVerifyEmail = async (verifyEmail: noBodyApiType) => {
-    const res = await verifyEmail(apiRoute)
+  const handleVerifyEmail = async (
+    makeRequest: makeRequestType,
+    verifyEmail: verifyEmailType,
+    showModal: showModalType
+  ) => {
+    const res = await verifyEmail(makeRequest, apiRoute)
 
     if (res && !res.ok) {
       const data = await res.json()
       setError(data.error)
     }
 
-    if (res && res.ok) document.getElementById("modal").showModal()
+    if (res && res.ok) showModal()
   }
 
   return (
@@ -49,7 +54,7 @@ const EmailVerification = () => {
       </p>
       <button
         className="btn btn-secondary text-lg capitalize block m-auto mt-16"
-        onClick={() => handleVerifyEmail(verifyEmail)}>
+        onClick={() => handleVerifyEmail(makeRequest, verifyEmail, showModal)}>
         verify email
       </button>
       {error && <p className="text-error text-center my-6">{error}</p>}

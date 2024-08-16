@@ -1,25 +1,30 @@
 //components
-import Input from "@/src/components/input/input"
-import EmailUnverifiedMessage from "@/src/components/email-unverified-message/email-unverified-message"
+import Input from "@/components/input/input"
+import EmailUnverifiedMessage from "@/components/email-unverified-message/email-unverified-message"
 
 //react
 import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
+import {
+  useForm,
+  type FieldValues,
+  type UseFormSetError,
+} from "react-hook-form"
 
 //next
-import { useRouter } from "next/router"
+import { useRouter, type NextRouter } from "next/router"
 
 //lib
-import { createGroup } from "@/src/lib/api"
-import clientRoute from "@/src/enums/client-route"
-import { protectedRoute } from "@/src/lib/auth"
-import apiRoute from "@/src/enums/api-route"
-import method from "@/src/enums/http-method"
-import pattern from "@/src/lib/field-validation"
+import { createGroup } from "@/lib/api"
+import clientRoute from "@/enums/client-route"
+import { protectedRoute } from "@/lib/auth"
+import apiRoute from "@/enums/api-route"
+import method from "@/enums/http-method"
+import pattern from "@/lib/field-validation"
+import { makeRequest } from "@/lib/utils"
 
 //store
-import headerStore from "@/src/store/header"
-import userStore from "@/src/store/user"
+import headerStore from "@/store/header"
+import userStore from "@/store/user"
 
 //next-auth
 import { authOptions } from "../api/auth/[...nextauth]"
@@ -30,10 +35,8 @@ import type {
   clientRouteType,
   apiRouteType,
   methodType,
-  changeAccountDetailType,
+  apiRequestType,
 } from "@/types"
-import type { NextRouter } from "next/router"
-import type { FieldValues, UseFormSetError } from "react-hook-form"
 import type { GetServerSidePropsContext } from "next"
 
 type props = {
@@ -46,7 +49,7 @@ const CreateGroup = ({ emailUnverified }: props) => {
     handleSubmit,
     setError,
     clearErrors,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm()
 
   const router = useRouter()
@@ -55,10 +58,9 @@ const CreateGroup = ({ emailUnverified }: props) => {
   const setActiveGroup = userStore(state => state.setActiveGroup)
   const setBackRoute = headerStore(state => state.setBackRoute)
   const clearBackRoute = headerStore(state => state.clearBackRoute)
-  const [submitting, setSubmitting] = useState(false)
 
   const handleCreateGroup = async (
-    createGroup: changeAccountDetailType,
+    createGroup: apiRequestType,
     formData: FieldValues,
     setError: UseFormSetError<FieldValues>,
     router: NextRouter,
@@ -66,7 +68,6 @@ const CreateGroup = ({ emailUnverified }: props) => {
     apiRoute: apiRouteType,
     method: methodType
   ) => {
-    setSubmitting(true)
     try {
       if (userGroups.length >= 3) {
         setError("maxGroupCount", {
@@ -77,6 +78,7 @@ const CreateGroup = ({ emailUnverified }: props) => {
       }
 
       const res: Awaited<Response> = await createGroup(
+        makeRequest,
         formData,
         apiRoute,
         method
@@ -100,8 +102,6 @@ const CreateGroup = ({ emailUnverified }: props) => {
       }
     } catch (error) {
       console.log(error)
-    } finally {
-      setSubmitting(false)
     }
   }
 
@@ -141,6 +141,7 @@ const CreateGroup = ({ emailUnverified }: props) => {
             }}
             register={register}
             onChange={() => clearErrors()}
+            disabled={isSubmitting}
           />
           {errors.groupName && (
             <p className="text-error text-center">
@@ -159,8 +160,8 @@ const CreateGroup = ({ emailUnverified }: props) => {
             </p>
           )}
         </div>
-        <button className="btn btn-secondary">
-          {submitting ? (
+        <button disabled={isSubmitting} className="btn btn-secondary">
+          {isSubmitting ? (
             <span className="loading loading-bars loading-sm"></span>
           ) : (
             "create group"

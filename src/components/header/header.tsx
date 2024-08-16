@@ -7,11 +7,11 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 
 //lib
-import clientRoute from "@/src/enums/client-route"
+import clientRoute from "@/enums/client-route"
 
 //store
-import headerStore from "@/src/store/header"
-import userStore from "@/src/store/user"
+import headerStore from "@/store/header"
+import userStore from "@/store/user"
 
 const Header = () => {
   const router = useRouter()

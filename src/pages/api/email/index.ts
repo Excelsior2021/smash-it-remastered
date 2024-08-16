@@ -2,14 +2,14 @@
 import { v4 as uuid } from "uuid"
 
 //lib
-import method from "@/src/enums/http-method"
-import prisma from "@/src/lib/prisma"
-import resend, { resendType } from "@/src/lib/resend"
+import method from "@/enums/http-method"
+import prisma from "@/lib/prisma"
+import resend, { resendType } from "@/lib/resend"
 import {
   generateToken,
   sendEmailVerificationToken,
   sendResetPasswordToken,
-} from "@/src/lib/auth"
+} from "@/lib/auth"
 
 //next-auth
 import { getServerSession } from "next-auth"

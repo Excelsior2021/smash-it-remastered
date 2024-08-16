@@ -1,7 +1,7 @@
 //components
-import FormSection from "@/src/components/form-section/form-section"
-import OauthProviders from "@/src/components/oauth-providers/oauth-providers"
-import Modal from "@/src/components/modal/modal"
+import FormSection from "@/components/form-section/form-section"
+import OauthProviders from "@/components/oauth-providers/oauth-providers"
+import Modal from "@/components/modal/modal"
 
 //react
 import { useState } from "react"
@@ -12,12 +12,13 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 
 //lib
-import { createAccount } from "@/src/lib/api"
-import { authRedirect } from "@/src/lib/auth"
-import { accountFormFields, personalFormFields } from "@/src/lib/form-fields"
-import clientRoute from "@/src/enums/client-route"
-import apiRoute from "@/src/enums/api-route"
-import method from "@/src/enums/http-method"
+import { createAccount } from "@/lib/api"
+import { authRedirect } from "@/lib/auth"
+import { accountFormFields, personalFormFields } from "@/lib/form-fields"
+import clientRoute from "@/enums/client-route"
+import apiRoute from "@/enums/api-route"
+import method from "@/enums/http-method"
+import { makeRequest, showModal } from "@/lib/utils"
 
 //next-auth
 import { authOptions } from "../api/auth/[...nextauth]"
@@ -27,9 +28,10 @@ import { getProviders, signIn } from "next-auth/react"
 //types
 import type {
   apiRouteType,
-  changeAccountDetailType,
+  apiRequestType,
   methodType,
   providers,
+  showModalType,
 } from "@/types"
 import type { GetServerSidePropsContext } from "next"
 
@@ -44,29 +46,28 @@ const CreateAccount = ({ providers }: props) => {
     trigger,
     setError,
     clearErrors,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm()
   const [accountSection, setAccountSection] = useState(false)
-  const [submitting, setSubmmiting] = useState(false)
   const router = useRouter()
 
   const handleCreateAccount = async (
-    createAccount: changeAccountDetailType,
+    createAccount: apiRequestType,
+    showModal: showModalType,
     formData: FieldValues,
     apiRoute: apiRouteType,
     method: methodType
   ) => {
-    setSubmmiting(true)
     try {
       const res: Awaited<Response> = await createAccount(
+        makeRequest,
         formData,
         apiRoute,
         method
       )
 
-      if (res.ok) {
-        document.getElementById("modal").showModal()
-      } else {
+      if (res.ok) showModal()
+      else {
         const serverErrors = await res.json()
 
         if (res.status === 500) {
@@ -90,8 +91,6 @@ const CreateAccount = ({ providers }: props) => {
       }
     } catch (error) {
       console.log(error)
-    } finally {
-      setSubmmiting(false)
     }
   }
 
@@ -105,11 +104,17 @@ const CreateAccount = ({ providers }: props) => {
         <form
           className="flex flex-col gap-6 mb-6"
           onSubmit={handleSubmit(async formData =>
-            handleCreateAccount(createAccount, formData, apiRoute, method)
+            handleCreateAccount(
+              createAccount,
+              showModal,
+              formData,
+              apiRoute,
+              method
+            )
           )}>
           <fieldset
             className={`${accountSection ? "hidden" : null}`}
-            disabled={submitting}>
+            disabled={isSubmitting}>
             <FormSection
               heading="personal details"
               fields={personalFormFields}
@@ -121,7 +126,7 @@ const CreateAccount = ({ providers }: props) => {
 
           <fieldset
             className={`${accountSection ? null : "hidden"}`}
-            disabled={submitting}>
+            disabled={isSubmitting}>
             <FormSection
               heading="account details"
               fields={accountFormFields}
@@ -148,13 +153,13 @@ const CreateAccount = ({ providers }: props) => {
               <button
                 className="btn btn-secondary sm:w-[48%]"
                 onClick={() => setAccountSection(false)}
-                disabled={submitting}>
+                disabled={isSubmitting}>
                 back
               </button>
               <button
                 className="btn btn-secondary sm:w-[48%]"
-                disabled={submitting}>
-                {submitting ? (
+                disabled={isSubmitting}>
+                {isSubmitting ? (
                   <span className="loading loading-bars loading-sm"></span>
                 ) : (
                   "create account"

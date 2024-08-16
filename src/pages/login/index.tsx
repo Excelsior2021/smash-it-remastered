@@ -1,21 +1,21 @@
 //components
-import Input from "@/src/components/input/input"
-import Toggle from "@/src/components/toggle/toggle"
-import OauthProviders from "@/src/components/oauth-providers/oauth-providers"
+import Input from "@/components/input/input"
+import Toggle from "@/components/toggle/toggle"
+import OauthProviders from "@/components/oauth-providers/oauth-providers"
 
 //react
-import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { useState, type ReactNode } from "react"
+import { useForm, type FieldValues } from "react-hook-form"
 
 //next
 import Link from "next/link"
 import { useRouter } from "next/router"
 
 //lib
-import { login } from "@/src/lib/api"
-import { authRedirect } from "@/src/lib/auth"
-import { loginFormFields } from "@/src/lib/form-fields"
-import clientRoute from "@/src/enums/client-route"
+import { login } from "@/lib/api"
+import { authRedirect } from "@/lib/auth"
+import { loginFormFields } from "@/lib/form-fields"
+import clientRoute from "@/enums/client-route"
 
 //next-auth
 import { getProviders, signIn } from "next-auth/react"
@@ -24,7 +24,6 @@ import { getServerSession } from "next-auth"
 
 //types
 import type { clientRouteType, providers, signInNextAuth } from "@/types"
-import type { FieldValues } from "react-hook-form"
 import type { GetServerSidePropsContext } from "next"
 
 type props = {
@@ -37,10 +36,9 @@ const Login = ({ providers }: props) => {
     handleSubmit,
     setError,
     clearErrors,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm()
   const router = useRouter()
-  const [submitting, setSubmmiting] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
 
   const handleLogin = async (
@@ -48,7 +46,6 @@ const Login = ({ providers }: props) => {
     formData: FieldValues,
     clientRoute: clientRouteType
   ) => {
-    setSubmmiting(true)
     try {
       const res = await login(signIn, formData, clientRoute)
 
@@ -61,8 +58,7 @@ const Login = ({ providers }: props) => {
         })
       } else router.replace(clientRoute.root)
     } catch (error) {
-    } finally {
-      setSubmmiting(false)
+      console.log(error)
     }
   }
 
@@ -88,16 +84,18 @@ const Login = ({ providers }: props) => {
                   className="input text-black w-full"
                   register={register}
                   required={field.required}
-                  disabled={submitting}
+                  disabled={isSubmitting}
                 />
                 {errors[field.name] ? (
-                  <p className="text-error">{errors[field.name]?.message}</p>
+                  <p className="text-error">
+                    {errors[field.name]?.message as ReactNode}
+                  </p>
                 ) : null}
               </div>
             )
           })}
           {errors.server ? (
-            <p className="text-error">{errors.server?.message}</p>
+            <p className="text-error">{errors.server?.message as ReactNode}</p>
           ) : null}
           <Toggle
             text="show password"
@@ -106,8 +104,8 @@ const Login = ({ providers }: props) => {
           <button
             className="btn btn-secondary sm:w-1/2 sm:self-end"
             onClick={() => clearErrors()}
-            disabled={submitting}>
-            {submitting ? (
+            disabled={isSubmitting}>
+            {isSubmitting ? (
               <span className="loading loading-bars loading-sm"></span>
             ) : (
               "login"

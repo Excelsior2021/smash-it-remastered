@@ -3,11 +3,13 @@ import {
   debounce,
   generateDisplayName,
   handleGetUserGroups,
+  makeRequest,
   updateGroupDataForPage,
-} from "@/src/lib/utils"
+} from "@/lib/utils"
 import { useRouter } from "next/router"
 import { mockDeep, mockReset } from "vitest-mock-extended"
-import apiRoute from "@/src/enums/api-route"
+import apiRoute from "@/enums/api-route"
+import method from "@/enums/http-method"
 
 describe("lib/utils", () => {
   describe("updateGroupDataForPage()", () => {
@@ -62,6 +64,7 @@ describe("lib/utils", () => {
   })
 
   describe("handleGetUserGroups()", () => {
+    const makeRequest = vi.fn()
     const getUserGroups = vi.fn()
     const setGroups = vi.fn()
     const setActiveGroup = vi.fn()
@@ -71,11 +74,17 @@ describe("lib/utils", () => {
       json: () => [{ mock: "data" }],
     })
 
-    handleGetUserGroups(getUserGroups, setGroups, setActiveGroup, apiRoute)
+    handleGetUserGroups(
+      makeRequest,
+      getUserGroups,
+      setGroups,
+      setActiveGroup,
+      apiRoute
+    )
 
     it("sets user's groups and active group", () => {
       expect(getUserGroups).toHaveBeenCalledOnce()
-      expect(getUserGroups).toHaveBeenCalledWith(apiRoute)
+      expect(getUserGroups).toHaveBeenCalledWith(makeRequest, apiRoute)
       expect(setGroups).toHaveBeenCalledOnce()
       expect(setGroups).toHaveBeenCalledWith([{ mock: "data" }])
       expect(setActiveGroup).toHaveBeenCalledOnce()
@@ -104,6 +113,34 @@ describe("lib/utils", () => {
     it("does not call the callback before 1s has passed", () => {
       vi.advanceTimersByTime(900)
       expect(cb).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("makeRequest()", () => {
+    const apiRoute = "http://api-route:3000"
+
+    beforeEach(() => {
+      global.fetch = vi.fn()
+    })
+
+    it("returns fetch function for a GET request", async () => {
+      await makeRequest(apiRoute)
+      expect(fetch).toHaveBeenCalledOnce()
+      expect(fetch).toHaveBeenCalledWith(apiRoute)
+    })
+
+    it("returns a fetch function for a non GET request", async () => {
+      const body = { data: 1 }
+      const options = {
+        method: method.post,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      }
+      await makeRequest(apiRoute, method.post, body)
+      expect(fetch).toHaveBeenCalledOnce()
+      expect(fetch).toHaveBeenCalledWith(apiRoute, options)
     })
   })
 })

@@ -5,10 +5,10 @@ import LinkButton from "../../link-button/link-button"
 import { useEffect } from "react"
 
 //lib
-import clientRoute from "@/src/enums/client-route"
+import clientRoute from "@/enums/client-route"
 
 //store
-import navStore from "@/src/store/nav"
+import navStore from "@/store/nav"
 
 //types
 import type { userGroup } from "@/types"
