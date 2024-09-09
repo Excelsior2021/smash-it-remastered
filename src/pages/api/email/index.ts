@@ -2,7 +2,7 @@
 import { v4 as uuid } from "uuid"
 
 //lib
-import method from "@/enums/http-method"
+import { method } from "@/enums"
 import prisma from "@/lib/prisma"
 import resend, { resendType } from "@/lib/resend"
 import {

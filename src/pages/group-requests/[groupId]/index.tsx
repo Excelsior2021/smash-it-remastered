@@ -12,9 +12,9 @@ import { useRouter } from "next/router"
 import prisma from "@/lib/prisma"
 
 import { adminRoute, notAdmin, protectedRoute } from "@/lib/auth"
-import memberListItemType from "@/enums/member-list-item-types"
+import { memberListItemType } from "@/enums"
 import { updateGroupDataForPage } from "@/lib/utils"
-import clientRoute from "@/enums/client-route"
+import { clientRoute } from "@/enums"
 
 //store
 import userStore from "@/store/user"
@@ -27,6 +27,7 @@ import { getServerSession } from "next-auth"
 //types
 import type { member } from "@/types"
 import type { GetServerSidePropsContext } from "next"
+import { groupRequestEffect } from "../route-lib"
 
 type props = {
   users: member[]
@@ -40,18 +41,18 @@ const GroupRequests = ({ users, groupId, serverMessage }: props) => {
   const setBackRoute = headerStore(state => state.setBackRoute)
   const clearBackRoute = headerStore(state => state.clearBackRoute)
 
-  useEffect(() => {
-    if (activeGroup) {
-      updateGroupDataForPage(
+  useEffect(
+    () =>
+      groupRequestEffect(
         activeGroup,
+        updateGroupDataForPage,
+        setBackRoute,
+        clearBackRoute,
         router,
-        router.query.groupId as string,
-        `${clientRoute.groupRequests}/${activeGroup.id}`
-      )
-      setBackRoute(`${clientRoute.manageGroup}/${activeGroup.id}`)
-    }
-    return () => clearBackRoute()
-  }, [router, activeGroup, setBackRoute, clearBackRoute])
+        clientRoute
+      ),
+    [router, activeGroup, setBackRoute, clearBackRoute]
+  )
 
   return (
     <div className="relative flex flex-col justify-center items-center">

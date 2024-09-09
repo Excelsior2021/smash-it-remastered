@@ -3,17 +3,18 @@ import GroupResults from "@/components/group-results/group-results"
 import EmailUnverifiedMessage from "@/components/email-unverified-message/email-unverified-message"
 
 //react
-import { useEffect, useState, type Dispatch, type SetStateAction } from "react"
+import { useEffect, useState } from "react"
 import { FieldValues, useForm } from "react-hook-form"
 
 //lib
+import { handleQueryGroups } from "./route-lib"
 import prisma from "@/lib/prisma"
 import { getGroupRequests, queryGroups } from "@/lib/api"
 import { protectedRoute } from "@/lib/auth"
-import clientRoute from "@/enums/client-route"
-import apiRoute from "@/enums/api-route"
-import method from "@/enums/http-method"
-import { debounce, makeRequest } from "@/lib/utils"
+import { clientRoute } from "@/enums"
+import { apiRoute } from "@/enums"
+import { method } from "@/enums"
+import { makeRequest } from "@/lib/utils"
 
 //store
 import headerStore from "@/store/header"
@@ -24,14 +25,7 @@ import { authOptions } from "../api/auth/[...nextauth]"
 import { getServerSession } from "next-auth"
 
 //types
-import type {
-  apiRouteType,
-  apiRequestType,
-  groupRequest,
-  groupResult,
-  methodType,
-  userGroup,
-} from "@/types"
+import type { groupRequest, groupResult } from "@/types"
 import type { GetServerSidePropsContext } from "next"
 
 type props = {
@@ -48,34 +42,6 @@ const JoinGroup = ({ groupRequests, emailUnverified, userId }: props) => {
   const userGroups = userStore(state => state.groups)
   const setBackRoute = headerStore(state => state.setBackRoute)
   const clearBackRoute = headerStore(state => state.clearBackRoute)
-
-  const handleQueryGroups = debounce(
-    async (
-      queryGroups: apiRequestType,
-      formData: FieldValues,
-      setGroups: Dispatch<SetStateAction<userGroup[] | null>>,
-      apiRoute: apiRouteType,
-      method: methodType
-    ) => {
-      const res: Awaited<Response> = await queryGroups(
-        makeRequest,
-        formData,
-        apiRoute,
-        method
-      )
-
-      const res2: Awaited<Response> = await getGroupRequests(
-        makeRequest,
-        apiRoute
-      )
-
-      if (res && res.ok && res2 && res2.ok) {
-        setGroups(await res.json())
-        setGroupRequestsState(await res2.json())
-      } else setGroups(null)
-    },
-    250
-  )
 
   useEffect(() => {
     setBackRoute(clientRoute.joinCreateGroup)
@@ -99,8 +65,11 @@ const JoinGroup = ({ groupRequests, emailUnverified, userId }: props) => {
             onChange={handleSubmit(async (formData: FieldValues) =>
               handleQueryGroups(
                 queryGroups,
+                makeRequest,
                 formData,
                 setGroups,
+                getGroupRequests,
+                setGroupRequestsState,
                 apiRoute,
                 method
               )

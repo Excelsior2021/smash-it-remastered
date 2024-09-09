@@ -3,7 +3,7 @@ import { useEffect } from "react"
 
 //lib
 import { getUserGroups } from "@/lib/api"
-import apiRoute from "@/enums/api-route"
+import { apiRoute } from "@/enums"
 import { handleGetUserGroups, makeRequest } from "@/lib/utils"
 
 //store

@@ -6,7 +6,7 @@ import {
   notAdmin,
   protectedRoute,
 } from "@/lib/auth"
-import clientRoute from "@/enums/client-route"
+import { clientRoute } from "@/enums"
 import prisma from "./__mocks__/prisma"
 
 describe("lib/auth", () => {

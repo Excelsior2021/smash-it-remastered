@@ -2,14 +2,14 @@
 import MemberListItem from "../member-list-item/member-list-item"
 
 //types
-import type { member, opponentData } from "@/types"
-import type memberListItemType from "@/enums/member-list-item-types"
+import type { member, opponentDataType } from "@/types"
+import type { memberListItemType } from "@/enums"
 
 type props = {
   heading?: string
   members: member[]
   groupId: number
-  itemOnClick?: (() => void) | ((opponentData: opponentData) => void) | null
+  itemOnClick?: (() => void) | ((opponentData: opponentDataType) => void) | null
   type?: memberListItemType
   className?: string
 }

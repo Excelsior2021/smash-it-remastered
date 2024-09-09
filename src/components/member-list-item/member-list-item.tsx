@@ -13,7 +13,7 @@ import { useCallback, useState, type MouseEvent } from "react"
 import { useRouter } from "next/router"
 
 //lib
-import memberListItemType from "@/enums/member-list-item-types"
+import { handleActionCallback } from "./component-lib"
 import { generateDisplayName, makeRequest, showModal } from "@/lib/utils"
 import {
   approveUserToGroup,
@@ -21,25 +21,15 @@ import {
   makeUserAdminOfGroup,
   removeUserFromGroup,
 } from "@/lib/api"
-import clientRoute from "@/enums/client-route"
-import apiRoute from "@/enums/api-route"
-import method from "@/enums/http-method"
+import { clientRoute, apiRoute, method, memberListItemType } from "@/enums"
 
 //types
-import type {
-  apiRouteType,
-  makeRequestType,
-  member,
-  methodType,
-  opponentData,
-  showModalType,
-  userGroupApiType,
-} from "@/types"
+import type { member, opponentDataType } from "@/types"
 
 type props = {
   member: member
   groupId: number
-  onClick?: (() => void) | ((opponentData: opponentData) => void) | null
+  onClick?: (() => void) | ((opponentData: opponentDataType) => void) | null
   type?: memberListItemType
   className?: string
 }
@@ -55,38 +45,7 @@ const MemberListItem = ({
   const [actionSuccess, setActionSuccess] = useState(false)
   const [showMemberModal, setShowMemberModal] = useState(false)
   const router = useRouter()
-
-  const handleAction = useCallback(
-    async (
-      makeRequest: makeRequestType,
-      action: userGroupApiType,
-      showModal: showModalType,
-      userId: number,
-      groupId: number,
-      apiRoute: apiRouteType,
-      method: methodType
-    ) => {
-      try {
-        setLoading(true)
-        const res: Awaited<Response> = await action(
-          makeRequest,
-          userId,
-          groupId,
-          apiRoute,
-          method
-        )
-
-        if (res.ok) setActionSuccess(true)
-        if (res.status === 409) setTimeout(() => showModal(), 100)
-      } catch (error) {
-        console.log(error)
-      } finally {
-        setLoading(false)
-        setShowMemberModal(false)
-      }
-    },
-    []
-  )
+  const handleAction = useCallback(handleActionCallback, [])
 
   return (
     <li
@@ -136,6 +95,9 @@ const MemberListItem = ({
                         makeRequest,
                         removeUserFromGroup,
                         showModal,
+                        setLoading,
+                        setActionSuccess,
+                        setShowMemberModal,
                         member.id,
                         groupId,
                         apiRoute,
@@ -171,6 +133,9 @@ const MemberListItem = ({
                       makeRequest,
                       approveUserToGroup,
                       showModal,
+                      setLoading,
+                      setActionSuccess,
+                      setShowMemberModal,
                       member.id,
                       groupId,
                       apiRoute,
@@ -186,6 +151,9 @@ const MemberListItem = ({
                       makeRequest,
                       declineUserToGroup,
                       showModal,
+                      setLoading,
+                      setActionSuccess,
+                      setShowMemberModal,
                       member.id,
                       groupId,
                       apiRoute,
@@ -207,6 +175,9 @@ const MemberListItem = ({
                         makeRequest,
                         makeUserAdminOfGroup,
                         showModal,
+                        setLoading,
+                        setActionSuccess,
+                        setShowMemberModal,
                         member.id,
                         groupId,
                         apiRoute,

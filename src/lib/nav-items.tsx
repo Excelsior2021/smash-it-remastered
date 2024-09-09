@@ -1,4 +1,4 @@
-import clientRoute from "../enums/client-route"
+import { clientRoute } from "@/enums"
 
 const navItems = [
   {

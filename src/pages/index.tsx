@@ -1,11 +1,11 @@
 //components
-import LandingPage from "../components/pages/landing/landing"
-import DashboardPage from "../components/pages/dashboard/dashboard"
+import LandingPage from "@/components/routes/landing/landing"
+import DashboardPage from "@/components/routes/dashboard/dashboard"
 
 //lib
-import { protectedRoute } from "../lib/auth"
-import clientRoute from "../enums/client-route"
-import prisma from "../lib/prisma"
+import { protectedRoute } from "@/lib/auth"
+import { clientRoute } from "@/enums"
+import prisma from "@/lib/prisma"
 
 //next-auth
 import { authOptions } from "./api/auth/[...nextauth]"

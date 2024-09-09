@@ -3,7 +3,7 @@ import Input from "../input/input"
 import Toggle from "../toggle/toggle"
 
 //react
-import { useState } from "react"
+import { useState, type ReactNode } from "react"
 
 //types
 import type { formField } from "@/types"
@@ -53,14 +53,16 @@ const FormSection = ({
             />
             {errors[field.name] && (
               <>
-                {Array.isArray(errors[field.name].message) ? (
+                {Array.isArray(errors[field.name]?.message) ? (
                   errors[field.name].message.map((message, i) => (
                     <p key={i} className="text-error">
                       {message}
                     </p>
                   ))
                 ) : (
-                  <p className="text-error">{errors[field.name].message}</p>
+                  <p className="text-error">
+                    {errors[field.name]?.message as ReactNode}
+                  </p>
                 )}
               </>
             )}
@@ -76,7 +78,9 @@ const FormSection = ({
       {Object.keys(errors).length > 0 && (
         <p className="text-error">please check all sections for errors.</p>
       )}
-      {errors.server && <p className="text-error">{errors.server.message}</p>}
+      {errors.server && (
+        <p className="text-error">{errors.server.message as ReactNode}</p>
+      )}
     </div>
   )
 }

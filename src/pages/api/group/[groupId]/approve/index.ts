@@ -6,7 +6,7 @@ import {
   isMaxUserGroups,
 } from "@/lib/server-validation"
 import prisma from "@/lib/prisma"
-import method from "@/enums/http-method"
+import { method } from "@/enums"
 
 //types
 import type { NextApiRequest, NextApiResponse } from "next"

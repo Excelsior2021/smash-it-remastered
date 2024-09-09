@@ -2,7 +2,7 @@
 import { useRouter } from "next/router"
 
 //lib
-import clientRoute from "@/enums/client-route"
+import { clientRoute } from "@/enums"
 
 //types
 import type { match, profileUser } from "@/types"

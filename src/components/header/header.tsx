@@ -7,7 +7,7 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 
 //lib
-import clientRoute from "@/enums/client-route"
+import { clientRoute } from "@/enums"
 
 //store
 import headerStore from "@/store/header"

@@ -8,9 +8,10 @@ import { useEffect } from "react"
 import { useRouter } from "next/router"
 
 //lib
+import { manageGroupEffect, manageGroupLinks } from "../route-lib"
 import { adminRoute, notAdmin, protectedRoute } from "@/lib/auth"
 import prisma from "@/lib/prisma"
-import clientRoute from "@/enums/client-route"
+import { clientRoute } from "@/enums"
 import { updateGroupDataForPage } from "@/lib/utils"
 
 //store
@@ -25,29 +26,6 @@ import { authOptions } from "../../api/auth/[...nextauth]"
 //types
 import type { GetServerSidePropsContext } from "next"
 
-const manageGroupLinks = [
-  {
-    key: 1,
-    hrefPrefix: clientRoute.groupRequests,
-    text: "requests",
-  },
-  {
-    key: 2,
-    hrefPrefix: clientRoute.approveMatches,
-    text: "approve matches",
-  },
-  {
-    key: 3,
-    hrefPrefix: clientRoute.addAdmin,
-    text: "add to admins",
-  },
-  {
-    key: 4,
-    hrefPrefix: clientRoute.removeMembers,
-    text: "remove members",
-  },
-]
-
 const ManageGroup = () => {
   const activeGroup = userStore(state => state.activeGroup)
   const setActiveNavItem = navStore(state => state.setActiveNavItem)
@@ -56,30 +34,27 @@ const ManageGroup = () => {
   const router = useRouter()
   const { groupId } = router.query
 
-  useEffect(() => {
-    setActiveNavItem("group")
-    if (activeGroup) {
-      updateGroupDataForPage(
+  useEffect(
+    () =>
+      manageGroupEffect(
         activeGroup,
-        router,
+        updateGroupDataForPage,
+        setActiveNavItem,
+        setBackRoute,
+        clearBackRoute,
         groupId as string,
-        `${clientRoute.manageGroup}/${activeGroup.id}`
-      )
-      setBackRoute(`${clientRoute.group}/${activeGroup.id}`)
-    }
-
-    return () => {
-      setActiveNavItem(null)
-      clearBackRoute()
-    }
-  }, [
-    activeGroup,
-    clearBackRoute,
-    groupId,
-    router,
-    setActiveNavItem,
-    setBackRoute,
-  ])
+        router,
+        clientRoute
+      ),
+    [
+      activeGroup,
+      clearBackRoute,
+      groupId,
+      router,
+      setActiveNavItem,
+      setBackRoute,
+    ]
+  )
 
   return (
     <div>

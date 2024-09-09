@@ -9,7 +9,7 @@ import { useEffect } from "react"
 import { useRouter } from "next/router"
 
 //lib
-import clientRoute from "@/enums/client-route"
+import { clientRoute } from "@/enums"
 import prisma from "@/lib/prisma"
 import { showModal } from "@/lib/utils"
 
@@ -31,9 +31,7 @@ const VerifyEmail = ({ message, loggedIn, emailVerified }: props) => {
   const { update } = useSession()
   const router = useRouter()
 
-  useEffect(() => {
-    showModal()
-  }, [])
+  useEffect(showModal, [])
 
   return (
     <div>

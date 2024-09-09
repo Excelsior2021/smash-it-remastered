@@ -3,7 +3,7 @@ import Input from "@/components/input/input"
 import Modal from "@/components/modal/modal"
 
 //react
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 
 //next
@@ -11,12 +11,13 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 
 //lib
+import { forgottenPasswordEffect, handleForgottenPassword } from "./route-lib"
 import { authRedirect } from "@/lib/auth"
-import clientRoute from "@/enums/client-route"
+import { clientRoute } from "@/enums"
 import pattern from "@/lib/field-validation"
 import { forgottenPassword } from "@/lib/api"
-import apiRoute from "@/enums/api-route"
-import method from "@/enums/http-method"
+import { apiRoute } from "@/enums"
+import { method } from "@/enums"
 import { makeRequest, showModal } from "@/lib/utils"
 
 //store
@@ -27,14 +28,6 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "../api/auth/[...nextauth]"
 
 //type
-import type { FieldValues } from "react-hook-form"
-import type {
-  apiRouteType,
-  apiRequestType,
-  methodType,
-  makeRequestType,
-  showModalType,
-} from "@/types"
 import type { GetServerSidePropsContext } from "next"
 
 const ForgottenPassword = () => {
@@ -49,36 +42,10 @@ const ForgottenPassword = () => {
   const clearBackRoute = headerStore(state => state.clearBackRoute)
   const router = useRouter()
 
-  useEffect(() => {
-    setBackRoute(clientRoute.login)
-    return () => clearBackRoute()
-  }, [setBackRoute, clearBackRoute])
-
-  const handleForgottenPassword = async (
-    makeRequest: makeRequestType,
-    forgottenPassword: apiRequestType,
-    showModal: showModalType,
-    { email }: FieldValues,
-    apiRoute: apiRouteType,
-    method: methodType
-  ) => {
-    try {
-      const res = await forgottenPassword(makeRequest, email, apiRoute, method)
-
-      if (res && !res.ok) {
-        const { error } = await res.json()
-        setError("server", {
-          message: error,
-          type: "server",
-        })
-        return
-      }
-
-      if (res && res.ok) showModal()
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  useEffect(
+    () => forgottenPasswordEffect(setBackRoute, clearBackRoute, clientRoute),
+    [setBackRoute, clearBackRoute]
+  )
 
   return (
     <div className="max-w-[500px] m-auto">
@@ -96,8 +63,9 @@ const ForgottenPassword = () => {
             await handleForgottenPassword(
               makeRequest,
               forgottenPassword,
-              showModal,
               formData,
+              showModal,
+              setError,
               apiRoute,
               method
             )

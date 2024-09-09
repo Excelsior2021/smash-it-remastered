@@ -2,7 +2,7 @@
 import LinkButton from "../../link-button/link-button"
 
 //lib
-import clientRoute from "@/enums/client-route"
+import { clientRoute } from "@/enums"
 
 const LandingPage = () => {
   const links = [

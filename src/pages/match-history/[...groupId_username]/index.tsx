@@ -9,8 +9,9 @@ import { useEffect } from "react"
 import { useRouter } from "next/router"
 
 //lib
+import { matchHistoryEffect } from "../route-lib"
 import { protectedRoute } from "@/lib/auth"
-import clientRoute from "@/enums/client-route"
+import { clientRoute } from "@/enums"
 import prisma from "@/lib/prisma"
 import { updateGroupDataForPage } from "@/lib/utils"
 
@@ -55,19 +56,20 @@ const MatchHistory = ({
     username = router.query.groupId_username[1]
   }
 
-  useEffect(() => {
-    if (activeGroup) {
-      updateGroupDataForPage(
+  useEffect(
+    () =>
+      matchHistoryEffect(
         activeGroup,
+        updateGroupDataForPage,
+        username,
+        groupId,
+        setBackRoute,
+        clearBackRoute,
         router,
-        groupId as string,
-        `${clientRoute.matchHistory}/${activeGroup.id}/${username}`
-      )
-      setBackRoute(`${clientRoute.profile}/${activeGroup.id}/${username}`)
-    }
-
-    return () => clearBackRoute()
-  }, [activeGroup, router, setBackRoute, clearBackRoute, groupId, username])
+        clientRoute
+      ),
+    [activeGroup, router, setBackRoute, clearBackRoute, groupId, username]
+  )
 
   return (
     <div>

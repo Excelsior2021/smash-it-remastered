@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "../auth/[...nextauth]"
 import prisma from "@/lib/prisma"
 import { isMaxUserGroups, validateGroupName } from "@/lib/server-validation"
-import method from "@/enums/http-method"
+import { method } from "@/enums"
 import obscenity from "@/lib/obscenity-matcher"
 import pattern from "@/lib/field-validation"
 

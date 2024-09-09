@@ -5,23 +5,14 @@ import XMark from "../svg/x-mark"
 //react
 import { useState } from "react"
 
-//next
-
 //lib
+import { handleApproveMatch, handleDeclineMatch } from "./component-lib"
 import { recordMatch, removeMatchSubmission } from "@/lib/api"
-import apiRoute from "@/enums/api-route"
-import method from "@/enums/http-method"
+import { apiRoute, method } from "@/enums"
 import { makeRequest } from "@/lib/utils"
 
 //types
-import type {
-  apiRouteType,
-  makeRequestType,
-  matchSubmission,
-  methodType,
-  recordMatchType,
-  removeMatchSubmissionType,
-} from "@/types"
+import type { matchSubmission } from "@/types"
 
 type props = {
   matchSubmission: matchSubmission
@@ -30,59 +21,6 @@ type props = {
 
 const ApproveMatchItem = ({ matchSubmission, adminUserId }: props) => {
   const [submitted, setSubmitted] = useState(false)
-
-  const handleApproveMatch = async (
-    makeRequest: makeRequestType,
-    recordMatch: recordMatchType,
-    matchSubmission: matchSubmission,
-    apiRoute: apiRouteType,
-    method: methodType
-  ) => {
-    const {
-      userScore,
-      opponentScore,
-      matchDate,
-      groupId,
-      userId,
-      opponentId,
-      id, //matchId
-    } = matchSubmission
-    const res: Awaited<Response> = await recordMatch(
-      makeRequest,
-      userScore,
-      opponentScore,
-      matchDate,
-      groupId,
-      userId,
-      opponentId,
-      adminUserId,
-      apiRoute,
-      method,
-      id //matchId
-    )
-
-    if (res.ok) setSubmitted(true)
-  }
-
-  const handleDeclineMatch = async (
-    makeRequest: makeRequestType,
-    removeMatchSubmission: removeMatchSubmissionType,
-    matchId: number,
-    groupId: number,
-    apiRoute: apiRouteType,
-    method: methodType
-  ) => {
-    const res: Awaited<Response> = await removeMatchSubmission(
-      makeRequest,
-      matchId,
-      groupId,
-      apiRoute,
-      method
-    )
-
-    if (res.ok) setSubmitted(true)
-  }
-
   const matchDate = new Date(matchSubmission.matchDate)
   const submittedAt = new Date(matchSubmission.submittedAt)
   const user = matchSubmission.user
@@ -122,6 +60,7 @@ const ApproveMatchItem = ({ matchSubmission, adminUserId }: props) => {
               removeMatchSubmission,
               matchSubmission.id,
               matchSubmission.groupId,
+              setSubmitted,
               apiRoute,
               method
             )
@@ -135,6 +74,8 @@ const ApproveMatchItem = ({ matchSubmission, adminUserId }: props) => {
               makeRequest,
               recordMatch,
               matchSubmission,
+              adminUserId,
+              setSubmitted,
               apiRoute,
               method
             )

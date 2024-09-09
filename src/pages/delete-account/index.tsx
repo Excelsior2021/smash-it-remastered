@@ -2,14 +2,16 @@
 import Modal from "@/components/modal/modal"
 
 //react
-import { useEffect, useState } from "react"
+import { useEffect, useState, type ReactNode } from "react"
 import { useForm } from "react-hook-form"
 
 //lib
+import { deleteAccountEffect, handleDeleteAccount } from "./route-lib"
+import { makeRequest, showModal } from "@/lib/utils"
 import { deleteAccount } from "@/lib/api"
-import clientRoute from "@/enums/client-route"
-import apiRoute from "@/enums/api-route"
-import method from "@/enums/http-method"
+import { clientRoute } from "@/enums"
+import { apiRoute } from "@/enums"
+import { method } from "@/enums"
 import { protectedRoute } from "@/lib/auth"
 
 //store
@@ -21,16 +23,7 @@ import { authOptions } from "../api/auth/[...nextauth]"
 import { getServerSession } from "next-auth"
 
 //types
-import type { FieldValues } from "react-hook-form"
-import type {
-  apiRouteType,
-  deleteAccountType,
-  makeRequestType,
-  methodType,
-  showModalType,
-} from "@/types"
 import { GetServerSidePropsContext } from "next"
-import { makeRequest, showModal } from "@/lib/utils"
 
 const DeleteAccount = () => {
   const {
@@ -44,37 +37,10 @@ const DeleteAccount = () => {
   const clearBackRoute = headerStore(state => state.clearBackRoute)
   const [groups, setGroups] = useState(null)
 
-  useEffect(() => {
-    setBackRoute(clientRoute.account)
-    return () => clearBackRoute()
-  }, [setBackRoute, clearBackRoute])
-
-  const handleDeleteAccount = async (
-    makeRequest: makeRequestType,
-    deleteAccount: deleteAccountType,
-    showModal: showModalType,
-    { deleteInput }: FieldValues,
-    apiRoute: apiRouteType,
-    method: methodType
-  ) => {
-    if (deleteInput === "delete") {
-      const res = await deleteAccount(makeRequest, apiRoute, method)
-
-      if (res && res.ok) {
-        await signOut()
-      }
-
-      if (res && res.status === 409) {
-        const data = await res.json()
-        setGroups(data.needsAdmin)
-        showModal()
-      }
-    } else {
-      setError("delete", {
-        message: "please enter 'delete' in the input field",
-      })
-    }
-  }
+  useEffect(
+    () => deleteAccountEffect(setBackRoute, clearBackRoute, clientRoute),
+    [setBackRoute, clearBackRoute]
+  )
 
   return (
     <div>
@@ -96,8 +62,11 @@ const DeleteAccount = () => {
           handleDeleteAccount(
             makeRequest,
             deleteAccount,
-            showModal,
             formData,
+            signOut,
+            setGroups,
+            setError,
+            showModal,
             apiRoute,
             method
           )
@@ -113,7 +82,7 @@ const DeleteAccount = () => {
             onChange={() => clearErrors()}
           />
           {errors.delete && (
-            <p className="text-error">{errors.delete.message}</p>
+            <p className="text-error">{errors.delete.message as ReactNode}</p>
           )}
         </div>
         <button

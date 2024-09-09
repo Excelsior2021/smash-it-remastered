@@ -5,13 +5,22 @@ import NavWrapper from "../components/nav-wrapper/nav-wrapper"
 
 import Providers from "../components/providers/providers"
 import Head from "next/head"
-import { useState } from "react"
+import { type ReactElement, type ReactNode, useState } from "react"
 import Router from "next/router"
 import navItems from "../lib/nav-items"
 
 import type { AppProps } from "next/app"
+import type { NextPage } from "next"
 
-const App = ({ Component, pageProps }: AppProps) => {
+export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+  getLayout?: (page: ReactElement) => ReactNode
+}
+
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout
+}
+
+const App = ({ Component, pageProps }: AppPropsWithLayout) => {
   const [loading, setLoading] = useState(false)
 
   Router.events.on("routeChangeStart", () => setLoading(true))
@@ -19,6 +28,8 @@ const App = ({ Component, pageProps }: AppProps) => {
   Router.events.on("routeChangeComplete", () => setLoading(false))
 
   Router.events.on("routeChangeError", () => setLoading(false))
+
+  const getLayout = Component.getLayout ?? (page => page)
 
   return (
     <>

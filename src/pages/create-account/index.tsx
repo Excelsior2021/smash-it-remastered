@@ -5,19 +5,20 @@ import Modal from "@/components/modal/modal"
 
 //react
 import { useState } from "react"
-import { FieldValues, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 
 //next
 import Link from "next/link"
 import { useRouter } from "next/router"
 
 //lib
+import { handleCreateAccount } from "./route-lib"
 import { createAccount } from "@/lib/api"
 import { authRedirect } from "@/lib/auth"
 import { accountFormFields, personalFormFields } from "@/lib/form-fields"
-import clientRoute from "@/enums/client-route"
-import apiRoute from "@/enums/api-route"
-import method from "@/enums/http-method"
+import { clientRoute } from "@/enums"
+import { apiRoute } from "@/enums"
+import { method } from "@/enums"
 import { makeRequest, showModal } from "@/lib/utils"
 
 //next-auth
@@ -26,13 +27,7 @@ import { getServerSession } from "next-auth"
 import { getProviders, signIn } from "next-auth/react"
 
 //types
-import type {
-  apiRouteType,
-  apiRequestType,
-  methodType,
-  providers,
-  showModalType,
-} from "@/types"
+import type { providers } from "@/types"
 import type { GetServerSidePropsContext } from "next"
 
 type props = {
@@ -51,49 +46,6 @@ const CreateAccount = ({ providers }: props) => {
   const [accountSection, setAccountSection] = useState(false)
   const router = useRouter()
 
-  const handleCreateAccount = async (
-    createAccount: apiRequestType,
-    showModal: showModalType,
-    formData: FieldValues,
-    apiRoute: apiRouteType,
-    method: methodType
-  ) => {
-    try {
-      const res: Awaited<Response> = await createAccount(
-        makeRequest,
-        formData,
-        apiRoute,
-        method
-      )
-
-      if (res.ok) showModal()
-      else {
-        const serverErrors = await res.json()
-
-        if (res.status === 500) {
-          setError("server", {
-            type: "server",
-            message: serverErrors.error,
-          })
-          return
-        }
-
-        for (const error in serverErrors.errors) {
-          serverErrors.errors[error] = serverErrors.errors[error].filter(
-            (error: string | boolean) => error && error
-          )
-          if (serverErrors.errors[error].length > 0)
-            setError(error, {
-              type: "server",
-              message: serverErrors.errors[error],
-            })
-        }
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   return (
     <div className="sm:flex justify-center">
       <div className="sm:w-[500px]">
@@ -106,7 +58,9 @@ const CreateAccount = ({ providers }: props) => {
           onSubmit={handleSubmit(async formData =>
             handleCreateAccount(
               createAccount,
+              makeRequest,
               showModal,
+              setError,
               formData,
               apiRoute,
               method

@@ -6,19 +6,20 @@ import LinkButton from "@/components/link-button/link-button"
 
 //react
 import { useState, type ReactNode } from "react"
-import { useForm, type FieldValues } from "react-hook-form"
+import { useForm } from "react-hook-form"
 
 //next
 import { useRouter } from "next/router"
 
 //lib
+import { handleResetPassword } from "./route-lib"
 import { authRedirect } from "@/lib/auth"
-import clientRoute from "@/enums/client-route"
+import { clientRoute } from "@/enums"
 import { changePasswordFormFields } from "@/lib/form-fields"
 import prisma from "@/lib/prisma"
 import { resetPassword } from "@/lib/api"
-import apiRoute from "@/enums/api-route"
-import method from "@/enums/http-method"
+import { apiRoute } from "@/enums"
+import { method } from "@/enums"
 import { makeRequest, showModal } from "@/lib/utils"
 
 //next-auth
@@ -26,13 +27,6 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "../api/auth/[...nextauth]"
 
 //types
-import type {
-  apiRouteType,
-  makeRequestType,
-  methodType,
-  resetPasswordType,
-  showModalType,
-} from "@/types"
 import type { GetServerSidePropsContext } from "next"
 
 type props = {
@@ -52,29 +46,6 @@ const ResetPassword = ({ token, invalid }: props) => {
   const router = useRouter()
 
   let newPassword: string
-
-  const handleResetPassword = async (
-    makeRequest: makeRequestType,
-    resetPassword: resetPasswordType,
-    showModal: showModalType,
-    formData: FieldValues,
-    token: string,
-    apiRoute: apiRouteType,
-    method: methodType
-  ) => {
-    try {
-      const res = await resetPassword(
-        makeRequest,
-        formData,
-        token,
-        apiRoute,
-        method
-      )
-      if (res && res.ok) showModal()
-    } catch (error) {
-      console.log(error)
-    }
-  }
 
   return (
     <div>
@@ -173,7 +144,7 @@ export const getServerSideProps = async (
   if (!token) {
     return {
       redirect: {
-        destination: "/",
+        destination: clientRoute.root,
         permanent: false,
       },
     }

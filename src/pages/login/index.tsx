@@ -5,17 +5,18 @@ import OauthProviders from "@/components/oauth-providers/oauth-providers"
 
 //react
 import { useState, type ReactNode } from "react"
-import { useForm, type FieldValues } from "react-hook-form"
+import { useForm } from "react-hook-form"
 
 //next
 import Link from "next/link"
 import { useRouter } from "next/router"
 
 //lib
+import { handleLogin } from "./route-lib"
 import { login } from "@/lib/api"
 import { authRedirect } from "@/lib/auth"
 import { loginFormFields } from "@/lib/form-fields"
-import clientRoute from "@/enums/client-route"
+import { clientRoute } from "@/enums"
 
 //next-auth
 import { getProviders, signIn } from "next-auth/react"
@@ -23,7 +24,7 @@ import { authOptions } from "../api/auth/[...nextauth]"
 import { getServerSession } from "next-auth"
 
 //types
-import type { clientRouteType, providers, signInNextAuth } from "@/types"
+import type { providers } from "@/types"
 import type { GetServerSidePropsContext } from "next"
 
 type props = {
@@ -41,27 +42,6 @@ const Login = ({ providers }: props) => {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
 
-  const handleLogin = async (
-    signIn: signInNextAuth,
-    formData: FieldValues,
-    clientRoute: clientRouteType
-  ) => {
-    try {
-      const res = await login(signIn, formData, clientRoute)
-
-      if (!res.ok) {
-        setError("server", {
-          message:
-            res.error === "CredentialsSignin"
-              ? "invalid credentials. please check your username/email and password"
-              : res.error,
-        })
-      } else router.replace(clientRoute.root)
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   return (
     <div className="sm:flex sm:justify-center">
       <div className="sm:w-[500px]">
@@ -72,7 +52,15 @@ const Login = ({ providers }: props) => {
         <form
           className="flex flex-col gap-8 mb-6"
           onSubmit={handleSubmit(
-            async formData => await handleLogin(signIn, formData, clientRoute)
+            async formData =>
+              await handleLogin(
+                signIn,
+                login,
+                formData,
+                setError,
+                router,
+                clientRoute
+              )
           )}>
           {loginFormFields.map(field => {
             if (field.name === "password")

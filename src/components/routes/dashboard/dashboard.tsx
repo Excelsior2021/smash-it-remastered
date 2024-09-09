@@ -5,7 +5,7 @@ import LinkButton from "../../link-button/link-button"
 import { useEffect } from "react"
 
 //lib
-import clientRoute from "@/enums/client-route"
+import { clientRoute } from "@/enums"
 
 //store
 import navStore from "@/store/nav"

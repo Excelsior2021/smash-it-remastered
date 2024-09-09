@@ -11,11 +11,16 @@ import { useForm } from "react-hook-form"
 import { useRouter } from "next/router"
 
 //lib
+import {
+  accountDetailsEffect,
+  handleChangeAccountDetail,
+  submissionStatus,
+} from "./route-lib"
 import prisma from "@/lib/prisma"
-import clientRoute from "@/enums/client-route"
+import { clientRoute } from "@/enums"
 import { protectedRoute } from "@/lib/auth"
-import apiRoute from "@/enums/api-route"
-import method from "@/enums/http-method"
+import { apiRoute } from "@/enums"
+import { method } from "@/enums"
 import { changeAccountDetail } from "@/lib/api"
 import { makeRequest, showModal } from "@/lib/utils"
 
@@ -28,13 +33,6 @@ import { authOptions } from "../api/auth/[...nextauth]"
 import { useSession } from "next-auth/react"
 
 //types
-import type {
-  apiRouteType,
-  apiRequestType,
-  methodType,
-  makeRequestType,
-} from "@/types"
-import type { FieldValues } from "react-hook-form"
 import type { GetServerSidePropsContext } from "next"
 import type { MouseEventHandler } from "react"
 
@@ -57,11 +55,6 @@ type accountFieldsModalDataType = {
 }
 
 const AccountDetails = ({ fields }: props) => {
-  enum submissionStatus {
-    pending,
-    success,
-    failed,
-  }
   const { update } = useSession()
   const {
     register,
@@ -80,44 +73,10 @@ const AccountDetails = ({ fields }: props) => {
   const setBackRoute = headerStore(state => state.setBackRoute)
   const clearBackRoute = headerStore(state => state.clearBackRoute)
 
-  useEffect(() => {
-    setBackRoute(clientRoute.account)
-    return () => clearBackRoute()
-  }, [setBackRoute, clearBackRoute])
-
-  const handleChangeAccountDetail = async (
-    makeRequest: makeRequestType,
-    changeAccountDetail: apiRequestType,
-    formData: FieldValues,
-    apiRoute: apiRouteType,
-    method: methodType
-  ) => {
-    try {
-      const res = await changeAccountDetail(
-        makeRequest,
-        formData,
-        apiRoute,
-        method
-      )
-
-      if (res && res.ok) {
-        router.replace(router.asPath)
-        const data = await res?.json()
-        update({ [data.field]: data.value })
-        setSubmission(submissionStatus.success)
-      } else {
-        const data = await res?.json()
-        const errors = data.errors.filter((error: string) => error && error)
-        setServerError(true)
-        setError("server", {
-          type: "server",
-          message: errors,
-        })
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  useEffect(
+    () => accountDetailsEffect(setBackRoute, clearBackRoute, clientRoute),
+    [setBackRoute, clearBackRoute]
+  )
 
   return (
     <div className="max-w-[500px] m-auto">
@@ -163,6 +122,11 @@ const AccountDetails = ({ fields }: props) => {
                           await handleChangeAccountDetail(
                             makeRequest,
                             changeAccountDetail,
+                            update,
+                            setSubmission,
+                            setServerError,
+                            setError,
+                            router,
                             formData,
                             apiRoute,
                             method

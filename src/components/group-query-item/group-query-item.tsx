@@ -3,8 +3,8 @@ import { useEffect, useState } from "react"
 
 //lib
 import { groupRequest } from "@/lib/api"
-import apiRoute from "@/enums/api-route"
-import method from "@/enums/http-method"
+import { apiRoute } from "@/enums"
+import { method } from "@/enums"
 import { makeRequest } from "@/lib/utils"
 
 //types

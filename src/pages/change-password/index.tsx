@@ -5,20 +5,21 @@ import EmailUnverifiedMessage from "@/components/email-unverified-message/email-
 import Toggle from "@/components/toggle/toggle"
 
 //react
-import { useEffect, useState } from "react"
-import { useForm, type FieldValues } from "react-hook-form"
+import { useEffect, useState, type ReactNode } from "react"
+import { useForm } from "react-hook-form"
 
 //next
 import { useRouter } from "next/router"
 
 //lib
+import { changePasswordEffect, handleChangePassword } from "./route-lib"
 import prisma from "@/lib/prisma"
 import { changePasswordFormFields } from "@/lib/form-fields"
 import { changePassword, setPassword } from "@/lib/api"
 import { protectedRoute } from "@/lib/auth"
-import clientRoute from "@/enums/client-route"
-import apiRoute from "@/enums/api-route"
-import method from "@/enums/http-method"
+import { clientRoute } from "@/enums"
+import { apiRoute } from "@/enums"
+import { method } from "@/enums"
 import { makeRequest, showModal } from "@/lib/utils"
 
 //store
@@ -28,13 +29,6 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "../api/auth/[...nextauth]"
 
 //types
-import type {
-  apiRouteType,
-  apiRequestType,
-  methodType,
-  makeRequestType,
-  showModalType,
-} from "@/types"
 import type { GetServerSidePropsContext } from "next"
 
 type props = {
@@ -59,38 +53,10 @@ const ChangePassword = ({ hasPassword, emailUnverified }: props) => {
 
   let newPassword: string
 
-  useEffect(() => {
-    setBackRoute(clientRoute.account)
-    return () => clearBackRoute()
-  }, [setBackRoute, clearBackRoute])
-
-  const handleChangePassword = async (
-    makeRequest: makeRequestType,
-    changePassword: apiRequestType,
-    showModal: showModalType,
-    formData: FieldValues,
-    apiRoute: apiRouteType,
-    method: methodType
-  ) => {
-    try {
-      let res
-      if (hasPassword)
-        res = await changePassword(makeRequest, formData, apiRoute, method)
-      else res = await setPassword(makeRequest, formData, apiRoute, method)
-
-      if (res && res.ok) {
-        showModal()
-        reset()
-      } else if (res) {
-        const { field, error } = await res.json()
-        setError(field, {
-          message: error,
-        })
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  useEffect(
+    () => changePasswordEffect(setBackRoute, clearBackRoute, clientRoute),
+    [setBackRoute, clearBackRoute]
+  )
 
   if (emailUnverified) return <EmailUnverifiedMessage />
 
@@ -105,7 +71,11 @@ const ChangePassword = ({ hasPassword, emailUnverified }: props) => {
           handleChangePassword(
             makeRequest,
             changePassword,
+            setPassword,
             showModal,
+            reset,
+            setError,
+            hasPassword,
             formData,
             apiRoute,
             method
@@ -135,7 +105,9 @@ const ChangePassword = ({ hasPassword, emailUnverified }: props) => {
                 disabled={isSubmitting}
               />
               {errors[field.name] && (
-                <p className="text-error">{errors[field.name].message}</p>
+                <p className="text-error">
+                  {errors[field.name]?.message as ReactNode}
+                </p>
               )}
             </div>
           )

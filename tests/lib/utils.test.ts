@@ -8,8 +8,8 @@ import {
 } from "@/lib/utils"
 import { useRouter } from "next/router"
 import { mockDeep, mockReset } from "vitest-mock-extended"
-import apiRoute from "@/enums/api-route"
-import method from "@/enums/http-method"
+import { apiRoute } from "@/enums"
+import { method } from "@/enums"
 
 describe("lib/utils", () => {
   describe("updateGroupDataForPage()", () => {

@@ -9,10 +9,11 @@ import { useEffect } from "react"
 import { useRouter } from "next/router"
 
 //lib
+import { addAdminEffect } from "./route-lib"
 import prisma from "@/lib/prisma"
 import { adminRoute, notAdmin, protectedRoute } from "@/lib/auth"
-import clientRoute from "@/enums/client-route"
-import memberListItemType from "@/enums/member-list-item-types"
+import { clientRoute } from "@/enums"
+import { memberListItemType } from "@/enums"
 
 //store
 import userStore from "@/store/user"
@@ -40,18 +41,18 @@ const AddAdmin = ({ groupId, members, noMoreMembers }: props) => {
   const clearBackRoute = headerStore(state => state.clearBackRoute)
   const router = useRouter()
 
-  useEffect(() => {
-    if (activeGroup) {
-      updateGroupDataForPage(
+  useEffect(
+    () =>
+      addAdminEffect(
         activeGroup,
+        updateGroupDataForPage,
+        setBackRoute,
+        clearBackRoute,
         router,
-        router.query.groupId as string,
-        `${clientRoute.addAdmin}/${activeGroup.id}`
-      )
-      setBackRoute(`${clientRoute.manageGroup}/${activeGroup.id}`)
-    }
-    return () => clearBackRoute()
-  }, [activeGroup, router, setBackRoute, clearBackRoute])
+        clientRoute
+      ),
+    [activeGroup, router, setBackRoute, clearBackRoute]
+  )
 
   return (
     <div>

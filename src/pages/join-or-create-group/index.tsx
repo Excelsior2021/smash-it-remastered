@@ -6,7 +6,7 @@ import { useEffect } from "react"
 
 //lib
 import { protectedRoute } from "@/lib/auth"
-import clientRoute from "@/enums/client-route"
+import { clientRoute } from "@/enums"
 
 //store
 import headerStore from "@/store/header"
@@ -17,6 +17,7 @@ import { getServerSession } from "next-auth"
 
 //types
 import type { GetServerSidePropsContext } from "next"
+import { joinOrCreateGroupEffect } from "./route-lib"
 
 const joinCreateGroupLinks = [
   { key: 1, href: clientRoute.joinGroup, text: "join group" },
@@ -27,10 +28,10 @@ const JoinCreateGroup = () => {
   const setBackRoute = headerStore(state => state.setBackRoute)
   const clearBackRoute = headerStore(state => state.clearBackRoute)
 
-  useEffect(() => {
-    setBackRoute(clientRoute.root)
-    return () => clearBackRoute()
-  }, [setBackRoute, clearBackRoute])
+  useEffect(
+    () => joinOrCreateGroupEffect(setBackRoute, clearBackRoute, clientRoute),
+    [setBackRoute, clearBackRoute]
+  )
 
   return (
     <div>

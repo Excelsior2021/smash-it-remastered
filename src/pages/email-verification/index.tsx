@@ -8,10 +8,11 @@ import { useState } from "react"
 import { useRouter } from "next/router"
 
 //lib
+import { handleVerifyEmail } from "./route-lib"
 import { protectedRoute } from "@/lib/auth"
-import clientRoute from "@/enums/client-route"
+import { clientRoute } from "@/enums"
 import { verifyEmail } from "@/lib/api"
-import apiRoute from "@/enums/api-route"
+import { apiRoute } from "@/enums"
 import { makeRequest, showModal } from "@/lib/utils"
 
 //next-auth
@@ -19,27 +20,11 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "../api/auth/[...nextauth]"
 
 //types
-import type { makeRequestType, showModalType, verifyEmailType } from "@/types"
 import type { GetServerSidePropsContext } from "next"
 
 const EmailVerification = () => {
   const [error, setError] = useState(null)
   const router = useRouter()
-
-  const handleVerifyEmail = async (
-    makeRequest: makeRequestType,
-    verifyEmail: verifyEmailType,
-    showModal: showModalType
-  ) => {
-    const res = await verifyEmail(makeRequest, apiRoute)
-
-    if (res && !res.ok) {
-      const data = await res.json()
-      setError(data.error)
-    }
-
-    if (res && res.ok) showModal()
-  }
 
   return (
     <div>
@@ -54,7 +39,15 @@ const EmailVerification = () => {
       </p>
       <button
         className="btn btn-secondary text-lg capitalize block m-auto mt-16"
-        onClick={() => handleVerifyEmail(makeRequest, verifyEmail, showModal)}>
+        onClick={() =>
+          handleVerifyEmail(
+            makeRequest,
+            verifyEmail,
+            showModal,
+            setError,
+            apiRoute
+          )
+        }>
         verify email
       </button>
       {error && <p className="text-error text-center my-6">{error}</p>}

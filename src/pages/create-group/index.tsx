@@ -3,22 +3,19 @@ import Input from "@/components/input/input"
 import EmailUnverifiedMessage from "@/components/email-unverified-message/email-unverified-message"
 
 //react
-import { useEffect, useState } from "react"
-import {
-  useForm,
-  type FieldValues,
-  type UseFormSetError,
-} from "react-hook-form"
+import { useEffect } from "react"
+import { useForm } from "react-hook-form"
 
 //next
-import { useRouter, type NextRouter } from "next/router"
+import { useRouter } from "next/router"
 
 //lib
+import { createGroupEffect, handleCreateGroup } from "./route-lib"
 import { createGroup } from "@/lib/api"
-import clientRoute from "@/enums/client-route"
+import { clientRoute } from "@/enums"
 import { protectedRoute } from "@/lib/auth"
-import apiRoute from "@/enums/api-route"
-import method from "@/enums/http-method"
+import { apiRoute } from "@/enums"
+import { method } from "@/enums"
 import pattern from "@/lib/field-validation"
 import { makeRequest } from "@/lib/utils"
 
@@ -31,12 +28,6 @@ import { authOptions } from "../api/auth/[...nextauth]"
 import { getServerSession } from "next-auth"
 
 //types
-import type {
-  clientRouteType,
-  apiRouteType,
-  methodType,
-  apiRequestType,
-} from "@/types"
 import type { GetServerSidePropsContext } from "next"
 
 type props = {
@@ -59,56 +50,10 @@ const CreateGroup = ({ emailUnverified }: props) => {
   const setBackRoute = headerStore(state => state.setBackRoute)
   const clearBackRoute = headerStore(state => state.clearBackRoute)
 
-  const handleCreateGroup = async (
-    createGroup: apiRequestType,
-    formData: FieldValues,
-    setError: UseFormSetError<FieldValues>,
-    router: NextRouter,
-    clientRoute: clientRouteType,
-    apiRoute: apiRouteType,
-    method: methodType
-  ) => {
-    try {
-      if (userGroups.length >= 3) {
-        setError("maxGroupCount", {
-          message:
-            "max group count reached. (you can only be a member of a max. of 3 groups.)",
-        })
-        return
-      }
-
-      const res: Awaited<Response> = await createGroup(
-        makeRequest,
-        formData,
-        apiRoute,
-        method
-      )
-
-      if (!res.ok) {
-        const data = await res.json()
-        const errors = data.errors.filter(
-          (error: string | boolean) => error && error
-        )
-        setError("server", {
-          type: "server",
-          message: errors,
-        })
-      } else {
-        const { group } = await res.json()
-        let newGroup = { id: group.id, name: group.name }
-        setGroups([...userGroups, { ...newGroup }])
-        setActiveGroup(newGroup)
-        router.push(`${clientRoute.group}/${group.id}`)
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  useEffect(() => {
-    setBackRoute(clientRoute.joinCreateGroup)
-    return () => clearBackRoute()
-  }, [setBackRoute, clearBackRoute])
+  useEffect(
+    () => createGroupEffect(setBackRoute, clearBackRoute, clientRoute),
+    [setBackRoute, clearBackRoute]
+  )
 
   if (emailUnverified) return <EmailUnverifiedMessage />
 
@@ -120,7 +65,11 @@ const CreateGroup = ({ emailUnverified }: props) => {
         onSubmit={handleSubmit(formData =>
           handleCreateGroup(
             createGroup,
+            makeRequest,
             formData,
+            userGroups,
+            setGroups,
+            setActiveGroup,
             setError,
             router,
             clientRoute,

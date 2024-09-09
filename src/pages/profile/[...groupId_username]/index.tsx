@@ -10,11 +10,12 @@ import { useEffect } from "react"
 import { useRouter } from "next/router"
 
 //lib
+import { profileEffect } from "../route-lib"
 import { protectedRoute } from "@/lib/auth"
-import clientRoute from "@/enums/client-route"
+import { clientRoute } from "@/enums"
 import { generateDisplayName, updateGroupDataForPage } from "@/lib/utils"
 import prisma from "@/lib/prisma"
-import statKeys from "@/enums/stat-keys"
+import { statKeys } from "@/enums"
 import { userInGroup } from "@/lib/server-validation"
 
 //store
@@ -49,29 +50,29 @@ const Profile = ({ profile, stats, noGroup, sessionUserId }: props) => {
     username = router.query.groupId_username[1]
   }
 
-  useEffect(() => {
-    if (noGroup) setActiveNavItem("profile")
-
-    if (!noGroup) {
-      if (profile) if (profile.id === sessionUserId) setActiveNavItem("profile")
-      if (activeGroup)
-        updateGroupDataForPage(
-          activeGroup,
-          router,
-          groupId,
-          `${clientRoute.profile}/${activeGroup.id}/${profile.username}`
-        )
-    }
-    return () => setActiveNavItem(null)
-  }, [
-    router,
-    activeGroup,
-    sessionUserId,
-    noGroup,
-    profile,
-    setActiveNavItem,
-    groupId,
-  ])
+  useEffect(
+    () =>
+      profileEffect(
+        sessionUserId,
+        profile,
+        activeGroup,
+        groupId,
+        noGroup,
+        setActiveNavItem,
+        updateGroupDataForPage,
+        router,
+        clientRoute
+      ),
+    [
+      router,
+      activeGroup,
+      sessionUserId,
+      noGroup,
+      profile,
+      setActiveNavItem,
+      groupId,
+    ]
+  )
 
   if (noGroup) return <NoGroup />
 

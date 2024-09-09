@@ -7,28 +7,26 @@ import ServerMessage from "@/components/server-message/server-message"
 import NoGroup from "@/components/no-group/no-group"
 
 //react
-import {
-  useCallback,
-  useEffect,
-  useState,
-  type Dispatch,
-  type ReactNode,
-  type SetStateAction,
-} from "react"
-import { useForm, type FieldValues } from "react-hook-form"
+import { useCallback, useEffect, useState, type ReactNode } from "react"
+import { useForm } from "react-hook-form"
 
 //next
 import { useRouter } from "next/router"
 
 //lib
+import {
+  handleChosenOpponentCallback,
+  handleSubmitScores,
+  recordMatchEffect,
+} from "../route-lib"
 import prisma from "@/lib/prisma"
 import { protectedRoute } from "@/lib/auth"
 import { makeRequest, showModal, updateGroupDataForPage } from "@/lib/utils"
 import { recordMatch, submitMatch } from "@/lib/api"
-import clientRoute from "@/enums/client-route"
+import { clientRoute, scoresSubmissionStatus } from "@/enums"
 import { validateScores } from "@/lib/server-validation"
-import apiRoute from "@/enums/api-route"
-import method from "@/enums/http-method"
+import { apiRoute } from "@/enums"
+import { method } from "@/enums"
 
 //store
 import userStore from "@/store/user"
@@ -39,7 +37,7 @@ import { authOptions } from "../../api/auth/[...nextauth]"
 import { getServerSession } from "next-auth"
 
 //types
-import type { apiRouteType, member, methodType, player } from "@/types"
+import type { member, opponentDataType, player } from "@/types"
 import type { GetServerSidePropsContext } from "next"
 
 type props = {
@@ -49,14 +47,6 @@ type props = {
   emailUnverified?: true
   session: any
   noGroup?: boolean
-}
-
-type opponentData = { groupId: number; member: member }
-
-enum scoresSubmissionStatus {
-  pending,
-  success,
-  failed,
 }
 
 const RecordMatch = ({
@@ -87,82 +77,23 @@ const RecordMatch = ({
   const activeGroup = userStore(state => state.activeGroup)
   const setBackRoute = headerStore(state => state.setBackRoute)
   const clearBackRoute = headerStore(state => state.clearBackRoute)
+  const handleChosenOpponent = useCallback(handleChosenOpponentCallback, [
+    groupId,
+  ])
 
-  useEffect(() => {
-    if (activeGroup) {
-      {
-        updateGroupDataForPage(
-          activeGroup,
-          router,
-          router.query.groupId as string,
-          `${clientRoute.recordMatch}/${activeGroup.id}`
-        )
-        setBackRoute(clientRoute.root)
-      }
-      setChosenOpponent(null)
-    }
-    return () => clearBackRoute()
-  }, [router, activeGroup, setBackRoute, clearBackRoute])
-
-  const handleChosenOpponent = useCallback(
-    (
-      setChosenOpponent: Dispatch<SetStateAction<member | null>>,
-      opponentData: opponentData
-    ) => {
-      if (groupId === opponentData.groupId) {
-        setChosenOpponent(opponentData.member)
-      }
-    },
-    [groupId]
+  useEffect(
+    () =>
+      recordMatchEffect(
+        activeGroup,
+        updateGroupDataForPage,
+        setChosenOpponent,
+        setBackRoute,
+        clearBackRoute,
+        router,
+        clientRoute
+      ),
+    [router, activeGroup, setBackRoute, clearBackRoute]
   )
-
-  const handleSubmitScores = async (
-    formData: FieldValues,
-    groupId: number,
-    userId: number,
-    opponentId: number,
-    apiRoute: apiRouteType,
-    method: methodType
-  ) => {
-    const userScore = parseInt(formData.userScore)
-    const opponentScore = parseInt(formData.opponentScore)
-    const matchDate = formData.matchDate
-    let res: Response | undefined
-
-    try {
-      if (isAdmin) {
-        res = await recordMatch(
-          makeRequest,
-          userScore,
-          opponentScore,
-          matchDate,
-          groupId,
-          userId,
-          opponentId,
-          userId, //automatically approved by admin
-          apiRoute,
-          method
-        )
-      } else {
-        res = await submitMatch(
-          makeRequest,
-          userScore,
-          opponentScore,
-          matchDate,
-          groupId,
-          userId,
-          opponentId,
-          apiRoute,
-          method
-        )
-      }
-
-      if (res && res.ok) setScoresSubmitted(scoresSubmissionStatus.success)
-      else setScoresSubmitted(scoresSubmissionStatus.failed)
-    } catch (error) {
-      console.log(error)
-    }
-  }
 
   if (emailUnverified) return <EmailUnverifiedMessage />
 
@@ -192,10 +123,16 @@ const RecordMatch = ({
           onClick={handleSubmit(
             async formData =>
               await handleSubmitScores(
+                recordMatch,
+                submitMatch,
+                makeRequest,
                 formData,
                 groupId,
                 session.user.id,
                 chosenOpponent.id,
+                isAdmin,
+                setScoresSubmitted,
+                scoresSubmissionStatus,
                 apiRoute,
                 method
               )
@@ -218,8 +155,8 @@ const RecordMatch = ({
                 heading="choose an opponent"
                 members={opponents}
                 groupId={groupId}
-                itemOnClick={(opponentData: opponentData) =>
-                  handleChosenOpponent(setChosenOpponent, opponentData)
+                itemOnClick={(opponentData: opponentDataType) =>
+                  handleChosenOpponent(setChosenOpponent, opponentData, groupId)
                 }
               />
             )}

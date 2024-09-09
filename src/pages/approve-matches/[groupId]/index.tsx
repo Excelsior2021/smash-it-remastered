@@ -11,7 +11,7 @@ import { useRouter } from "next/router"
 //lib
 import prisma from "@/lib/prisma"
 import { adminRoute, notAdmin, protectedRoute } from "@/lib/auth"
-import clientRoute from "@/enums/client-route"
+import { clientRoute } from "@/enums"
 import { updateGroupDataForPage } from "@/lib/utils"
 
 //store
@@ -24,6 +24,7 @@ import { getServerSession } from "next-auth"
 
 //types
 import type { GetServerSidePropsContext } from "next"
+import { approveMatchesGroupIdEffect } from "../route-lib"
 
 type props = {
   matchSubmissions?: string
@@ -41,19 +42,18 @@ const ApproveMatches = ({
   const clearBackRoute = headerStore(state => state.clearBackRoute)
   const router = useRouter()
 
-  useEffect(() => {
-    if (activeGroup) {
-      updateGroupDataForPage(
+  useEffect(
+    () =>
+      approveMatchesGroupIdEffect(
         activeGroup,
+        updateGroupDataForPage,
+        setBackRoute,
+        clearBackRoute,
         router,
-        router.query.groupId as string,
-        `${clientRoute.approveMatches}/${activeGroup.id}`
-      )
-      setBackRoute(`${clientRoute.manageGroup}/${activeGroup.id}`)
-    }
-
-    return () => clearBackRoute()
-  }, [activeGroup, router, setBackRoute, clearBackRoute])
+        clientRoute
+      ),
+    [activeGroup, router, setBackRoute, clearBackRoute]
+  )
 
   return (
     <div className="flex flex-col justify-center items-center">

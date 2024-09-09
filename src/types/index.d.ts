@@ -1,6 +1,9 @@
-import type apiRoute from "@/enums/api-route"
-import type clientRoute from "@/enums/client-route"
-import type method from "@/enums/http-method"
+import type {
+  apiRoute,
+  clientRoute,
+  method,
+  scoresSubmissionStatus,
+} from "@/enums"
 import type { v4 } from "uuid"
 
 export type navItems = {
@@ -75,7 +78,7 @@ export type profileUser = {
   id: number
 }
 
-export type opponentData = { groupId: number; member: member }
+export type opponentDataType = { groupId: number; member: member }
 
 export type match = {
   approvedAt: string
@@ -121,6 +124,8 @@ export type apiRouteType = typeof apiRoute
 
 export type methodType = typeof method
 
+export type scoresSubmissionStatusType = typeof scoresSubmissionStatus
+
 export type groupRequest = {
   userId: number
   groupId: number
@@ -152,6 +157,13 @@ export type passwordData = {
   newPassword: string
   confirmNewPassword: string
 }
+
+export type updateGroupDataForPageType = (
+  activeGroup: userGroup,
+  router: NextRouter,
+  routerGroupId: string,
+  url: string
+) => void
 
 export type txPrisma = Omit<
   PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
@@ -187,6 +199,10 @@ export type signInNextAuth = <
   P extends RedirectableProviderType ? SignInResponse | undefined : undefined
 >
 
+export type signOutNextAuth = <R extends boolean = true>(
+  options?: SignOutParams<R>
+) => Promise<R extends true ? undefined : SignOutResponse>
+
 export type getServerSession = <
   O extends GetServerSessionOptions,
   R = O["callbacks"] extends {
@@ -203,6 +219,19 @@ export type uuidType = typeof v4
 export type showModalType = () => void
 
 //api handlers
+export type apiRequestType = (
+  makeRequest: makeRequestType,
+  field: FieldValues,
+  apiRoute: apiRouteType,
+  method: methodType
+) => Promise<apiResponse>
+
+export type loginRequestType = (
+  signIn: signInNextAuth,
+  formData: FieldValues,
+  clientRoute: clientRouteType
+) => Promise<apiResponse>
+
 export type userGroupApiType = (
   makeRequest: makeRequestType,
   userId: number,
@@ -225,6 +254,18 @@ export type recordMatchType = (
   matchId: number | null = null
 ) => Promise<apiResponse>
 
+export type submitMatchType = (
+  makeRequest: makeRequestType,
+  userScore: number,
+  opponentScore: number,
+  matchDate: string,
+  groupId: number,
+  userId: number,
+  opponentId: number,
+  apiRoute: apiRouteType,
+  method: methodType
+) => Promise<apiResponse>
+
 export type removeMatchSubmissionType = (
   makeRequest: makeRequestType,
   matchId: number,
@@ -236,13 +277,6 @@ export type removeMatchSubmissionType = (
 export type getUserGroupsType = (
   makeRequest: makeRequestType,
   apiRoute: apiRouteType
-) => Promise<apiResponse>
-
-export type apiRequestType = (
-  makeRequest: makeRequestType,
-  field: FieldValues,
-  apiRoute: apiRouteType,
-  method: methodType
 ) => Promise<apiResponse>
 
 export type deleteAccountType = (

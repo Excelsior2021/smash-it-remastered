@@ -14,7 +14,7 @@ import { useRouter } from "next/router"
 //lib
 import { protectedRoute } from "@/lib/auth"
 import prisma from "@/lib/prisma"
-import clientRoute from "@/enums/client-route"
+import { clientRoute } from "@/enums"
 import {
   handleGetUserGroups,
   makeRequest,
@@ -23,8 +23,8 @@ import {
 } from "@/lib/utils"
 import { userInGroup } from "@/lib/server-validation"
 import { getUserGroups, removeUserFromGroup } from "@/lib/api"
-import apiRoute from "@/enums/api-route"
-import method from "@/enums/http-method"
+import { apiRoute } from "@/enums"
+import { method } from "@/enums"
 
 //store
 import navStore from "@/store/nav"
@@ -35,16 +35,9 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "../../api/auth/[...nextauth]"
 
 //type
-import type {
-  apiRouteType,
-  group,
-  makeRequestType,
-  member,
-  methodType,
-  showModalType,
-  userGroupApiType,
-} from "@/types"
+import type { group, member } from "@/types"
 import type { GetServerSidePropsContext } from "next"
+import { groupEffect, handleLeaveGroup } from "../route-lib"
 
 type props = {
   groupJSON: any
@@ -78,53 +71,17 @@ const GroupPage = ({
   let group: group | null = null
   if (groupJSON) group = JSON.parse(groupJSON)
 
-  const handleLeaveGroup = async (
-    makeRequest: makeRequestType,
-    removeUserFromGroup: userGroupApiType,
-    showModal: showModalType,
-    userId: number,
-    groupId: number,
-    apiRoute: apiRouteType,
-    method: methodType
-  ) => {
-    setSubmitting(true)
-    try {
-      const res: Awaited<Response> = await removeUserFromGroup(
-        makeRequest,
-        userId,
-        groupId,
-        apiRoute,
-        method
-      )
-
-      if (res && res.status === 409) {
-        setNeedAdmin(true)
-        setTimeout(() => showModal())
-      }
-
-      if (res && res.ok) {
-        setNeedAdmin(false)
-        setLeftGroup(true)
-        setTimeout(() => showModal())
-      }
-    } catch (error) {
-      console.log(error)
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  useEffect(() => {
-    setActiveNavItem("group")
-    if (activeGroup)
-      updateGroupDataForPage(
+  useEffect(
+    () =>
+      groupEffect(
         activeGroup,
+        setActiveNavItem,
+        updateGroupDataForPage,
         router,
-        router.query.groupId as string,
-        `${clientRoute.group}/${activeGroup.id}`
-      )
-    return () => setActiveNavItem(null)
-  }, [router, activeGroup, setActiveNavItem])
+        clientRoute
+      ),
+    [router, activeGroup, setActiveNavItem]
+  )
 
   if (noGroup) return <NoGroup />
 
@@ -163,9 +120,12 @@ const GroupPage = ({
             await handleLeaveGroup(
               makeRequest,
               removeUserFromGroup,
-              showModal,
               userId,
               group.id,
+              showModal,
+              setNeedAdmin,
+              setLeftGroup,
+              setSubmitting,
               apiRoute,
               method
             )
