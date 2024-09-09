@@ -5,6 +5,7 @@ import LinkButton from "@/components/link-button/link-button"
 import { useEffect } from "react"
 
 //lib
+import { accountPageEffect } from "./route-lib"
 import { protectedRoute } from "@/lib/auth"
 import { clientRoute } from "@/enums"
 
@@ -18,7 +19,6 @@ import { getServerSession } from "next-auth"
 
 //types
 import type { GetServerSidePropsContext } from "next"
-import { accountPageEffect } from "./route-lib"
 
 type props = {
   emailVerified: boolean

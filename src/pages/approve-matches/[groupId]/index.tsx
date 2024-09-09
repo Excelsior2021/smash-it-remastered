@@ -9,6 +9,7 @@ import { useEffect } from "react"
 import { useRouter } from "next/router"
 
 //lib
+import { approveMatchesGroupIdEffect } from "../route-lib"
 import prisma from "@/lib/prisma"
 import { adminRoute, notAdmin, protectedRoute } from "@/lib/auth"
 import { clientRoute } from "@/enums"
@@ -24,7 +25,6 @@ import { getServerSession } from "next-auth"
 
 //types
 import type { GetServerSidePropsContext } from "next"
-import { approveMatchesGroupIdEffect } from "../route-lib"
 
 type props = {
   matchSubmissions?: string

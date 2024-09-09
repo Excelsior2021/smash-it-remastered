@@ -29,8 +29,6 @@ const App = ({ Component, pageProps }: AppPropsWithLayout) => {
 
   Router.events.on("routeChangeError", () => setLoading(false))
 
-  const getLayout = Component.getLayout ?? (page => page)
-
   return (
     <>
       <Head>

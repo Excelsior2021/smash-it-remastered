@@ -5,6 +5,7 @@ import LinkButton from "@/components/link-button/link-button"
 import { useEffect } from "react"
 
 //lib
+import { joinOrCreateGroupEffect } from "./route-lib"
 import { protectedRoute } from "@/lib/auth"
 import { clientRoute } from "@/enums"
 
@@ -17,7 +18,6 @@ import { getServerSession } from "next-auth"
 
 //types
 import type { GetServerSidePropsContext } from "next"
-import { joinOrCreateGroupEffect } from "./route-lib"
 
 const joinCreateGroupLinks = [
   { key: 1, href: clientRoute.joinGroup, text: "join group" },

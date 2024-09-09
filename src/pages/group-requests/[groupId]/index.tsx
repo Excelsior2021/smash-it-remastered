@@ -9,6 +9,7 @@ import { useEffect } from "react"
 import { useRouter } from "next/router"
 
 //lib
+import { groupRequestEffect } from "../route-lib"
 import prisma from "@/lib/prisma"
 
 import { adminRoute, notAdmin, protectedRoute } from "@/lib/auth"
@@ -27,7 +28,6 @@ import { getServerSession } from "next-auth"
 //types
 import type { member } from "@/types"
 import type { GetServerSidePropsContext } from "next"
-import { groupRequestEffect } from "../route-lib"
 
 type props = {
   users: member[]

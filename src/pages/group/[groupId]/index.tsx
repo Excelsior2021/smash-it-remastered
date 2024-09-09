@@ -12,6 +12,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 
 //lib
+import { groupEffect, handleLeaveGroup } from "../route-lib"
 import { protectedRoute } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { clientRoute } from "@/enums"
@@ -37,7 +38,6 @@ import { authOptions } from "../../api/auth/[...nextauth]"
 //type
 import type { group, member } from "@/types"
 import type { GetServerSidePropsContext } from "next"
-import { groupEffect, handleLeaveGroup } from "../route-lib"
 
 type props = {
   groupJSON: any
