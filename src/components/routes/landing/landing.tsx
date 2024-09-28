@@ -1,4 +1,5 @@
 //components
+import ServerDown from "@/components/server-down/server-down"
 import LinkButton from "../../link-button/link-button"
 
 //lib
@@ -26,6 +27,7 @@ const LandingPage = () => {
     <>
       <div className="hero mb-6">
         <div className="hero-content flex-col gap-12">
+          <ServerDown />
           <h1 className="text-3xl text-center">
             Performance tracking for table tennis.
           </h1>

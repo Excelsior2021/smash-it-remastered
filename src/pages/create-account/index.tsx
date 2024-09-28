@@ -2,6 +2,7 @@
 import FormSection from "@/components/form-section/form-section"
 import OauthProviders from "@/components/oauth-providers/oauth-providers"
 import Modal from "@/components/modal/modal"
+import ServerDown from "@/components/server-down/server-down"
 
 //react
 import { useState } from "react"
@@ -49,6 +50,7 @@ const CreateAccount = ({ providers }: props) => {
   return (
     <div className="sm:flex justify-center">
       <div className="sm:w-[500px]">
+        <ServerDown />
         <h1 className="text-3xl mb-6">Create an account</h1>
 
         <OauthProviders providers={providers} signIn={signIn} />
@@ -68,7 +70,8 @@ const CreateAccount = ({ providers }: props) => {
           )}>
           <fieldset
             className={`${accountSection ? "hidden" : null}`}
-            disabled={isSubmitting}>
+            //if server is down disabled = true, else, isSubmitting
+            disabled={true}>
             <FormSection
               heading="personal details"
               fields={personalFormFields}
@@ -80,7 +83,8 @@ const CreateAccount = ({ providers }: props) => {
 
           <fieldset
             className={`${accountSection ? null : "hidden"}`}
-            disabled={isSubmitting}>
+            //if server is down disabled = true, else, isSubmitting
+            disabled={true}>
             <FormSection
               heading="account details"
               fields={accountFormFields}

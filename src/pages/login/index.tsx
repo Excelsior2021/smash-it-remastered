@@ -2,6 +2,7 @@
 import Input from "@/components/input/input"
 import Toggle from "@/components/toggle/toggle"
 import OauthProviders from "@/components/oauth-providers/oauth-providers"
+import ServerDown from "@/components/server-down/server-down"
 
 //react
 import { useState, type ReactNode } from "react"
@@ -45,6 +46,7 @@ const Login = ({ providers }: props) => {
   return (
     <div className="sm:flex sm:justify-center">
       <div className="sm:w-[500px]">
+        <ServerDown />
         <h1 className="text-3xl mb-10">Login to your account</h1>
 
         <OauthProviders providers={providers} signIn={signIn} />
@@ -72,7 +74,8 @@ const Login = ({ providers }: props) => {
                   className="input text-black w-full"
                   register={register}
                   required={field.required}
-                  disabled={isSubmitting}
+                  //if server is down disabled = true, else, isSubmitting
+                  disabled={true}
                 />
                 {errors[field.name] ? (
                   <p className="text-error">
