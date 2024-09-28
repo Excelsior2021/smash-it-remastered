@@ -75,7 +75,7 @@ const Login = ({ providers }: props) => {
                   register={register}
                   required={field.required}
                   //if server is down disabled = true, else, isSubmitting
-                  disabled={false}
+                  disabled={true}
                 />
                 {errors[field.name] ? (
                   <p className="text-error">
