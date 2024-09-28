@@ -6,7 +6,7 @@ import { useEffect, useState, type ReactNode } from "react"
 import { useForm } from "react-hook-form"
 
 //lib
-import { deleteAccountEffect, handleDeleteAccount } from "./route-lib"
+import { deleteAccountEffect, handleDeleteAccount } from "./_route-lib"
 import { makeRequest, showModal } from "@/lib/utils"
 import { deleteAccount } from "@/lib/api"
 import { clientRoute } from "@/enums"

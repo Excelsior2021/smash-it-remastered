@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form"
 import { useRouter } from "next/router"
 
 //lib
-import { createGroupEffect, handleCreateGroup } from "./route-lib"
+import { createGroupEffect, handleCreateGroup } from "./_route-lib"
 import { createGroup } from "@/lib/api"
 import { clientRoute } from "@/enums"
 import { protectedRoute } from "@/lib/auth"

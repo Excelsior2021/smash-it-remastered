@@ -15,7 +15,7 @@ import {
   accountDetailsEffect,
   handleChangeAccountDetail,
   submissionStatus,
-} from "./route-lib"
+} from "./_route-lib"
 import prisma from "@/lib/prisma"
 import { clientRoute } from "@/enums"
 import { protectedRoute } from "@/lib/auth"

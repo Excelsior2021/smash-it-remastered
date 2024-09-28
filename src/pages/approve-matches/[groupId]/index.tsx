@@ -9,7 +9,7 @@ import { useEffect } from "react"
 import { useRouter } from "next/router"
 
 //lib
-import { approveMatchesGroupIdEffect } from "../route-lib"
+import { approveMatchesGroupIdEffect } from "../_route-lib"
 import prisma from "@/lib/prisma"
 import { adminRoute, notAdmin, protectedRoute } from "@/lib/auth"
 import { clientRoute } from "@/enums"

@@ -9,7 +9,7 @@ import { useEffect } from "react"
 import { useRouter } from "next/router"
 
 //lib
-import { removeMembersEffect } from "../route-lib"
+import { removeMembersEffect } from "../_route-lib"
 import { adminRoute, notAdmin, protectedRoute } from "@/lib/auth"
 import { memberListItemType } from "@/enums"
 import prisma from "@/lib/prisma"

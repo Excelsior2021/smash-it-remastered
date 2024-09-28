@@ -12,7 +12,7 @@ import { useForm } from "react-hook-form"
 import { useRouter } from "next/router"
 
 //lib
-import { handleResetPassword } from "./route-lib"
+import { handleResetPassword } from "./_route-lib"
 import { authRedirect } from "@/lib/auth"
 import { clientRoute } from "@/enums"
 import { changePasswordFormFields } from "@/lib/form-fields"

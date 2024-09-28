@@ -13,7 +13,7 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 
 //lib
-import { handleLogin } from "./route-lib"
+import { handleLogin } from "./_route-lib"
 import { login } from "@/lib/api"
 import { authRedirect } from "@/lib/auth"
 import { loginFormFields } from "@/lib/form-fields"

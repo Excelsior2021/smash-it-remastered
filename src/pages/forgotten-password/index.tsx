@@ -11,7 +11,7 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 
 //lib
-import { forgottenPasswordEffect, handleForgottenPassword } from "./route-lib"
+import { forgottenPasswordEffect, handleForgottenPassword } from "./_route-lib"
 import { authRedirect } from "@/lib/auth"
 import { clientRoute } from "@/enums"
 import pattern from "@/lib/field-validation"

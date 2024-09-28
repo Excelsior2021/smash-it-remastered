@@ -9,7 +9,7 @@ import { useEffect } from "react"
 import { useRouter } from "next/router"
 
 //lib
-import { matchHistoryEffect } from "../route-lib"
+import { matchHistoryEffect } from "../_route-lib"
 import { protectedRoute } from "@/lib/auth"
 import { clientRoute } from "@/enums"
 import prisma from "@/lib/prisma"

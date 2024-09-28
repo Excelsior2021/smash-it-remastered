@@ -12,7 +12,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 
 //lib
-import { groupEffect, handleLeaveGroup } from "../route-lib"
+import { groupEffect, handleLeaveGroup } from "../_route-lib"
 import { protectedRoute } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { clientRoute } from "@/enums"
