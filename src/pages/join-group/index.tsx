@@ -7,7 +7,7 @@ import { useEffect, useState } from "react"
 import { FieldValues, useForm } from "react-hook-form"
 
 //lib
-import { handleQueryGroups } from "./_route-lib"
+import { handleQueryGroups } from "@/lib/route-libs/join-group"
 import prisma from "@/lib/prisma"
 import { getGroupRequests, queryGroups } from "@/lib/api"
 import { protectedRoute } from "@/lib/auth"

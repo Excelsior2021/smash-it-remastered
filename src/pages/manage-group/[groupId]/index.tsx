@@ -8,7 +8,10 @@ import { useEffect } from "react"
 import { useRouter } from "next/router"
 
 //lib
-import { manageGroupEffect, manageGroupLinks } from "../_route-lib"
+import {
+  manageGroupEffect,
+  manageGroupLinks,
+} from "@/lib/route-libs/manage-group"
 import { adminRoute, notAdmin, protectedRoute } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { clientRoute } from "@/enums"

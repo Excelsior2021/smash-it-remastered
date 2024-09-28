@@ -9,7 +9,7 @@ import { useEffect } from "react"
 import { useRouter } from "next/router"
 
 //lib
-import { groupRequestEffect } from "../_route-lib"
+import { groupRequestEffect } from "@/lib/route-libs/group-requests"
 import prisma from "@/lib/prisma"
 
 import { adminRoute, notAdmin, protectedRoute } from "@/lib/auth"

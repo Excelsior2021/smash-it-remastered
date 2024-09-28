@@ -5,7 +5,7 @@ import LinkButton from "@/components/link-button/link-button"
 import { useEffect } from "react"
 
 //lib
-import { accountPageEffect } from "./_route-lib"
+import { accountPageEffect } from "@/lib/route-libs/account"
 import { protectedRoute } from "@/lib/auth"
 import { clientRoute } from "@/enums"
 

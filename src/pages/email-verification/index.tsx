@@ -8,7 +8,7 @@ import { useState } from "react"
 import { useRouter } from "next/router"
 
 //lib
-import { handleVerifyEmail } from "./_route-lib"
+import { handleVerifyEmail } from "@/lib/route-libs/email-verification"
 import { protectedRoute } from "@/lib/auth"
 import { clientRoute } from "@/enums"
 import { verifyEmail } from "@/lib/api"

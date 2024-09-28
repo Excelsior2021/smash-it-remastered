@@ -18,7 +18,7 @@ import {
   handleChosenOpponentCallback,
   handleSubmitScores,
   recordMatchEffect,
-} from "../_route-lib"
+} from "@/lib/route-libs/record-match"
 import prisma from "@/lib/prisma"
 import { protectedRoute } from "@/lib/auth"
 import { makeRequest, showModal, updateGroupDataForPage } from "@/lib/utils"

@@ -10,7 +10,7 @@ import { useEffect } from "react"
 import { useRouter } from "next/router"
 
 //lib
-import { profileEffect } from "../_route-lib"
+import { profileEffect } from "@/lib/route-libs/profile"
 import { protectedRoute } from "@/lib/auth"
 import { clientRoute } from "@/enums"
 import { generateDisplayName, updateGroupDataForPage } from "@/lib/utils"

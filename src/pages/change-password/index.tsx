@@ -12,7 +12,10 @@ import { useForm } from "react-hook-form"
 import { useRouter } from "next/router"
 
 //lib
-import { changePasswordEffect, handleChangePassword } from "./_route-lib"
+import {
+  changePasswordEffect,
+  handleChangePassword,
+} from "@/lib/route-libs/change-password"
 import prisma from "@/lib/prisma"
 import { changePasswordFormFields } from "@/lib/form-fields"
 import { changePassword, setPassword } from "@/lib/api"

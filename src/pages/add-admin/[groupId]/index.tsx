@@ -9,7 +9,7 @@ import { useEffect } from "react"
 import { useRouter } from "next/router"
 
 //lib
-import { addAdminEffect } from "./_route-lib"
+import { addAdminEffect } from "@/lib/route-libs/add-admin"
 import prisma from "@/lib/prisma"
 import { adminRoute, notAdmin, protectedRoute } from "@/lib/auth"
 import { clientRoute } from "@/enums"

@@ -5,7 +5,7 @@ import LinkButton from "@/components/link-button/link-button"
 import { useEffect } from "react"
 
 //lib
-import { joinOrCreateGroupEffect } from "./_route-lib"
+import { joinOrCreateGroupEffect } from "@/lib/route-libs/join-or-create-group"
 import { protectedRoute } from "@/lib/auth"
 import { clientRoute } from "@/enums"
 

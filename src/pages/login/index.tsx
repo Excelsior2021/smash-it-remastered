@@ -13,7 +13,7 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 
 //lib
-import { handleLogin } from "./_route-lib"
+import { handleLogin } from "@/lib/route-libs/login"
 import { login } from "@/lib/api"
 import { authRedirect } from "@/lib/auth"
 import { loginFormFields } from "@/lib/form-fields"
@@ -75,7 +75,7 @@ const Login = ({ providers }: props) => {
                   register={register}
                   required={field.required}
                   //if server is down disabled = true, else, isSubmitting
-                  disabled={true}
+                  disabled={false}
                 />
                 {errors[field.name] ? (
                   <p className="text-error">
