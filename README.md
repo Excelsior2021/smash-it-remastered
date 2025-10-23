@@ -55,7 +55,7 @@ The previous version of the app was more of a proof of concept. I decided to bui
 
 ## Approach
 
-The current approach for this project was to use Next.js, a React framework for building full-stack web applications. Therefore having the benefit of building a single page application integrated server side rendering. To speed up the development process to achieve a minimum viable product, I decided to use Tailwind CSS for utility css classes and daisyUI a TailwindCSS component library. NextAuth.js was used for user authentication and session management. Zustand was used for state management on the client side. Obscenity was used to prevent the use of profanity in the app. Resend is an email service, used for email verification and password resets.
+The current approach for this project was to use Next.js, a React framework for building full-stack web applications. Therefore having the benefit of building a single page application integrated with the server. To speed up the development process and achieve a minimum viable product, I decided to use Tailwind CSS for utility css classes and daisyUI a TailwindCSS component library. NextAuth.js was used for user authentication and session management. Zustand was used for state management on the client side. Obscenity was used to prevent the use of profanity in the app. Resend is an email service, used for email verification and password resets.
 
 Primsa ORM was used to generate the database schema and interact with the database on the application level. A PostgreSQL database was used. Snaplet seed was used for database seeding during testing.
 
