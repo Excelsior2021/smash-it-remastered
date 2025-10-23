@@ -20,7 +20,7 @@
 
 The idea for Smash It! came about whilst I was enrolled in my web development bootcamp. My coursemates and I would play table tennis every chance we got. The problem was, we struggled to keep track of our performances (wins, loses, matches etc.). We tried using a whiteboard and a spreadsheet but these proved impractical or cumbersome. For my capstone project, I thought it would be a good idea to build an app that would solve this problem.
 
-The previous version of the app was more of a proof of concept. I decided to build a production ready version that real users could use. To potentially solve a problem many other table tennis groups may find and to showcase my ability to build and deploy a full-stack web application.
+The previous version of the app was more of a proof of concept. I decided to build a production ready version that real users could use. To potentially solve a problem many other table tennis groups may find.
 
 <!-- TechStack -->
 
@@ -55,14 +55,14 @@ The previous version of the app was more of a proof of concept. I decided to bui
 
 ## Approach
 
-The current approach for this project was to use Next.js, a React framework for building full-stack web applications, which enabled the use of server side rendering. Therefore having the benefit of an single page application with server side rendering. This app uses the pages router as I wanted to learn this approach. To speed up the development process to achieve a minimum viable product, I decided to use Tailwind CSS and daisyUI for utility css classes and a component library respectively. NextAuth.js was used for user authentication and session management. Zustand was used for global state management client side. Obscenity was used to prevent the use of profanity. Resend is an email service, used for email verification and password resets.
+The current approach for this project was to use Next.js, a React framework for building full-stack web applications. Therefore having the benefit of building a single page application integrated server side rendering. To speed up the development process to achieve a minimum viable product, I decided to use Tailwind CSS for utility css classes and daisyUI a TailwindCSS component library. NextAuth.js was used for user authentication and session management. Zustand was used for state management on the client side. Obscenity was used to prevent the use of profanity in the app. Resend is an email service, used for email verification and password resets.
 
-Primsa ORM was used to generate the database schema and interact with the database on an application level. A PostgreSQL database was used. Snaplet seed was used for database seeding.
+Primsa ORM was used to generate the database schema and interact with the database on the application level. A PostgreSQL database was used. Snaplet seed was used for database seeding during testing.
 
 ## Deployment
 
-Smash It! is deployed on [Vercel](https://vercel.com). The database is deployed on [Render](https://render.com).
+Smash It! was deployed on [Vercel](https://vercel.com). The database was deployed on [Render](https://render.com).
 
 ## Enhancements
 
-This app is currently an MVP. A lot more features can be added if the there is interest. Feedback and feature requests welcome.
+This app is currently an MVP. A lot more features can be added. Feedback and feature requests welcome.
